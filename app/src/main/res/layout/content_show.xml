@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:background="@color/grey100"
+
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+
+    tools:context="com.moobasoft.damego.ui.activities.ShowActivity"
+    tools:showIn="@layout/activity_show">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:padding="@dimen/activity_horizontal_margin"
+            android:background="@color/white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="30dp"
+                android:textColor="@color/grey900"
+                android:textSize="26sp" />
+
+            <TextView
+                android:id="@+id/body"
+                android:lineSpacingMultiplier="1.35"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/grey800"
+                android:textSize="17sp" />
+
+            <include layout="@layout/element_tag_container"
+                android:layout_marginTop="0dp"
+                android:layout_marginBottom="26dp"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0.8dp"
+            android:background="@color/grey300"/>
+
+        <LinearLayout
+            android:padding="@dimen/activity_horizontal_margin"
+            android:background="@color/grey100"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
+
+            <RelativeLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp">
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/fab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:scaleType="center"
+                    app:elevation="3dp"
+                    app:fabSize="mini"
+                    android:layout_margin="5dp"
+                    android:clickable="true"
+                    android:src="@drawable/ic_create_white_18dp" />
+
+                <TextView
+                    fontPath="fonts/Roboto-Medium.ttf"
+                    android:id="@+id/comment_title"
+                    android:layout_centerVertical="true"
+                    android:text="12コメント"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/grey700"
+                    android:textSize="18sp" />
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/comments_preview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="10dp"
+                android:orientation="vertical">
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/view_comments_btn"
+                android:gravity="center|right"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:paddingTop="15dp"
+                android:paddingBottom="20dp">
+
+                <TextView
+                    fontPath="fonts/Roboto-Medium.ttf"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/comments_view"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="17sp" />
+
+                <ImageView
+                    android:layout_marginLeft="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:tint="@color/colorPrimary"
+                    android:src="@drawable/ic_arrow_forward_teal_500_24dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>

@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Damego</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="action_save_comment">Save</string>
+    <string name="action_destroy_comment">Destroy</string>
+
+    <string name="comments_title">%1$sコメント</string>
+    <string name="comments_view">すべてのコメントを見る</string>
+
+    <!--　Create comment　-->
+    <string name="title_activity_create_comment"></string>
+    <string name="comment_hint">コメントを書き込む</string>
+    <string name="comment_error_too_short">コメントは短すぎるぞ</string>
+    <string name="destroy_comment_dialog">データをなくして戻りますか？</string>
+
+    <string name="title_activity_show"></string>
+    <string name="title_activity_comments"></string>
+    <string name="loading_list">ロード中…</string>
+    <string name="empty_list">コメントはまだありません。</string>
+    <string name="error_list">エラーが発生しました。</string>
+    <string name="comment_submitting">コメントを送信中</string>
+    <string name="comment_success">コメントを作成しました。</string>
+
+</resources>

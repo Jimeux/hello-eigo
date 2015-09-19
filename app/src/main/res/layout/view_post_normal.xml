@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.moobasoft.damego.ui.views.PostSummaryView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:padding="2dp">
+
+    <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        card_view:cardBackgroundColor="@color/white"
+        card_view:cardCornerRadius="0dp"
+        card_view:cardElevation="1dp"
+        card_view:cardUseCompatPadding="true">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="start|center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/title"
+                    fontPath="fonts/Roboto-Medium.ttf"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Why Your English Sucks"
+                    android:textColor="@color/grey900"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+
+                <TextView
+                    android:id="@+id/body"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Should I blow this shit up?"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:textColor="@color/grey700"
+                    android:textSize="15sp" />
+
+                <include layout="@layout/element_tag_container" />
+                <include layout="@layout/element_comment_count" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginLeft="10dp" />
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+</com.moobasoft.damego.ui.views.PostSummaryView>

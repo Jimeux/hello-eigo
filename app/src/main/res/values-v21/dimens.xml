@@ -1,0 +1,4 @@
+<resources>
+    <!-- Rely on native elevation -->
+    <dimen name="shadow_height">0dp</dimen>
+</resources>

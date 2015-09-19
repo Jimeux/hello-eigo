@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/comment_strip"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="15dp"
+    android:layout_gravity="bottom"
+    android:orientation="horizontal"
+    tools:showIn="@layout/view_post_normal">
+
+    <ImageView
+        android:layout_marginTop="2dp"
+        android:layout_marginRight="2dp"
+        android:layout_width="wrap_content"
+        android:layout_height="16dp"
+        android:src="@drawable/ic_mode_comment_white_18dp"
+        android:tint="@color/grey400" />
+
+    <TextView
+        android:id="@+id/comments_count"
+        android:text=" 10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/grey600"
+        android:textSize="16sp" />
+
+</LinearLayout>
