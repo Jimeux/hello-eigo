@@ -2,6 +2,7 @@ package com.moobasoft.damego.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -32,6 +33,7 @@ public class CommentsActivity extends BaseActivity implements ShowPresenter.Show
     @Inject ShowPresenter presenter;
 
     @Bind(R.id.toolbar)       Toolbar toolbar;
+    @Bind(R.id.fab)           FloatingActionButton fab;
     @Bind(R.id.comment_list)  RecyclerView commentList;
     @Bind(R.id.swipe_refresh) SwipeRefreshLayout swipeRefreshLayout;
     @Bind({R.id.loading_view, R.id.error_view, R.id.empty_view, R.id.swipe_refresh})
@@ -103,6 +105,7 @@ public class CommentsActivity extends BaseActivity implements ShowPresenter.Show
     public void onPostRetrieved(Post post) {
         this.post = post;
         setTitle(post.getTitle());
+        fab.setVisibility(View.VISIBLE);
         swipeRefreshLayout.setRefreshing(false);
 
         if (post.getComments().isEmpty()) {

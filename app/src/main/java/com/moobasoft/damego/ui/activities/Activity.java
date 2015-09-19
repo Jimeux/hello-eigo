@@ -10,7 +10,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.moobasoft.damego.App;
@@ -32,7 +31,7 @@ import butterknife.OnClick;
 
 import static android.view.View.VISIBLE;
 
-public class IndexActivity extends BaseActivity implements IndexPresenter.IndexView, PostsAdapter.OnSummaryClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class Activity extends BaseActivity implements IndexPresenter.View, PostsAdapter.OnSummaryClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     @Inject IndexPresenter presenter;
 
@@ -78,7 +77,7 @@ public class IndexActivity extends BaseActivity implements IndexPresenter.IndexV
 
     // TODO: Move these two methods to new super class
     private void activateView(int id) {
-        for (ViewGroup vg : listStateViews) vg.setVisibility(View.GONE);
+        for (ViewGroup vg : listStateViews) vg.setVisibility(android.view.View.GONE);
         findViewById(id).setVisibility(VISIBLE);
     }
 
@@ -156,7 +155,7 @@ public class IndexActivity extends BaseActivity implements IndexPresenter.IndexV
 
     @Override
     public void onSummaryClicked(Post post) {
-        Intent i = new Intent(IndexActivity.this, ShowActivity.class);
+        Intent i = new Intent(Activity.this, ShowActivity.class);
         i.putExtra(ShowActivity.POST_ID, post.getId());
         startActivity(i);
     }

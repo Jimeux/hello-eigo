@@ -13,7 +13,7 @@ public class RxPresenter<V> extends BasePresenter<V> {
     @Override
     public void releaseView() {
         super.releaseView();
-        subscriptions.close();
+        subscriptions.clear();
     }
 
 }

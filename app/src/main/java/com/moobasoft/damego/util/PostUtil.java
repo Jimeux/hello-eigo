@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
-import com.moobasoft.damego.ui.activities.IndexActivity;
+import com.moobasoft.damego.ui.activities.Activity;
 
 public class PostUtil {
 
@@ -23,8 +23,8 @@ public class PostUtil {
             tagView.setText(tag);
             tagView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
             tagView.setOnClickListener(v -> {
-                Intent i = new Intent(inflater.getContext(), IndexActivity.class);
-                i.putExtra(IndexActivity.TAG_NAME, tag);
+                Intent i = new Intent(inflater.getContext(), Activity.class);
+                i.putExtra(Activity.TAG_NAME, tag);
                 inflater.getContext().startActivity(i);
             });
             tags.addView(tagView);

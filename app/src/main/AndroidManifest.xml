@@ -13,7 +13,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".ui.activities.IndexActivity"
+            android:name=".ui.activities.Activity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
@@ -25,11 +25,11 @@
         <activity
             android:name=".ui.activities.ShowActivity"
             android:label="@string/title_activity_show"
-            android:parentActivityName=".ui.activities.IndexActivity"
+            android:parentActivityName=".ui.activities.Activity"
             android:theme="@style/AppTheme.TransStatusBar" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activities.IndexActivity" />
+                android:value=".ui.activities.Activity" />
         </activity>
         <activity
             android:name=".ui.activities.CommentsActivity"

@@ -2,12 +2,10 @@ package com.moobasoft.damego.ui.presenters;
 
 import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.rest.services.PostService;
-import com.moobasoft.damego.ui.presenters.base.BasePresenter;
+import com.moobasoft.damego.ui.RxSubscriber;
+import com.moobasoft.damego.ui.presenters.base.RxPresenter;
 
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-
-public class ShowPresenter extends BasePresenter<ShowPresenter.ShowView> {
+public class ShowPresenter extends RxPresenter<ShowPresenter.ShowView> {
 
     public interface ShowView {
         void onPostRetrieved(Post post);
@@ -16,16 +14,15 @@ public class ShowPresenter extends BasePresenter<ShowPresenter.ShowView> {
 
     private PostService postService;
 
-    public ShowPresenter(PostService postService) {
+    public ShowPresenter(PostService postService, RxSubscriber rxSubscriber) {
+        super(rxSubscriber);
         this.postService = postService;
     }
 
     public void getPost(int id) {
-        postService.show(id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(view::onPostRetrieved,
-                        throwable -> view.onPostError());
+        subscriptions.add(postService.show(id),
+                          view::onPostRetrieved,
+                          throwable -> view.onPostError());
     }
 
 }

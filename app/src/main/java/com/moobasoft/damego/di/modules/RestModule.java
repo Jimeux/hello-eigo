@@ -6,7 +6,10 @@ import com.facebook.stetho.okhttp.StethoInterceptor;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.moobasoft.damego.CredentialStore;
 import com.moobasoft.damego.di.scopes.Endpoint;
+import com.moobasoft.damego.rest.ApiAuthenticator;
+import com.moobasoft.damego.rest.ApiHeaders;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.OkHttpClient;
 
@@ -30,13 +33,14 @@ public class RestModule {
 
     @Provides
     @Singleton
-    Retrofit provideRetrofit(@Endpoint String baseUrl, Gson gson, Context context) {
+    Retrofit provideRetrofit(@Endpoint String baseUrl, Gson gson, Context context,
+                             CredentialStore credentialStore) {
         final Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
-        configureHttpClient(retrofit.client(), context);
+        configureHttpClient(retrofit.client(), context, credentialStore);
         return retrofit;
     }
 
@@ -48,9 +52,10 @@ public class RestModule {
         return gson.create();
     }
 
-    private static void configureHttpClient(OkHttpClient client, Context context) {
-        //client.interceptors().add(new ApiHeaders(context, credentialStore));
-        //client.setAuthenticator(new ApiAuthenticator(context, credentialStore));
+    private static void configureHttpClient(OkHttpClient client, Context context,
+                                            CredentialStore credentialStore) {
+        client.interceptors().add(new ApiHeaders(context, credentialStore));
+        client.setAuthenticator(new ApiAuthenticator(context, credentialStore));
 
         // TODO: Debug build only
         client.networkInterceptors().add(new StethoInterceptor());

@@ -45,7 +45,7 @@ public class RxSubscriber {
                 .subscribe());
     }*/
 
-    public void close() {
+    public void clear() {
         subscriptions.unsubscribe();
     }
 

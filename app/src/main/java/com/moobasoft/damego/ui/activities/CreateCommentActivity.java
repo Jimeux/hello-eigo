@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.moobasoft.damego.App;
 import com.moobasoft.damego.R;
@@ -28,6 +29,8 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+
+import static android.support.design.widget.Snackbar.LENGTH_INDEFINITE;
 
 public class CreateCommentActivity extends AppCompatActivity implements CommentPresenter.View {
 
@@ -130,6 +133,17 @@ public class CreateCommentActivity extends AppCompatActivity implements CommentP
     public void onCommentError(String message) {
         progress.dismiss();
         Snackbar.make(toolbar, message, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onUnauthorized() {
+        progress.dismiss();
+        Snackbar.make(toolbar, getString(R.string.unauthorized), LENGTH_INDEFINITE)
+                .setActionTextColor(getResources().getColor(R.color.red100))
+                .setAction("取り消す", v1 -> finish())
+                .setAction("ログイン", v ->
+                    Toast.makeText(this, "Nice job!", Toast.LENGTH_SHORT).show())
+                .show();
     }
 
     public static class ConfirmCancelDialog extends DialogFragment {

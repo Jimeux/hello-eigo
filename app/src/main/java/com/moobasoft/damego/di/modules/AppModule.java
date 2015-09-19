@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.moobasoft.damego.App;
+import com.moobasoft.damego.CredentialStore;
 
 import javax.inject.Singleton;
 
@@ -32,6 +33,12 @@ public class AppModule {
     @Singleton
     SharedPreferences provideSharedPreferences(Context context) {
         return context.getSharedPreferences(PREFS, MODE_PRIVATE);
+    }
+
+    @Provides
+    @Singleton
+    CredentialStore credentialStore(SharedPreferences preferences) {
+        return new CredentialStore(preferences);
     }
 
 }
