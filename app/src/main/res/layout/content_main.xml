@@ -23,7 +23,10 @@
                 android:id="@+id/post_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="6dp"
+                android:paddingTop="@dimen/main_list_margin_vert"
+                android:paddingBottom="@dimen/main_list_margin_vert"
+                android:paddingLeft="@dimen/main_list_margin_horiz"
+                android:paddingRight="@dimen/main_list_margin_horiz"
                 android:clipToPadding="false"
                 android:scrollbars="none" />
 

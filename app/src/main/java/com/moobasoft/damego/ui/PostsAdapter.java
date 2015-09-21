@@ -18,10 +18,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.SummaryViewH
 
     private OnSummaryClickListener summaryClickListener;
     private List<Post> postList;
+    private final int columns;
 
-    public PostsAdapter(OnSummaryClickListener summaryClickListener, List<Post> posts) {
+    public PostsAdapter(OnSummaryClickListener summaryClickListener, List<Post> posts, int columns) {
         this.summaryClickListener = summaryClickListener;
         this.postList = posts;
+        this.columns = columns;
     }
 
     public void loadPosts(List<Post> posts) {
@@ -47,7 +49,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.SummaryViewH
 
     @Override
     public int getItemViewType(int position) {
-        return (position % 6 == 0) ? TYPE_FEATURED : TYPE_NORMAL;
+        return (position % 6 == 0 || (columns == 2 && (position-1) % 6 == 0)) ? TYPE_FEATURED : TYPE_NORMAL;
     }
 
     @Override

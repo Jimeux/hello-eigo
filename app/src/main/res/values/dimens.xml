@@ -10,5 +10,9 @@
     <dimen name="tag_text_index">15dp</dimen>
     <dimen name="tag_text_show">17dp</dimen>
 
+    <dimen name="main_card_margin">2dp</dimen>
+    <dimen name="main_list_margin_vert">6dp</dimen>
+    <dimen name="main_list_margin_horiz">6dp</dimen>
+
 
 </resources>

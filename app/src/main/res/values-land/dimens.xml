@@ -1,0 +1,5 @@
+<resources>
+
+    <dimen name="main_list_margin_horiz">30dp</dimen>
+
+</resources>

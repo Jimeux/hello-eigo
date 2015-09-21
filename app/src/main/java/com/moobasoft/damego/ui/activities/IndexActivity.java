@@ -1,11 +1,13 @@
 package com.moobasoft.damego.ui.activities;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -145,9 +147,11 @@ public class IndexActivity extends BaseActivity implements IndexPresenter.View, 
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setColorSchemeResources(R.color.colorPrimary,
                 R.color.colorAccent);
-        postsAdapter = new PostsAdapter(this, posts);
-        
-        layoutManager = new LinearLayoutManager(this);
+
+        int orientation = getResources().getConfiguration().orientation;
+        int columns = orientation == Configuration.ORIENTATION_PORTRAIT ? 1 : 2;
+        postsAdapter = new PostsAdapter(this, posts, columns);
+        layoutManager = new GridLayoutManager(this, columns);
 
         postList.setLayoutManager(layoutManager);
         postList.setAdapter(postsAdapter);
