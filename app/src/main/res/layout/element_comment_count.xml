@@ -4,7 +4,6 @@
     android:id="@+id/comment_strip"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginTop="15dp"
     android:layout_gravity="bottom"
     android:orientation="horizontal"
     tools:showIn="@layout/view_post_normal">

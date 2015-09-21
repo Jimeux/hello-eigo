@@ -2,6 +2,7 @@ package com.moobasoft.damego.di.components;
 
 import android.content.Context;
 
+import com.moobasoft.damego.CredentialStore;
 import com.moobasoft.damego.di.modules.AppModule;
 import com.moobasoft.damego.di.modules.EndpointModule;
 import com.moobasoft.damego.di.modules.RestModule;
@@ -26,7 +27,7 @@ public interface AppComponent {
 
     Retrofit retrofit();
 
-    //CredentialStore credentialStore();
+    CredentialStore credentialStore();
 
     @Endpoint String endpoint();
 

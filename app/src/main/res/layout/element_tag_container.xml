@@ -4,6 +4,6 @@
     android:id="@+id/tags"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginTop="15dp"
+    android:layout_alignParentRight="true"
     android:orientation="horizontal"
     tools:showIn="@layout/view_post_featured" />

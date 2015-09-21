@@ -22,5 +22,15 @@
     <string name="comment_submitting">コメントを送信中</string>
     <string name="comment_success">コメントを作成しました。</string>
     <string name="unauthorized">ログインしてください</string>
+    <string name="login_success">ログインしました</string>
+    <string name="login_error">ログインできませんでした</string>
+    <string name="register_success">アカウントを登録しました</string>
+    <string name="register">登録する</string>
+    <string name="login">ログイン</string>
+    <string name="username">ユーザー名</string>
+    <string name="email">Eメール</string>
+    <string name="password">パスワード</string>
+    <string name="logout_success">ログアウトしました</string>
+    <string name="logout">ログアウト</string>
 
 </resources>

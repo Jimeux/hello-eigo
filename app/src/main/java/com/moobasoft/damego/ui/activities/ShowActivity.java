@@ -3,7 +3,6 @@ package com.moobasoft.damego.ui.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +35,6 @@ public class ShowActivity extends BaseActivity implements ShowPresenter.ShowView
 
     @Inject ShowPresenter presenter;
 
-    @Bind(R.id.toolbar)           Toolbar toolbar;
     @Bind(R.id.title)             TextView title;
     @Bind(R.id.body)              TextView body;
     @Bind(R.id.tags)              ViewGroup tags;
@@ -89,7 +87,6 @@ public class ShowActivity extends BaseActivity implements ShowPresenter.ShowView
         title.setText(post.getTitle());
         commentTitle.setText(getString(
                 R.string.comments_title, post.getCommentsCount()));
-        getSupportActionBar().setTitle(post.getTitle());
         Glide.with(this)
                 .load(post.getImageUrl())
                 .into(backdrop);
@@ -128,12 +125,9 @@ public class ShowActivity extends BaseActivity implements ShowPresenter.ShowView
 
     @OnClick(R.id.fab)
     public void clickFab() {
-        Intent i = new Intent(ShowActivity.this, CreateCommentActivity.class);
-        i.putExtra(ShowActivity.POST_ID, postId);
-        startActivity(i);
+        Intent intent = new Intent(ShowActivity.this, CreateCommentActivity.class);
+        intent.putExtra(ShowActivity.POST_ID, postId);
+        doIfLoggedIn(intent);
     }
-
-    @OnClick(R.id.back_btn)
-    public void customBackBtnClicked() { onBackPressed(); }
 
 }

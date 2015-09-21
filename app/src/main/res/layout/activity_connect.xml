@@ -1,0 +1,117 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:gravity="center"
+    android:minWidth="350dp"
+    android:orientation="vertical"
+    tools:context="com.moobasoft.damego.ui.activities.ConnectActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:paddingTop="15dp"
+            android:paddingRight="20dp"
+            android:layout_alignParentRight="true"
+            android:id="@+id/btn_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:src="@drawable/ic_close_white_24dp"
+            android:tint="@color/grey500" />
+
+        <LinearLayout
+            android:padding="25dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/username_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/username"
+                android:textColor="@color/grey700"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/username_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/text_area"
+                android:gravity="top"
+                android:inputType="text"
+                android:padding="10dp"
+                android:textColor="@color/grey700"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/email_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:text="@string/email"
+                android:textColor="@color/grey700"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/email_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/text_area"
+                android:gravity="top"
+                android:inputType="textEmailAddress"
+                android:padding="10dp"
+                android:textColor="@color/grey700"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/password_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:text="@string/password"
+                android:textColor="@color/grey700"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/password_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="25dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/text_area"
+                android:gravity="top"
+                android:inputType="textPassword"
+                android:padding="10dp"
+                android:textColor="@color/grey700"
+                android:textSize="18sp" />
+
+            <Button
+                android:id="@+id/btn_primary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_primary"
+                android:text="@string/register"
+                android:textColor="@color/white" />
+
+            <include layout="@layout/btn_processing" />
+
+            <Button
+                android:id="@+id/btn_secondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/btn_secondary"
+                android:text="@string/login"
+                android:textColor="@color/grey800" />
+        </LinearLayout>
+
+
+    </RelativeLayout>
+</LinearLayout>

@@ -54,8 +54,13 @@
                     android:textColor="@color/grey700"
                     android:textSize="15sp" />
 
-                <include layout="@layout/element_tag_container" />
-                <include layout="@layout/element_comment_count" />
+                <RelativeLayout
+                    android:layout_marginTop="15dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <include layout="@layout/element_comment_count" />
+                    <include layout="@layout/element_tag_container" />
+                </RelativeLayout>
 
             </LinearLayout>
         </LinearLayout>

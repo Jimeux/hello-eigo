@@ -1,20 +1,16 @@
 package com.moobasoft.damego.ui.activities;
 
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.moobasoft.damego.App;
@@ -32,15 +28,14 @@ import butterknife.ButterKnife;
 
 import static android.support.design.widget.Snackbar.LENGTH_INDEFINITE;
 
-public class CreateCommentActivity extends AppCompatActivity implements CommentPresenter.View {
+public class CreateCommentActivity extends BaseActivity implements CommentPresenter.View {
 
     @Inject CommentPresenter presenter;
 
-    @Bind(R.id.toolbar)  Toolbar toolbar;
-    @Bind(R.id.input)    EditText input;
+    @Bind(R.id.input) EditText input;
 
     private int postId;
-    private ProgressDialog progress;
+    private LoadingDialog progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +94,7 @@ public class CreateCommentActivity extends AppCompatActivity implements CommentP
                     return false;
                 }
 
-                input.clearFocus();
+                //input.clearFocus();
                 final String inputText = input.getText().toString();
                 presenter.createComment(postId, inputText);
                 showProgressDialog();
@@ -113,13 +108,10 @@ public class CreateCommentActivity extends AppCompatActivity implements CommentP
     }
 
     private void showProgressDialog() {
-        if (progress == null) {
-            progress = ProgressDialog.show(this, null, null);
-            progress.setContentView(R.layout.element_loading_vie);
-            TextView message = (TextView) progress.findViewById(R.id.message);
-            message.setText(getString(R.string.comment_submitting));
-        }
-        progress.show();
+        if (progress == null)
+            progress = new LoadingDialog();
+        input.setEnabled(false);
+        progress.show(getSupportFragmentManager(), "loading");
     }
 
     @Override
@@ -132,17 +124,19 @@ public class CreateCommentActivity extends AppCompatActivity implements CommentP
     @Override
     public void onCommentError(String message) {
         progress.dismiss();
+        input.setEnabled(true);
         Snackbar.make(toolbar, message, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
     public void onUnauthorized() {
         progress.dismiss();
+        input.setEnabled(true);
         Snackbar.make(toolbar, getString(R.string.unauthorized), LENGTH_INDEFINITE)
                 .setActionTextColor(getResources().getColor(R.color.red100))
                 .setAction("取り消す", v1 -> finish())
                 .setAction("ログイン", v ->
-                    Toast.makeText(this, "Nice job!", Toast.LENGTH_SHORT).show())
+                        Toast.makeText(this, "Nice job!", Toast.LENGTH_SHORT).show())
                 .show();
     }
 
@@ -162,15 +156,26 @@ public class CreateCommentActivity extends AppCompatActivity implements CommentP
         }
     }
 
-    public static class ConfirmSubmitDialog extends DialogFragment {
+    public static class LoadingDialog extends DialogFragment {
         @Override
         @NonNull
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             return new AlertDialog.Builder(getActivity())
+                    .setTitle(getString(R.string.comment_submitting))
+                    .setView(R.layout.loading_view)
+                    .create();
+        }
+    }
+
+    public static class ConfirmSubmitDialog extends DialogFragment {
+        @Override
+        @NonNull
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            return new AlertDialog.Builder(getActivity()) //TODO: finish() when touched outside
                     .setTitle(getString(R.string.comment_success))
                     .setPositiveButton("OK", (dialog, id) -> {
                         getActivity().finish();
-                        ConfirmSubmitDialog.this.getDialog().cancel();
+                        ConfirmSubmitDialog.this.getDialog().dismiss();
                     })
                     .create();
         }

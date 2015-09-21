@@ -5,18 +5,17 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 /**
- * Taken from this gist: https://gist.github.com/ssinss/e06f12ef66c51252563e
+ * Adapted from this gist: https://gist.github.com/ssinss/e06f12ef66c51252563e
  */
 public abstract class EndlessOnScrollListener extends RecyclerView.OnScrollListener {
 
     // The minimum amount of items to have below your current scroll position before loading more.
     private static final int VISIBLE_THRESHOLD = 0;
-    // The total number of items in the dataset after the last load
-    private int previousTotal = 0;
     // True if we are still waiting for the last set of data to load.
     private boolean loading = true;
-
-    private int firstVisibleItem, visibleItemCount, totalItemCount;
+    // The total number of items in the dataset after the last load
+    private int previousTotal = 0;
+    // The current page
     private int currentPage = 1;
 
     private final LinearLayoutManager layoutManager;
@@ -37,9 +36,9 @@ public abstract class EndlessOnScrollListener extends RecyclerView.OnScrollListe
         refreshLayout.setEnabled(
                 layoutManager.findFirstCompletelyVisibleItemPosition() == 0);
 
-        visibleItemCount = recyclerView.getChildCount();
-        totalItemCount = layoutManager.getItemCount();
-        firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
+        int visibleItemCount = recyclerView.getChildCount();
+        int totalItemCount   = layoutManager.getItemCount();
+        int firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
 
         if (loading && totalItemCount > previousTotal) {
             loading = false;
@@ -61,7 +60,13 @@ public abstract class EndlessOnScrollListener extends RecyclerView.OnScrollListe
         currentPage = 1;
     }
 
-    public int getCurrentPage() { return currentPage; }
+    public void restorePage(int currentPage, int previousTotal) {
+        this.currentPage   = currentPage;
+        this.previousTotal = previousTotal;
+    }
+
+    public int getCurrentPage()   { return currentPage; }
+    public int getPreviousTotal() { return previousTotal; }
 
     public abstract void onLoadMore(int current_page);
 }

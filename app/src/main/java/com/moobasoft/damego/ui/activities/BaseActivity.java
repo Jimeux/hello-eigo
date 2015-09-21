@@ -1,11 +1,27 @@
 package com.moobasoft.damego.ui.activities;
 
 import android.content.Context;
+import android.content.Intent;
+import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 
+import com.moobasoft.damego.CredentialStore;
+import com.moobasoft.damego.R;
+
+import javax.inject.Inject;
+
+import butterknife.Bind;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
+import static android.support.design.widget.Snackbar.LENGTH_INDEFINITE;
+
 public class BaseActivity extends AppCompatActivity {
+
+    @Inject CredentialStore credentialStore;
+
+    @Nullable @Bind(R.id.toolbar) Toolbar toolbar;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -16,5 +32,29 @@ public class BaseActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    protected boolean isLoggedIn() {
+        return credentialStore.isLoggedIn();
+    }
+
+    protected void doIfLoggedIn(Intent intent) {
+        if (isLoggedIn()) {
+            startActivity(intent);
+        } else {
+            showLoginSnackbar();
+        }
+    }
+
+    protected void showLoginSnackbar() {
+        Snackbar.make(toolbar, getString(R.string.unauthorized), LENGTH_INDEFINITE)
+                .setActionTextColor(getResources().getColor(R.color.green400))
+                .setAction(getString(R.string.login), v -> {
+                    Intent intent = new Intent(getApplicationContext(), ConnectActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra(ConnectActivity.REGISTER, false);
+                    startActivity(intent);
+                })
+                .show();
     }
 }

@@ -7,8 +7,8 @@
 
     <dimen name="shadow_height">2dp</dimen>
 
-    <dimen name="tag_text_index">12dp</dimen>
-    <dimen name="tag_text_show">14dp</dimen>
+    <dimen name="tag_text_index">15dp</dimen>
+    <dimen name="tag_text_show">17dp</dimen>
 
 
 </resources>

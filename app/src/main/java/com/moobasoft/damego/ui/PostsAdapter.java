@@ -8,7 +8,6 @@ import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.views.PostSummaryView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.SummaryViewHolder> {
@@ -20,9 +19,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.SummaryViewH
     private OnSummaryClickListener summaryClickListener;
     private List<Post> postList;
 
-    public PostsAdapter(OnSummaryClickListener summaryClickListener) {
+    public PostsAdapter(OnSummaryClickListener summaryClickListener, List<Post> posts) {
         this.summaryClickListener = summaryClickListener;
-        this.postList = new ArrayList<>();
+        this.postList = posts;
     }
 
     public void loadPosts(List<Post> posts) {

@@ -1,16 +1,19 @@
 package com.moobasoft.damego.rest.models;
 
+import org.parceler.Parcel;
+
 import java.util.Date;
 
+@Parcel
 public class User {
 
-    private int id;
-    private String username;
-    private String email;
-    private String password;
-    private String avatar;
-    private Date createdAt;
-    private String avatarUrl;
+    int id;
+    String username;
+    String email;
+    String password;
+    String avatar;
+    Date createdAt;
+    String avatarUrl;
 
     public int getId() {
         return id;

@@ -1,18 +1,21 @@
 package com.moobasoft.damego.rest.models;
 
+import org.parceler.Parcel;
+
 import java.util.Date;
 import java.util.List;
 
+@Parcel
 public class Post {
 
-    private int id;
-    private String title;
-    private String body;
-    private List<Comment> comments;
-    private List<String> tags;
-    private Date createdAt;
-    private String imageUrl;
-    private int commentsCount;
+    int id;
+    String title;
+    String body;
+    List<Comment> comments;
+    List<String> tags;
+    Date createdAt;
+    String imageUrl;
+    int commentsCount;
 
     public int getId() {
         return id;

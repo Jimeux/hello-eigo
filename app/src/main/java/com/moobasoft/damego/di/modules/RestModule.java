@@ -2,7 +2,6 @@ package com.moobasoft.damego.di.modules;
 
 import android.content.Context;
 
-import com.facebook.stetho.okhttp.StethoInterceptor;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -58,7 +57,7 @@ public class RestModule {
         client.setAuthenticator(new ApiAuthenticator(context, credentialStore));
 
         // TODO: Debug build only
-        client.networkInterceptors().add(new StethoInterceptor());
+        //client.networkInterceptors().add(new StethoInterceptor());
 
         client.setConnectTimeout(7, SECONDS);
         client.setReadTimeout(7, SECONDS);

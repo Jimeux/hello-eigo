@@ -45,16 +45,7 @@
 
     <LinearLayout style="@style/ListStatusView"
         android:id="@+id/loading_view">
-        <TextView
-            android:textSize="20sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/loading_list" />
-        <ProgressBar
-            android:id="@+id/progress"
-            style="?android:attr/progressBarStyleInverse"
-            android:layout_marginTop="28dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <include android:id="@+id/progress"
+            layout="@layout/loading_view" />
     </LinearLayout>
 </LinearLayout>

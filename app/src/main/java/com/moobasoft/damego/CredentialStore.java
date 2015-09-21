@@ -1,6 +1,7 @@
 package com.moobasoft.damego;
 
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 
 import com.moobasoft.damego.rest.models.AccessToken;
 import com.moobasoft.damego.rest.models.User;
@@ -20,6 +21,10 @@ public class CredentialStore {
 
     public CredentialStore(SharedPreferences prefs) {
         this.prefs = prefs;
+    }
+
+    public boolean isLoggedIn() {
+        return !TextUtils.isEmpty(getAccessToken());
     }
 
     public AccessToken loadAccessToken() {

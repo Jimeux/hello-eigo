@@ -1,7 +1,6 @@
 package com.moobasoft.damego;
 
 import com.facebook.stetho.Stetho;
-import com.squareup.leakcanary.LeakCanary;
 
 public class DebugApp extends App {
 
@@ -14,6 +13,6 @@ public class DebugApp extends App {
                 .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(this))
                 .build());
 
-        LeakCanary.install(this);
+        //LeakCanary.install(this);
     }
 }

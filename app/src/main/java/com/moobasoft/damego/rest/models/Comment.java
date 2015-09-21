@@ -1,14 +1,17 @@
 package com.moobasoft.damego.rest.models;
 
+import org.parceler.Parcel;
+
 import java.util.Date;
 
+@Parcel
 public class Comment {
 
-    private int id;
-    private User user;
-    private String body;
-    private int upVotes;
-    private Date createdAt;
+    int id;
+    User user;
+    String body;
+    int upVotes;
+    Date createdAt;
 
     public int getId() {
         return id;
