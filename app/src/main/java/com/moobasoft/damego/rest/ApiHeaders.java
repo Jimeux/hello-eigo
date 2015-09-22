@@ -24,22 +24,20 @@ public final class ApiHeaders implements Interceptor {
     }
 
     @Override
-    public Response intercept(Chain chain) {
-        try {
-            Request.Builder builder = chain.request().newBuilder();
-            addAuthHeader(builder);
-            addCacheHeader(builder);
-            Request request = builder
-                    .header("Accept", "application/javascript, application/json")
-                    .build();
-            return chain.proceed(request);
-        } catch (IOException e) {
-            return null;
-        }
+    public Response intercept(Chain chain) throws IOException {
+        Request originalRequest = chain.request();
+        Request.Builder builder = originalRequest.newBuilder();
+        addAuthHeader(builder);
+        addCacheHeader(builder, originalRequest.method());
+        Request request = builder
+                .header("Accept", "application/javascript, application/json")
+                .build();
+
+        return chain.proceed(request);
     }
 
-    private void addCacheHeader(Request.Builder builder) {
-        if (!isOnline())
+    private void addCacheHeader(Request.Builder builder, String method) {
+        if (!isOnline() && method.equals("GET"))
             builder.header("Cache-Control", "public, only-if-cached, max-stale=" + MAX_STALE);
     }
 

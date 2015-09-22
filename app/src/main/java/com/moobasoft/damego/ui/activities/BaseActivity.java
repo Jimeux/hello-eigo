@@ -42,11 +42,11 @@ public class BaseActivity extends AppCompatActivity {
         if (isLoggedIn()) {
             startActivity(intent);
         } else {
-            showLoginSnackbar();
+            promptForLogin();
         }
     }
 
-    protected void showLoginSnackbar() {
+    public void promptForLogin() {
         Snackbar.make(toolbar, getString(R.string.unauthorized), LENGTH_INDEFINITE)
                 .setActionTextColor(getResources().getColor(R.color.green400))
                 .setAction(getString(R.string.login), v -> {

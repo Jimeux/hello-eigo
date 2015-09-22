@@ -10,7 +10,7 @@
 
     <include layout="@layout/toolbar_collapse" />
 
-    <include layout="@layout/content_comments" />
+    <include android:id="@+id/content" layout="@layout/content_comments" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

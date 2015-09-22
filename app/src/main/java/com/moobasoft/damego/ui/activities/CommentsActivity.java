@@ -9,7 +9,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.ViewGroup;
 
 import com.moobasoft.damego.App;
 import com.moobasoft.damego.R;
@@ -20,27 +19,23 @@ import com.moobasoft.damego.ui.CommentsAdapter;
 import com.moobasoft.damego.ui.EndlessOnScrollListener;
 import com.moobasoft.damego.ui.presenters.ShowPresenter;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static android.view.View.GONE;
+import static android.support.v4.widget.SwipeRefreshLayout.*;
 import static android.view.View.VISIBLE;
 import static com.moobasoft.damego.ui.activities.ShowActivity.POST_ID;
 
-public class CommentsActivity extends BaseActivity implements ShowPresenter.ShowView, SwipeRefreshLayout.OnRefreshListener {
+public class CommentsActivity extends RxActivity implements ShowPresenter.ShowView, OnRefreshListener {
 
     @Inject ShowPresenter presenter;
 
     @Bind(R.id.fab)           FloatingActionButton fab;
     @Bind(R.id.comment_list)  RecyclerView commentList;
-    @Bind(R.id.swipe_refresh) SwipeRefreshLayout swipeRefreshLayout;
-    @Bind({R.id.loading_view, R.id.error_view, R.id.empty_view, R.id.swipe_refresh})
-    List<ViewGroup> listStateViews;
+    @Bind(R.id.swipe_refresh) SwipeRefreshLayout refreshLayout;
 
     private static final String LAYOUT_KEY = "layout";
     private CommentsAdapter commentsAdapter;
@@ -66,16 +61,11 @@ public class CommentsActivity extends BaseActivity implements ShowPresenter.Show
             postId = getIntent().getIntExtra(POST_ID, -1);
 
         if (postId <= 0)
-            onPostError();
+            onError("No post ID given!");
         else {
             activateView(R.id.loading_view);
             presenter.getPost(postId);
         }
-    }
-
-    private void activateView(int id) {
-        for (ViewGroup vg : listStateViews) vg.setVisibility(GONE);
-        findViewById(id).setVisibility(VISIBLE);
     }
 
     private void initialiseInjector() {
@@ -86,15 +76,15 @@ public class CommentsActivity extends BaseActivity implements ShowPresenter.Show
     }
 
     private void initialiseRecyclerView() {
-        swipeRefreshLayout.setOnRefreshListener(this);
-        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+        refreshLayout.setOnRefreshListener(this);
+        refreshLayout.setColorSchemeResources(R.color.colorPrimary,
                 R.color.colorAccent);
         commentsAdapter  = new CommentsAdapter();
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 
         commentList.setLayoutManager(layoutManager);
         commentList.setAdapter(commentsAdapter);
-        commentList.addOnScrollListener(new EndlessOnScrollListener(layoutManager, swipeRefreshLayout) {
+        commentList.addOnScrollListener(new EndlessOnScrollListener(layoutManager, refreshLayout) {
             @Override
             public void onLoadMore(int currentPage) {
                 //refreshLayout.setRefreshing(true);
@@ -127,21 +117,24 @@ public class CommentsActivity extends BaseActivity implements ShowPresenter.Show
     public void onPostRetrieved(Post post) {
         setTitle(post.getTitle());
         fab.setVisibility(VISIBLE);
-        swipeRefreshLayout.setRefreshing(false);
+        refreshLayout.setRefreshing(false);
 
         if (post.getComments().isEmpty()) {
             activateView(R.id.empty_view);
         } else {
             commentsAdapter.loadComments(post.getComments());
-            activateView(R.id.swipe_refresh);
+            activateView(R.id.content);
         }
     }
 
     @Override
-    public void onPostError() {
-        swipeRefreshLayout.setRefreshing(false);
-        activateView(R.id.error_view);
-        Snackbar.make(toolbar, getString(R.string.error_list), Snackbar.LENGTH_SHORT).show();
+    public void onError(String message) {
+        refreshLayout.setRefreshing(false);
+        if(loadingView.getVisibility() == VISIBLE || errorView.getVisibility() == VISIBLE) {
+            errorMessage.setText(message);
+            activateView(R.id.error_view);
+        } else
+            Snackbar.make(toolbar, message, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
@@ -156,7 +149,4 @@ public class CommentsActivity extends BaseActivity implements ShowPresenter.Show
         intent.putExtra(POST_ID, postId);
         doIfLoggedIn(intent);
     }
-
-    @OnClick({R.id.refresh_btn1, R.id.refresh_btn2})
-    public void clickRefresh() { onRefresh(); }
 }

@@ -80,10 +80,9 @@ public class ConnectPresenter extends RxPresenter<ConnectPresenter.View> {
             view.onError(context.getString(R.string.unexpected_error));*/
     }
 
-    public interface View {
+    public interface View extends RxPresenter.RxView {
         void onLoginSuccess();
         void onRegisterSuccess(String username);
-        void onError(String error);
         void onLoginError();
         void onRegistrationError(String username, String email, String password);
     }

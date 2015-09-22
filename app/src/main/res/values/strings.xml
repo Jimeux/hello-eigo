@@ -16,12 +16,16 @@
 
     <string name="title_activity_show"></string>
     <string name="title_activity_comments"></string>
+
     <string name="loading_list">Loading…</string>
     <string name="empty_list">コメントはまだありません。</string>
-    <string name="error_list">エラーが発生しました。</string>
+
+    <string name="error_default">エラーが発生しました。</string>
     <string name="comment_submitting">コメントを送信中</string>
     <string name="comment_success">コメントを作成しました。</string>
+
     <string name="unauthorized">ログインしてください</string>
+
     <string name="login_success">ログインしました</string>
     <string name="login_error">ログインできませんでした</string>
     <string name="register_success">アカウントを登録しました</string>
@@ -32,5 +36,6 @@
     <string name="password">パスワード</string>
     <string name="logout_success">ログアウトしました</string>
     <string name="logout">ログアウト</string>
+    <string name="refresh">Refresh</string>
 
 </resources>

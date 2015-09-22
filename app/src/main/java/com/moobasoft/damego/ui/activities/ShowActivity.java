@@ -28,7 +28,9 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class ShowActivity extends BaseActivity implements ShowPresenter.ShowView {
+import static android.view.View.VISIBLE;
+
+public class ShowActivity extends RxActivity implements ShowPresenter.ShowView {
 
     public static final String POST_ID = "post_id";
     private int postId;
@@ -42,8 +44,6 @@ public class ShowActivity extends BaseActivity implements ShowPresenter.ShowView
     @Bind(R.id.comment_title)     TextView commentTitle;
     @Bind(R.id.comments_preview)  ViewGroup commentContainer;
     @Bind(R.id.view_comments_btn) ViewGroup viewCommentsBtn;
-    @Bind({R.id.loading_view, R.id.error_view, R.id.empty_view, R.id.content})
-    List<ViewGroup> stateViews;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,10 +56,14 @@ public class ShowActivity extends BaseActivity implements ShowPresenter.ShowView
         initialiseInjector();
         presenter.bindView(this);
 
-        activateView(R.id.loading_view);
-
         postId = getIntent().getIntExtra(POST_ID, -1);
-        if (postId == -1) onPostError();
+        onRefresh();
+    }
+
+    @Override
+    public void onRefresh() {
+        activateView(R.id.loading_view);
+        if (postId == -1) onError("No post ID given!");
         else presenter.getPost(postId);
     }
 
@@ -67,11 +71,6 @@ public class ShowActivity extends BaseActivity implements ShowPresenter.ShowView
     protected void onDestroy() {
         presenter.releaseView();
         super.onDestroy();
-    }
-
-    private void activateView(int id) {
-        for (ViewGroup vg : stateViews) vg.setVisibility(View.GONE);
-        findViewById(id).setVisibility(View.VISIBLE);
     }
 
     private void initialiseInjector() {
@@ -111,9 +110,12 @@ public class ShowActivity extends BaseActivity implements ShowPresenter.ShowView
     }
 
     @Override
-    public void onPostError() {
-        activateView(R.id.error_view);
-        Snackbar.make(title, "Error getting post.", Snackbar.LENGTH_LONG).show();
+    public void onError(String message) {
+        if(loadingView.getVisibility() == VISIBLE || errorView.getVisibility() == VISIBLE) {
+            errorMessage.setText(message);
+            activateView(R.id.error_view);
+        } else
+            Snackbar.make(toolbar, message, Snackbar.LENGTH_SHORT).show();
     }
 
     @OnClick({R.id.comment_title, R.id.view_comments_btn})

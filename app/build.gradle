@@ -91,7 +91,7 @@ dependencies {
     /* Debug */
     //debugCompile 'com.squareup.leakcanary:leakcanary-android:1.3.1'
     debugCompile 'com.facebook.stetho:stetho:1.2.0'
-    //debugCompile 'com.facebook.stetho:stetho-okhttp:1.2.0'
+    debugCompile 'com.facebook.stetho:stetho-okhttp:1.2.0'
 
     /* Unit tests */
     testCompile 'junit:junit:4.12'

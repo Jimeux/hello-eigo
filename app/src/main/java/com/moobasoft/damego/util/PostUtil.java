@@ -14,7 +14,7 @@ public class PostUtil {
 
     public static void insertTags(Post post, LayoutInflater inflater, ViewGroup tags, boolean largeText) {
         float textSize = inflater.getContext().getResources().getDimension(
-                largeText ? R.dimen.tag_text_show : R.dimen.tag_text_index
+                largeText ? R.dimen.tag_text_show : R.dimen.index_footer_text
         );
         tags.removeAllViews();
         for (String tag : post.getTags()) {

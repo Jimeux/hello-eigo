@@ -15,6 +15,7 @@ public class Post {
     List<String> tags;
     Date createdAt;
     String imageUrl;
+    String thumbnailUrl;
     int commentsCount;
 
     public int getId() {
@@ -71,6 +72,14 @@ public class Post {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
+    }
+
+    public void setThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
     }
 
     public int getCommentsCount() {

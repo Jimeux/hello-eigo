@@ -11,7 +11,6 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.moobasoft.damego.App;
 import com.moobasoft.damego.R;
@@ -25,8 +24,6 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-
-import static android.support.design.widget.Snackbar.LENGTH_INDEFINITE;
 
 public class CreateCommentActivity extends BaseActivity implements CommentPresenter.View {
 
@@ -94,7 +91,6 @@ public class CreateCommentActivity extends BaseActivity implements CommentPresen
                     return false;
                 }
 
-                //input.clearFocus();
                 final String inputText = input.getText().toString();
                 presenter.createComment(postId, inputText);
                 showProgressDialog();
@@ -122,22 +118,17 @@ public class CreateCommentActivity extends BaseActivity implements CommentPresen
     }
 
     @Override
-    public void onCommentError(String message) {
+    public void onError(String message) {
         progress.dismiss();
         input.setEnabled(true);
-        Snackbar.make(toolbar, message, Snackbar.LENGTH_LONG).show();
+        Snackbar.make(toolbar, message, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onUnauthorized() {
+    public void promptForLogin() {
         progress.dismiss();
         input.setEnabled(true);
-        Snackbar.make(toolbar, getString(R.string.unauthorized), LENGTH_INDEFINITE)
-                .setActionTextColor(getResources().getColor(R.color.red100))
-                .setAction("取り消す", v1 -> finish())
-                .setAction("ログイン", v ->
-                        Toast.makeText(this, "Nice job!", Toast.LENGTH_SHORT).show())
-                .show();
+        super.promptForLogin();
     }
 
     public static class ConfirmCancelDialog extends DialogFragment {

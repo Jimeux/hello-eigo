@@ -9,9 +9,8 @@ import java.util.List;
 
 public class IndexPresenter extends RxPresenter<IndexPresenter.View> {
 
-    public interface View {
+    public interface View extends RxPresenter.RxView {
         void onPostsRetrieved(List<Post> posts);
-        void onPostsError();
     }
 
     private final PostService postService;
@@ -24,13 +23,13 @@ public class IndexPresenter extends RxPresenter<IndexPresenter.View> {
     public void postsIndex(int page) {
         subscriptions.add(postService.index(page),
                           view::onPostsRetrieved,
-                          throwable -> view.onPostsError());
+                          this::handleError);
     }
 
     public void filterByTag(String tag, int page) {
         subscriptions.add(postService.filterByTag(tag, page),
                           view::onPostsRetrieved,
-                          throwable -> view.onPostsError());
+                          this::handleError);
     }
 
 }

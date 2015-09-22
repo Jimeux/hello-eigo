@@ -7,9 +7,8 @@ import com.moobasoft.damego.ui.presenters.base.RxPresenter;
 
 public class ShowPresenter extends RxPresenter<ShowPresenter.ShowView> {
 
-    public interface ShowView {
+    public interface ShowView extends RxPresenter.RxView {
         void onPostRetrieved(Post post);
-        void onPostError();
     }
 
     private PostService postService;
@@ -22,7 +21,7 @@ public class ShowPresenter extends RxPresenter<ShowPresenter.ShowView> {
     public void getPost(int id) {
         subscriptions.add(postService.show(id),
                           view::onPostRetrieved,
-                          throwable -> view.onPostError());
+                          this::handleError);
     }
 
 }

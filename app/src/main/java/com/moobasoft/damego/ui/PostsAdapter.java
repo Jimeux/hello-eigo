@@ -44,12 +44,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.SummaryViewH
 
     @Override
     public void onBindViewHolder(SummaryViewHolder holder, int position) {
-        holder.bindTo(postList.get(position));
+        holder.bindTo(postList.get(position), getItemViewType(position));
     }
 
     @Override
     public int getItemViewType(int position) {
-        return (position % 6 == 0 || (columns == 2 && (position-1) % 6 == 0)) ? TYPE_FEATURED : TYPE_NORMAL;
+        return (position % 6 == 0 || (columns == 2 && (position-1) % 6 == 0)) ?
+                TYPE_FEATURED : TYPE_NORMAL;
     }
 
     @Override
@@ -71,9 +72,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.SummaryViewH
             this.itemView = itemView;
         }
 
-        public void bindTo(Post post) {
+        public void bindTo(Post post, int itemViewType) {
             itemView.setId(ID_PREFIX + post.getId());
-            itemView.bindTo(post);
+            itemView.bindTo(post, itemViewType);
             itemView.setOnClickListener(
                     v -> summaryClickListener.onSummaryClicked(post));
         }

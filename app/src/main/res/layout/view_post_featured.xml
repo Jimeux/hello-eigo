@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         card_view:cardBackgroundColor="@color/white"
         card_view:cardCornerRadius="0dp"
-        card_view:cardElevation="1dp"
+        card_view:cardElevation="2dp"
         card_view:cardUseCompatPadding="true">
 
         <LinearLayout
@@ -37,10 +37,12 @@
                     fontPath="fonts/Roboto-Medium.ttf"
                     android:id="@+id/title"
                     android:layout_width="wrap_content"
+                    android:maxLines="1"
+                    android:ellipsize="end"
                     android:layout_height="wrap_content"
                     android:text="Why Your English Sucks"
                     android:textColor="@color/grey900"
-                    android:textSize="18sp"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
 
                 <TextView

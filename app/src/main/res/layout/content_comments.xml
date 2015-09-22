@@ -17,8 +17,7 @@
         android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/grey100"
-        android:visibility="gone">
+        android:background="@color/grey100">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -29,7 +28,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:padding="4dp"
+                android:paddingTop="@dimen/main_list_margin_vert"
+                android:paddingBottom="@dimen/main_list_margin_vert"
+                android:paddingLeft="@dimen/main_list_margin_horiz"
+                android:paddingRight="@dimen/main_list_margin_horiz"
                 android:scrollbars="none" />
 
             <View

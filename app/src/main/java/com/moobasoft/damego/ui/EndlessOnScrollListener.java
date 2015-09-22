@@ -1,5 +1,6 @@
 package com.moobasoft.damego.ui;
 
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,7 +11,7 @@ import android.support.v7.widget.RecyclerView;
 public abstract class EndlessOnScrollListener extends RecyclerView.OnScrollListener {
 
     // The minimum amount of items to have below your current scroll position before loading more.
-    private static final int VISIBLE_THRESHOLD = 0;
+    private static final int VISIBLE_THRESHOLD = 1;
     // True if we are still waiting for the last set of data to load.
     private boolean loading = true;
     // The total number of items in the dataset after the last load
@@ -30,11 +31,10 @@ public abstract class EndlessOnScrollListener extends RecyclerView.OnScrollListe
     @Override
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
         if (refreshLayout.isRefreshing()) return;
-
         super.onScrolled(recyclerView, dx, dy);
 
-        refreshLayout.setEnabled(
-                layoutManager.findFirstCompletelyVisibleItemPosition() == 0);
+        boolean cannotScrollUp = !ViewCompat.canScrollVertically(recyclerView, -1);
+        refreshLayout.setEnabled(cannotScrollUp);
 
         int visibleItemCount = recyclerView.getChildCount();
         int totalItemCount   = layoutManager.getItemCount();
@@ -55,18 +55,29 @@ public abstract class EndlessOnScrollListener extends RecyclerView.OnScrollListe
         }
     }
 
+    /**
+     * Reset to first page. Use in onRefresh()
+     */
     public void reset() {
         previousTotal = 0;
         currentPage = 1;
     }
 
+    /**
+     * Restore state from a previous instance of EndlessOnScrollListener.
+     * Use in onRestoreInstanceState()
+     */
     public void restorePage(int currentPage, int previousTotal) {
         this.currentPage   = currentPage;
         this.previousTotal = previousTotal;
+        this.loading = false;
     }
 
     public int getCurrentPage()   { return currentPage; }
     public int getPreviousTotal() { return previousTotal; }
 
-    public abstract void onLoadMore(int current_page);
+    /**
+     * Allow client to define behaviour when next page is loaded.
+     */
+    public abstract void onLoadMore(int currentPage);
 }

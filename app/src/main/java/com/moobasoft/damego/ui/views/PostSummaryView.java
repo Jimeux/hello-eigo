@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
+import com.moobasoft.damego.ui.PostsAdapter;
 import com.moobasoft.damego.ui.activities.CommentsActivity;
 import com.moobasoft.damego.ui.activities.ShowActivity;
 import com.moobasoft.damego.util.PostUtil;
@@ -28,7 +29,6 @@ public final class PostSummaryView extends LinearLayout {
     @Bind(R.id.comments_count) TextView commentsCount;
     @Bind(R.id.comment_strip)  ViewGroup commentStrip;
     @Bind(R.id.tags)           ViewGroup tags;
-    //@Bind(R.id.created_at)     TextView createdAt;
 
     private int postId = -1;
 
@@ -42,19 +42,24 @@ public final class PostSummaryView extends LinearLayout {
         ButterKnife.bind(this);
     }
 
-    public void bindTo(Post post) {
+    public void bindTo(Post post, int itemViewType) {
         postId = post.getId();
-        Glide.with(getContext())
-                .load(post.getImageUrl())
-                .into(image);
         title.setText(post.getTitle());
         body.setText(Html.fromHtml(post.getBody()));
         commentsCount.setText(String.valueOf(post.getCommentsCount()));
-        //createdAt.setText(DateTimeUtil.formatShortDate(post.getCreatedAt()));
 
+        loadImage(post, itemViewType);
         LayoutInflater inflater = (LayoutInflater) tags.getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         PostUtil.insertTags(post, inflater, tags, false);
+    }
+
+    private void loadImage(Post post, int itemViewType) {
+        String imageUrl = (itemViewType == PostsAdapter.TYPE_FEATURED) ?
+                post.getImageUrl() : post.getThumbnailUrl();
+        Glide.with(getContext())
+                .load(imageUrl)
+                .into(image);
     }
 
     @OnClick(R.id.comment_strip)
