@@ -24,7 +24,7 @@ public class PostUtil {
             tagView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
             tagView.setOnClickListener(v -> {
                 Intent i = new Intent(inflater.getContext(), IndexActivity.class);
-                i.putExtra(IndexActivity.TAG_NAME, tag);
+                //i.putExtra(IndexActivity.TAG_NAME, tag); //TODO: Fix
                 inflater.getContext().startActivity(i);
             });
             tags.addView(tagView);

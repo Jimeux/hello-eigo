@@ -11,7 +11,7 @@
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         app:elevation="2dp"
-        android:layout_height="200dp"
+        android:layout_height="230dp"
         android:fitsSystemWindows="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:statusBarBackground="@android:color/transparent">
@@ -23,6 +23,7 @@
             app:statusBarScrim="@android:color/transparent"
             app:expandedTitleTextAppearance="@style/CollapsingToolbarLayoutExpandedTextStyle"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:contentScrim="?attr/colorPrimary"
             app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
             <ImageView
@@ -54,6 +55,12 @@
 </android.support.design.widget.CoordinatorLayout>
 
 
+<!--<android.support.v4.widget.NestedScrollView
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+app:layout_behavior="@string/appbar_scrolling_view_behavior"
+app:behavior_overlapTop="64dp">-->
+
 
 
 
@@ -61,10 +68,12 @@
 
 <!--
 
-I'm trying to get my collapsing toolbar act like the one in the Play store. The image parallaxes out
-as you scroll down, and when you scroll up at any point ye can see the regular action bar slide down.
+I'm trying to get my CollapsingToolbarLayout to act like the one in the Play store.
+The backdrop image and toolbar completely disappear as you scroll down (no toolbar pinning),
+and when you scroll up at any point, the toolbar is shown.
 
-What I have below
+What I have below is the typical example you see where the toolbar gets pinned to the top. I've
+tried all kinds of combinations, but nothing seems to work and I can't find any example anywhere.
 
 
 

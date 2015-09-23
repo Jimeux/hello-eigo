@@ -15,19 +15,28 @@
         android:layout_height="match_parent">
 
         <FrameLayout
+
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/post_list"
+            <LinearLayout
+                android:id="@+id/content"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingTop="@dimen/main_list_margin_vert"
-                android:paddingBottom="@dimen/main_list_margin_vert"
-                android:paddingLeft="@dimen/main_list_margin_horiz"
-                android:paddingRight="@dimen/main_list_margin_horiz"
-                android:clipToPadding="false"
-                android:scrollbars="none" />
+                android:layout_height="match_parent">
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/post_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingTop="@dimen/main_list_margin_vert"
+                    android:paddingBottom="@dimen/main_list_margin_vert"
+                    android:paddingLeft="@dimen/main_list_margin_horiz"
+                    android:paddingRight="@dimen/main_list_margin_horiz"
+                    android:clipToPadding="false"
+                    android:scrollbars="none" />
+            </LinearLayout>
+
+
+            <include layout="@layout/status_views" />
 
             <View
                 android:layout_width="match_parent"
@@ -37,7 +46,5 @@
         </FrameLayout>
 
     </android.support.v4.widget.SwipeRefreshLayout>
-
-    <include layout="@layout/status_views" />
 
 </RelativeLayout>

@@ -1,7 +1,5 @@
 package com.moobasoft.damego.ui;
 
-import android.support.v4.view.ViewCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
@@ -20,21 +18,16 @@ public abstract class EndlessOnScrollListener extends RecyclerView.OnScrollListe
     private int currentPage = 1;
 
     private final LinearLayoutManager layoutManager;
-    private final SwipeRefreshLayout refreshLayout;
 
-    public EndlessOnScrollListener(LinearLayoutManager layoutManager,
-                                   SwipeRefreshLayout refreshLayout) {
+    public EndlessOnScrollListener(LinearLayoutManager layoutManager) {
         this.layoutManager = layoutManager;
-        this.refreshLayout = refreshLayout;
     }
 
     @Override
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-        if (refreshLayout.isRefreshing()) return;
-        super.onScrolled(recyclerView, dx, dy);
+        if (isRefreshing()) return;
 
-        boolean cannotScrollUp = !ViewCompat.canScrollVertically(recyclerView, -1);
-        refreshLayout.setEnabled(cannotScrollUp);
+        super.onScrolled(recyclerView, dx, dy);
 
         int visibleItemCount = recyclerView.getChildCount();
         int totalItemCount   = layoutManager.getItemCount();
@@ -80,4 +73,7 @@ public abstract class EndlessOnScrollListener extends RecyclerView.OnScrollListe
      * Allow client to define behaviour when next page is loaded.
      */
     public abstract void onLoadMore(int currentPage);
+
+    public abstract boolean isRefreshing();
+
 }

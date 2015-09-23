@@ -2,14 +2,12 @@ package com.moobasoft.damego.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -18,41 +16,22 @@ import com.moobasoft.damego.R;
 import com.moobasoft.damego.di.components.DaggerMainComponent;
 import com.moobasoft.damego.di.modules.MainModule;
 import com.moobasoft.damego.rest.models.Post;
-import com.moobasoft.damego.ui.EndlessOnScrollListener;
 import com.moobasoft.damego.ui.PostsAdapter;
-import com.moobasoft.damego.ui.presenters.IndexPresenter;
-
-import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
-import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 import static android.support.design.widget.Snackbar.LENGTH_SHORT;
-import static android.view.View.VISIBLE;
 
-public class IndexActivity extends RxActivity implements IndexPresenter.View, PostsAdapter.OnSummaryClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class IndexActivity extends BaseActivity implements PostsAdapter.PostClickListener {
 
-    @Inject IndexPresenter presenter;
-
-    @Bind(R.id.post_list)     RecyclerView postList;
-    @Bind(R.id.swipe_refresh) SwipeRefreshLayout refreshLayout;
-
-    private PostsAdapter postsAdapter;
-    private String tagName;
-    private List<Post> posts;
-
-    private static final String POSTS_KEY = "posts";
-    private static final String LAYOUT_KEY = "layout";
-    private static final String CURRENT_PAGE_KEY = "current_page";
-    private static final String PREVIOUS_TOTAL_KEY = "previous_total";
-    public static final String TAG_NAME = "tag_name";
-
-    private EndlessOnScrollListener scrollListener;
+    @Bind(R.id.view_pager)    ViewPager viewPager;
+    @Bind(R.id.tab_layout)    TabLayout tabLayout;
+    private Adapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,62 +39,17 @@ public class IndexActivity extends RxActivity implements IndexPresenter.View, Po
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-
         initialiseInjector();
-        presenter.bindView(this);
 
-        tagName = getIntent().getStringExtra(TAG_NAME);
-        posts = new ArrayList<>();
-        initialiseRecyclerView();
+        adapter = new Adapter(getSupportFragmentManager());
 
-        if (savedInstanceState == null) {
-            activateView(R.id.loading_view);
-            loadPosts();
-        }
-    }
+        List<String> tags = Arrays
+                .asList("すべて", "Cool", "和製英語", "TOEIC", "馬鹿野郎", "ワンキング", "ゲーム", "CM", "nyans");
+        for (String t : tags )
+            adapter.addFragment(TagFragment.newInstance(t), t);
 
-    @Override
-    public void onSaveInstanceState(Bundle state) {
-        super.onSaveInstanceState(state);
-        state.putParcelable(LAYOUT_KEY, postList.getLayoutManager().onSaveInstanceState());
-        state.putParcelable(POSTS_KEY, Parcels.wrap(posts));
-        state.putInt(CURRENT_PAGE_KEY, scrollListener.getCurrentPage());
-        state.putInt(PREVIOUS_TOTAL_KEY, scrollListener.getPreviousTotal());
-    }
-
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle state) {
-        super.onRestoreInstanceState(state);
-        List<Post> savedPosts = Parcels.unwrap(state.getParcelable(POSTS_KEY));
-        if (savedPosts != null) {
-            postsAdapter.loadPosts(savedPosts);
-
-            Parcelable savedRecyclerLayoutState = state.getParcelable(LAYOUT_KEY);
-            if (savedRecyclerLayoutState != null)
-                postList.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
-
-            int currentPage   = state.getInt(CURRENT_PAGE_KEY, scrollListener.getCurrentPage());
-            int previousTotal = state.getInt(PREVIOUS_TOTAL_KEY, scrollListener.getPreviousTotal());
-            scrollListener.restorePage(currentPage, previousTotal);
-
-            activateView(R.id.content);
-        }
-    }
-
-    private void loadPosts() {
-        if (TextUtils.isEmpty(tagName)) {
-            presenter.postsIndex(1);
-        } else {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle(tagName);
-            presenter.filterByTag(tagName, 1);
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        presenter.releaseView();
-        super.onDestroy();
+        viewPager.setAdapter(adapter);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     private void initialiseInjector() {
@@ -125,27 +59,37 @@ public class IndexActivity extends RxActivity implements IndexPresenter.View, Po
                 .build().inject(this);
     }
 
-    protected void initialiseRecyclerView() {
-        refreshLayout.setOnRefreshListener(this);
-        refreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
+    static class Adapter extends FragmentStatePagerAdapter {
+        private final List<Fragment> mFragments = new ArrayList<>();
+        private final List<String> mFragmentTitles = new ArrayList<>();
 
-        int columns = getResources().getInteger(R.integer.main_list_columns);
-        postsAdapter = new PostsAdapter(this, posts, columns);
-        LinearLayoutManager layoutManager = new GridLayoutManager(this, columns);
+        public Adapter(FragmentManager fm) {
+            super(fm);
+        }
 
-        postList.setLayoutManager(layoutManager);
-        postList.setAdapter(postsAdapter);
-        scrollListener = new EndlessOnScrollListener(layoutManager, refreshLayout) {
-            @Override
-            public void onLoadMore(int currentPage) {
-                refreshLayout.setRefreshing(true);
-                if (TextUtils.isEmpty(tagName))
-                    presenter.postsIndex(currentPage);
-                else
-                    presenter.filterByTag(tagName, currentPage);
-            }
-        };
-        postList.addOnScrollListener(scrollListener);
+        public void addFragment(Fragment fragment, String title) {
+            mFragments.add(fragment);
+            mFragmentTitles.add(title);
+        }
+
+        public int getIndex(String tag) {
+            return mFragmentTitles.indexOf(tag);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragments.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragments.size();
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitles.get(position);
+        }
     }
 
     @Override
@@ -188,26 +132,6 @@ public class IndexActivity extends RxActivity implements IndexPresenter.View, Po
     }
 
     @Override
-    public void onPostsRetrieved(List<Post> posts) {
-        if (scrollListener.getCurrentPage() == 1)
-            postsAdapter.clear();
-        refreshLayout.setRefreshing(false);
-        postsAdapter.loadPosts(posts);
-
-        activateView(R.id.content);
-    } //TODO: No more posts message
-
-    @Override
-    public void onError(String message) {
-        refreshLayout.setRefreshing(false);
-        if(loadingView.getVisibility() == VISIBLE || errorView.getVisibility() == VISIBLE) {
-            errorMessage.setText(message);
-            activateView(R.id.error_view);
-        } else
-            Snackbar.make(toolbar, message, Snackbar.LENGTH_SHORT).show();
-    }
-
-    @Override
     public void onSummaryClicked(Post post) {
         Intent i = new Intent(IndexActivity.this, ShowActivity.class);
         i.putExtra(ShowActivity.POST_ID, post.getId());
@@ -215,15 +139,8 @@ public class IndexActivity extends RxActivity implements IndexPresenter.View, Po
     }
 
     @Override
-    public void onRefresh() {
-        if (errorView.getVisibility() == VISIBLE || emptyView.getVisibility() == VISIBLE) {
-            refreshLayout.setRefreshing(false);
-            activateView(R.id.loading_view);
-        } else
-            refreshLayout.setRefreshing(true);
-
-        scrollListener.reset();
-        loadPosts();
+    public void onTagClicked(String tag) {
+        viewPager.setCurrentItem(adapter.getIndex(tag), false);
     }
 
 }

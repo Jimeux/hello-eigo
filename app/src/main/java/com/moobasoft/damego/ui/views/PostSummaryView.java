@@ -13,7 +13,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
-import com.moobasoft.damego.ui.PostsAdapter;
 import com.moobasoft.damego.ui.activities.CommentsActivity;
 import com.moobasoft.damego.ui.activities.ShowActivity;
 import com.moobasoft.damego.util.PostUtil;
@@ -21,6 +20,9 @@ import com.moobasoft.damego.util.PostUtil;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+
+import static com.moobasoft.damego.ui.PostsAdapter.PostClickListener;
+import static com.moobasoft.damego.ui.PostsAdapter.TYPE_FEATURED;
 
 public final class PostSummaryView extends LinearLayout {
     @Bind(R.id.image)          ImageView image;
@@ -42,7 +44,7 @@ public final class PostSummaryView extends LinearLayout {
         ButterKnife.bind(this);
     }
 
-    public void bindTo(Post post, int itemViewType) {
+    public void bindTo(Post post, int itemViewType, PostClickListener postClickListener) {
         postId = post.getId();
         title.setText(post.getTitle());
         body.setText(Html.fromHtml(post.getBody()));
@@ -52,10 +54,16 @@ public final class PostSummaryView extends LinearLayout {
         LayoutInflater inflater = (LayoutInflater) tags.getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         PostUtil.insertTags(post, inflater, tags, false);
+
+        setOnClickListener(v -> postClickListener.onSummaryClicked(post));
+        for (int i = 0; i < tags.getChildCount(); i++) {
+            TextView tag = (TextView) tags.getChildAt(i);
+            tag.setOnClickListener(v -> postClickListener.onTagClicked(tag.getText().toString()));
+        }
     }
 
     private void loadImage(Post post, int itemViewType) {
-        String imageUrl = (itemViewType == PostsAdapter.TYPE_FEATURED) ?
+        String imageUrl = (itemViewType == TYPE_FEATURED) ?
                 post.getImageUrl() : post.getThumbnailUrl();
         Glide.with(getContext())
                 .load(imageUrl)

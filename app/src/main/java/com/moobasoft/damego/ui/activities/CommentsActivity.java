@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,7 +26,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static android.support.v4.widget.SwipeRefreshLayout.*;
+import static android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import static android.view.View.VISIBLE;
 import static com.moobasoft.damego.ui.activities.ShowActivity.POST_ID;
 
@@ -84,11 +85,22 @@ public class CommentsActivity extends RxActivity implements ShowPresenter.ShowVi
 
         commentList.setLayoutManager(layoutManager);
         commentList.setAdapter(commentsAdapter);
-        commentList.addOnScrollListener(new EndlessOnScrollListener(layoutManager, refreshLayout) {
+        commentList.addOnScrollListener(new EndlessOnScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int currentPage) {
                 //refreshLayout.setRefreshing(true);
                 //presenter.getPost(currentPage); //TODO: Paginate comments
+            }
+
+            @Override  // TODO: Fix this duplicated code
+            public boolean isRefreshing() {
+                if (toolbar != null && commentList != null) {
+                    boolean cannotScrollUp =
+                            toolbar.getVisibility() == VISIBLE &&
+                                    !ViewCompat.canScrollVertically(commentList, -1);
+                    refreshLayout.setEnabled(cannotScrollUp);
+                }
+                return refreshLayout.isRefreshing();
             }
         });
     }
