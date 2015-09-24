@@ -2,7 +2,7 @@
 <android.support.design.widget.AppBarLayout
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/appBarLayout"
+    android:id="@+id/app_bar_layout"
     app:elevation="2dp"
     android:background="@color/colorPrimary"
     android:layout_width="match_parent"
@@ -24,7 +24,8 @@
         app:tabMode="scrollable"
         app:tabBackground="@color/colorPrimary"
         app:tabIndicatorColor="@color/white"
-        app:tabPaddingEnd="25dp"
+        app:tabPaddingEnd="20dp"
+        app:tabPaddingStart="20dp"
         app:tabGravity="fill" />
 
 </android.support.design.widget.AppBarLayout>

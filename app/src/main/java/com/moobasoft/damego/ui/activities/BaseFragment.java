@@ -5,8 +5,12 @@ import android.support.v4.app.Fragment;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.moobasoft.damego.App;
 import com.moobasoft.damego.CredentialStore;
 import com.moobasoft.damego.R;
+import com.moobasoft.damego.di.components.DaggerMainComponent;
+import com.moobasoft.damego.di.components.MainComponent;
+import com.moobasoft.damego.di.modules.MainModule;
 
 import java.util.List;
 
@@ -20,6 +24,13 @@ import static android.view.View.VISIBLE;
 public abstract class BaseFragment extends Fragment {
 
     @Inject CredentialStore credentialStore;
+
+    protected MainComponent getComponent() {
+        return DaggerMainComponent.builder()
+                .mainModule(new MainModule())
+                .appComponent(((App) getActivity().getApplication()).getAppComponent())
+                .build();
+    }
 
     protected boolean isLoggedIn() {
         return credentialStore.isLoggedIn();
