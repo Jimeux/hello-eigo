@@ -22,7 +22,9 @@ public abstract class RxActivity extends BaseActivity {
     List<ViewGroup> stateViews;
 
     protected void activateView(int id) {
-        for (ViewGroup vg : stateViews) vg.setVisibility(android.view.View.GONE);
+        for (ViewGroup vg : stateViews)
+            vg.setVisibility(android.view.View.GONE);
+
         findViewById(id).setVisibility(VISIBLE);
     }
 

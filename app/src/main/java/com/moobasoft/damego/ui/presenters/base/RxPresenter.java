@@ -55,6 +55,7 @@ public class RxPresenter<V extends RxPresenter.RxView> extends BasePresenter<V> 
 
     public void handleError(Throwable throwable) {
         int errorType = getErrorType(throwable);
+
         switch (errorType) {
             case OFFLINE_ERROR:
                 view.onError("Not connected to the Internet.");

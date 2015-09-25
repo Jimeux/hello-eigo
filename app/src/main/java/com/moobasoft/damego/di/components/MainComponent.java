@@ -7,7 +7,7 @@ import com.moobasoft.damego.ui.activities.ConnectActivity;
 import com.moobasoft.damego.ui.activities.CreateCommentActivity;
 import com.moobasoft.damego.ui.activities.IndexActivity;
 import com.moobasoft.damego.ui.activities.ShowActivity;
-import com.moobasoft.damego.ui.activities.TagFragment;
+import com.moobasoft.damego.ui.fragments.TagFragment;
 
 import dagger.Component;
 

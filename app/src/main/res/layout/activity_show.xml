@@ -55,44 +55,7 @@
 </android.support.design.widget.CoordinatorLayout>
 
 
-<!--<android.support.v4.widget.NestedScrollView
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-app:layout_behavior="@string/appbar_scrolling_view_behavior"
-app:behavior_overlapTop="64dp">-->
-
-
-
-
-
-
 <!--
-
-I'm trying to get my CollapsingToolbarLayout to act like the one in the Play store.
-The backdrop image and toolbar completely disappear as you scroll down (no toolbar pinning),
-and when you scroll up at any point, the toolbar is shown.
-
-What I have below is the typical example you see where the toolbar gets pinned to the top. I've
-tried all kinds of combinations, but nothing seems to work and I can't find any example anywhere.
-
-
-
-<android.support.design.widget.AppBarLayout
-    android:layout_height="200dp"
-    android:fitsSystemWindows="true">
-
-    <android.support.design.widget.CollapsingToolbarLayout
-        android:fitsSystemWindows="true"
-        app:layout_scrollFlags="scroll|exitUntilCollapsed">
-
-        <ImageView
-            android:fitsSystemWindows="true"
-            app:layout_collapseMode="parallax" />
-
-        <android.support.v7.widget.Toolbar
-            android:layout_height="?attr/actionBarSize"
-            app:layout_scrollFlags="scroll|enterAlways"
-            app:layout_collapseMode="pin" />
-
-    </android.support.design.widget.CollapsingToolbarLayout>
-</android.support.design.widget.AppBarLayout>-->
+app:layout_behavior="@string/appbar_scrolling_view_behavior"
+app:behavior_overlapTop="64dp"
+>-->

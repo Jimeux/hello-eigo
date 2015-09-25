@@ -1,4 +1,4 @@
-package com.moobasoft.damego.ui.activities;
+package com.moobasoft.damego.ui.fragments;
 
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -19,6 +19,8 @@ import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.EndlessOnScrollListener;
 import com.moobasoft.damego.ui.PostsAdapter;
+import com.moobasoft.damego.ui.activities.BaseActivity;
+import com.moobasoft.damego.ui.activities.IndexActivity;
 import com.moobasoft.damego.ui.presenters.IndexPresenter;
 
 import org.parceler.Parcels;
@@ -44,18 +46,14 @@ public class TagFragment extends BaseFragment
     public static final String SHOW_ALL_TAG       = "すべて";
 
     private PostsAdapter postsAdapter;
-    /**
-     * The tag name of the posts to be loaded.
-     */
+    /** The tag name of the posts to be loaded. */
     private String tagName;
-    /**
-     * A list of {@code Post} instances that will be loaded into {@code postList}
-     */
+    /** A list of {@code Post} instances that will be loaded into {@code postList} */
     private List<Post> posts;
-    /**
-     * OnScrollListener for {@code postList}
-     */
+    /** OnScrollListener for {@code postList} */
     private EndlessOnScrollListener scrollListener;
+    /** A reference to the Activity's AppBarLayout. */
+    private AppBarLayout appBarLayout;
     /**
      *  Manually keep track of {@code appBarLayout}'s expanded/collapsed state.
      *  Makes use of {@code AppBarLayout.OnOffsetChangedListener}.
@@ -66,8 +64,6 @@ public class TagFragment extends BaseFragment
 
     @Bind(R.id.post_list)     RecyclerView postList;
     @Bind(R.id.swipe_refresh) SwipeRefreshLayout refreshLayout;
-
-    private AppBarLayout appBarLayout;
 
     public TagFragment() {}
 

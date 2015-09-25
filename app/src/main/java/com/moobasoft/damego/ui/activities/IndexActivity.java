@@ -17,6 +17,7 @@ import com.moobasoft.damego.di.components.DaggerMainComponent;
 import com.moobasoft.damego.di.modules.MainModule;
 import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.PostsAdapter;
+import com.moobasoft.damego.ui.fragments.TagFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
