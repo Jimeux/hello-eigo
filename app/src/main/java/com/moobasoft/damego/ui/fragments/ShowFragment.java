@@ -1,4 +1,4 @@
-package com.moobasoft.damego.ui.activities;
+package com.moobasoft.damego.ui.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,12 +10,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.moobasoft.damego.App;
 import com.moobasoft.damego.R;
-import com.moobasoft.damego.di.components.DaggerMainComponent;
-import com.moobasoft.damego.di.modules.MainModule;
 import com.moobasoft.damego.rest.models.Comment;
 import com.moobasoft.damego.rest.models.Post;
+import com.moobasoft.damego.ui.activities.CommentsActivity;
+import com.moobasoft.damego.ui.activities.CreateCommentActivity;
 import com.moobasoft.damego.ui.presenters.ShowPresenter;
 import com.moobasoft.damego.ui.views.CommentView;
 import com.moobasoft.damego.util.PostUtil;
@@ -30,7 +29,7 @@ import butterknife.OnClick;
 
 import static android.view.View.VISIBLE;
 
-public class ShowActivity extends RxActivity implements ShowPresenter.ShowView {
+public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView {
 
     public static final String POST_ID = "post_id";
     private int postId;
@@ -57,6 +56,7 @@ public class ShowActivity extends RxActivity implements ShowPresenter.ShowView {
         presenter.bindView(this);
 
         postId = getIntent().getIntExtra(POST_ID, -1);
+        getComponent().inject(this);
         onRefresh();
     }
 
@@ -71,13 +71,6 @@ public class ShowActivity extends RxActivity implements ShowPresenter.ShowView {
     protected void onDestroy() {
         presenter.releaseView();
         super.onDestroy();
-    }
-
-    private void initialiseInjector() {
-        DaggerMainComponent.builder()
-                .mainModule(new MainModule())
-                .appComponent(((App)getApplication()).getAppComponent())
-                .build().inject(this);
     }
 
     @Override
@@ -115,21 +108,21 @@ public class ShowActivity extends RxActivity implements ShowPresenter.ShowView {
             errorMessage.setText(message);
             activateView(R.id.error_view);
         } else
-            Snackbar.make(toolbar, message, Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(backdrop, message, Snackbar.LENGTH_SHORT).show();
     }
 
     @OnClick({R.id.comment_title, R.id.view_comments_btn})
     public void clickViewComments() {
-        Intent i = new Intent(ShowActivity.this, CommentsActivity.class);
+        Intent i = new Intent(ShowFragment.this, CommentsActivity.class);
         i.putExtra(POST_ID, postId);
         startActivity(i);
     }
 
     @OnClick(R.id.fab)
     public void clickFab() {
-        Intent intent = new Intent(ShowActivity.this, CreateCommentActivity.class);
-        intent.putExtra(ShowActivity.POST_ID, postId);
-        doIfLoggedIn(intent);
+        Intent intent = new Intent(ShowFragment.this, CreateCommentActivity.class);
+        intent.putExtra(ShowFragment.POST_ID, postId);
+        //doIfLoggedIn(intent);
     }
 
 }
