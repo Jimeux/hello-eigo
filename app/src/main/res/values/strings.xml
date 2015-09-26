@@ -40,5 +40,7 @@
     <string name="no_more_posts">ポストはもうありません</string>
     <string name="no_posts_found">ポストはありません</string>
     <string name="post_list_footer">ポストはノーモア残っている。</string>
+    <string name="action_search">Search</string>
+    <string name="fragment_image_trans">fragment_image_transition</string>
 
 </resources>

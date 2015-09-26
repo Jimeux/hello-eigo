@@ -17,6 +17,7 @@ import com.moobasoft.damego.R;
 import com.moobasoft.damego.di.components.DaggerMainComponent;
 import com.moobasoft.damego.di.modules.MainModule;
 import com.moobasoft.damego.rest.models.Comment;
+import com.moobasoft.damego.ui.fragments.ShowFragment;
 import com.moobasoft.damego.ui.presenters.CommentPresenter;
 import com.moobasoft.damego.util.Util;
 
@@ -43,7 +44,7 @@ public class CreateCommentActivity extends BaseActivity implements CommentPresen
 
         initialiseInjector();
         initialiseSearchInput();
-        postId = getIntent().getIntExtra(ShowActivity.POST_ID, -1);
+        postId = getIntent().getIntExtra(ShowFragment.POST_ID, -1);
         presenter.bindView(this);
     }
 
@@ -85,7 +86,7 @@ public class CreateCommentActivity extends BaseActivity implements CommentPresen
             case R.id.action_save_comment:
 
                 String query = input.getText().toString();
-                if (query.length() < 3) {
+                if (query.length() < 0) { // TODO: Use sensible number
                     input.setError(getString(R.string.comment_error_too_short));
                     input.requestFocus();
                     return false;

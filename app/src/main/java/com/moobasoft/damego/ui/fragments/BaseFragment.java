@@ -50,7 +50,7 @@ public abstract class BaseFragment extends Fragment {
     }
 
     protected void activateErrorView(String message) {
-        activateView(R.id.loading_view);
+        activateView(R.id.error_view);
         errorMessage.setText(message);
     }
 

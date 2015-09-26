@@ -30,12 +30,6 @@
         </android.support.v4.widget.SwipeRefreshLayout>
     </LinearLayout>
 
-
     <include layout="@layout/status_views" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/shadow_height"
-        android:background="@drawable/toolbar_shadow" />
 
 </RelativeLayout>

@@ -13,6 +13,7 @@ public class RxPresenter<V extends RxPresenter.RxView> extends BasePresenter<V> 
         void onError(String message);
     }
 
+    public static final int SUCCESS = 200;
     public static final int UNPROCESSABLE_ENTITY = 422;
     public static final int UNAUTHORIZED = 401;
     public static final String OFFLINE_CODE = "ENETUNREACH";

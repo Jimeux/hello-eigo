@@ -6,7 +6,7 @@ import com.moobasoft.damego.ui.activities.CommentsActivity;
 import com.moobasoft.damego.ui.activities.ConnectActivity;
 import com.moobasoft.damego.ui.activities.CreateCommentActivity;
 import com.moobasoft.damego.ui.activities.IndexActivity;
-import com.moobasoft.damego.ui.activities.ShowActivity;
+import com.moobasoft.damego.ui.fragments.ShowFragment;
 import com.moobasoft.damego.ui.fragments.TagFragment;
 
 import dagger.Component;
@@ -23,7 +23,7 @@ import dagger.Component;
 public interface MainComponent {
 
     void inject(IndexActivity mainIndexActivity);
-    void inject(ShowActivity mainActivity);
+    void inject(ShowFragment mainActivity);
     void inject(CommentsActivity mainActivity);
     void inject(CreateCommentActivity createCommentActivity);
     void inject(ConnectActivity connectActivity);

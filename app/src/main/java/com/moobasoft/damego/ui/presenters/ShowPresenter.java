@@ -1,5 +1,7 @@
 package com.moobasoft.damego.ui.presenters;
 
+import android.util.Log;
+
 import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.rest.services.PostService;
 import com.moobasoft.damego.ui.RxSubscriber;
@@ -20,7 +22,13 @@ public class ShowPresenter extends RxPresenter<ShowPresenter.ShowView> {
 
     public void getPost(int id) {
         subscriptions.add(postService.show(id),
-                          view::onPostRetrieved,
+                          postResult -> {
+                              if (postResult.isError())
+                                  Log.d("TAGGART", "" + postResult.error().getMessage());
+                              else
+                                  Log.d("TAGGART", "" + postResult.response().code());
+                              view.onPostRetrieved(postResult.response().body());
+                          },
                           this::handleError);
     }
 

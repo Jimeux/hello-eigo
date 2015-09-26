@@ -6,6 +6,7 @@ import com.moobasoft.damego.rest.requests.CommentRequest;
 
 import java.util.List;
 
+import retrofit.Result;
 import retrofit.http.Body;
 import retrofit.http.GET;
 import retrofit.http.POST;
@@ -16,7 +17,7 @@ import rx.Observable;
 public interface PostService {
 
     @GET("/api/posts/{id}")
-    Observable<Post> show(@Path("id") int id);
+    Observable<Result<Post>> show(@Path("id") int id);
 
     @GET("/api/posts")
     Observable<List<Post>> index(@Query("page") int page);
@@ -26,6 +27,6 @@ public interface PostService {
                                        @Query("page") int page);
 
     @POST("/api/posts/{id}/comments")
-    Observable<Comment> createComment(@Path("id") int postId,
+    Observable<Result<Comment>> createComment(@Path("id") int postId,
                                       @Body CommentRequest commentRequest);
 }

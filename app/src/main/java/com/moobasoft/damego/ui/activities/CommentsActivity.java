@@ -28,7 +28,7 @@ import butterknife.OnClick;
 
 import static android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import static android.view.View.VISIBLE;
-import static com.moobasoft.damego.ui.activities.ShowActivity.POST_ID;
+import static com.moobasoft.damego.ui.fragments.ShowFragment.POST_ID;
 
 public class CommentsActivity extends RxActivity implements ShowPresenter.ShowView, OnRefreshListener {
 

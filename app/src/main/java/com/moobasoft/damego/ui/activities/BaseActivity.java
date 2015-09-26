@@ -38,12 +38,11 @@ public class BaseActivity extends AppCompatActivity {
         return credentialStore.isLoggedIn();
     }
 
-    protected void doIfLoggedIn(Intent intent) {
-        if (isLoggedIn()) {
+    public void doIfLoggedIn(Intent intent) {
+        if (isLoggedIn())
             startActivity(intent);
-        } else {
+        else
             promptForLogin();
-        }
     }
 
     public void promptForLogin() {

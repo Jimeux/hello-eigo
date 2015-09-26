@@ -1,15 +1,23 @@
 package com.moobasoft.damego.ui.activities;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.moobasoft.damego.App;
 import com.moobasoft.damego.R;
@@ -17,6 +25,7 @@ import com.moobasoft.damego.di.components.DaggerMainComponent;
 import com.moobasoft.damego.di.modules.MainModule;
 import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.PostsAdapter;
+import com.moobasoft.damego.ui.fragments.ShowFragment;
 import com.moobasoft.damego.ui.fragments.TagFragment;
 
 import java.util.ArrayList;
@@ -28,11 +37,25 @@ import butterknife.ButterKnife;
 
 import static android.support.design.widget.Snackbar.LENGTH_SHORT;
 
-public class IndexActivity extends BaseActivity implements PostsAdapter.PostClickListener {
+public class IndexActivity extends BaseActivity implements PostsAdapter.PostClickListener, FragmentManager.OnBackStackChangedListener {
 
-    @Bind(R.id.view_pager)    ViewPager viewPager;
-    @Bind(R.id.tab_layout)    TabLayout tabLayout;
+    public static final String HOME_PAGE = "home";
+
+    @Nullable @Bind(R.id.fragment_container)  ViewGroup fragmentContainer;
+    @Nullable @Bind(R.id.show_post_container) ViewGroup showPostContainer;
+    @Nullable @Bind(R.id.post_index_container) ViewGroup postIndexContainer;
+
+    @Bind(R.id.app_bar_layout) AppBarLayout appBarLayout;
+    @Bind(R.id.view_pager)     ViewPager viewPager;
+    @Bind(R.id.tab_layout)     TabLayout tabLayout;
     private Adapter adapter;
+    private int currentPostId;
+    private String currentPage;
+
+    interface MainActions {
+        void promptLogin();
+        void setToolbar(Toolbar toolbar);
+    } // TODO: Use something like this for fragments
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,11 +69,33 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
 
         List<String> tags = Arrays
                 .asList("すべて", "Cool", "和製英語", "TOEIC", "馬鹿野郎", "ワンキング", "ゲーム", "CM", "nyans");
-        for (String t : tags )
+        for (String t : tags)
             adapter.addFragment(TagFragment.newInstance(t), t);
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
+
+        getSupportFragmentManager().addOnBackStackChangedListener(this);
+
+        if (savedInstanceState != null) {
+            currentPostId = savedInstanceState.getInt(ShowFragment.POST_ID, -1);
+            if (showPostContainer != null && currentPostId > 0) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(showPostContainer.getId(),
+                                ShowFragment.newInstance(currentPostId),
+                                ShowFragment.class.getName())
+                        .commit();
+            }
+        } else {
+            if (showPostContainer != null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(showPostContainer.getId(),
+                                ShowFragment.newInstance(10),
+                                ShowFragment.class.getName())
+                        .commit();
+            }
+        }
+        setToolbar(toolbar, HOME_PAGE);
     }
 
     private void initialiseInjector() {
@@ -58,6 +103,18 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
                 .mainModule(new MainModule())
                 .appComponent(((App) getApplication()).getAppComponent())
                 .build().inject(this);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        state.putInt(ShowFragment.POST_ID, currentPostId);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle state) {
+        super.onRestoreInstanceState(state);
+        currentPostId = state.getInt(ShowFragment.POST_ID, -1);
     }
 
     static class Adapter extends FragmentStatePagerAdapter {
@@ -133,10 +190,57 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
     }
 
     @Override
+    public void onBackStackChanged() {
+        Fragment current = getSupportFragmentManager().findFragmentByTag(ShowFragment.class.getName());
+        if (current != null && current.isVisible()) {
+        } else {
+            setToolbar(toolbar, HOME_PAGE);
+        }
+    }
+
+    public void setToolbar(Toolbar newToolbar, String tag) {
+        setSupportActionBar(newToolbar);
+
+        if (tag.equals(HOME_PAGE)) {
+            toolbar.setVisibility(View.VISIBLE);
+            tabLayout.setVisibility(View.VISIBLE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimary));
+        } else if (tag.equals(ShowFragment.class.getName())) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            toolbar.setVisibility(View.GONE);
+            tabLayout.setVisibility(View.GONE);
+            setTitle(""); // TODO: make this unnecessary
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
+    }
+
+    public void onHitBack(String tag) {
+        if (ShowFragment.class.getName().equals(tag)) {
+            // show home
+        }
+    }
+
+    @Override
     public void onSummaryClicked(Post post) {
-        Intent i = new Intent(IndexActivity.this, ShowActivity.class);
-        i.putExtra(ShowActivity.POST_ID, post.getId());
-        startActivity(i);
+        // TODO: This should be done on rotation!
+        // TODO: Maybe manage without backstack (onHitBack())
+        //TODO: If (land && ShowFragment on backstack) popBackstack()
+
+        currentPostId = post.getId();
+        int containerId = (showPostContainer != null) ?
+                showPostContainer.getId() : fragmentContainer.getId();
+
+        FragmentTransaction transaction = getSupportFragmentManager()
+                .beginTransaction()
+                .replace(containerId,
+                        ShowFragment.newInstance(post.getId()),
+                        ShowFragment.class.getName());
+        if (showPostContainer == null)
+            transaction.addToBackStack(ShowFragment.class.getName());
+
+        transaction.commit();
     }
 
     @Override
