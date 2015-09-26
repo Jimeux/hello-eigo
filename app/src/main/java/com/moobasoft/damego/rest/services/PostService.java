@@ -20,13 +20,13 @@ public interface PostService {
     Observable<Result<Post>> show(@Path("id") int id);
 
     @GET("/api/posts")
-    Observable<List<Post>> index(@Query("page") int page);
+    Observable<Result<List<Post>>> index(@Query("page") int page);
 
     @GET("/api/tag/{name}")
-    Observable<List<Post>> filterByTag(@Path("name")  String tag,
-                                       @Query("page") int page);
+    Observable<Result<List<Post>>> filterByTag(@Path("name")  String tag,
+                                               @Query("page") int page);
 
     @POST("/api/posts/{id}/comments")
     Observable<Result<Comment>> createComment(@Path("id") int postId,
-                                      @Body CommentRequest commentRequest);
+                                              @Body CommentRequest commentRequest);
 }

@@ -14,6 +14,8 @@ import com.moobasoft.damego.di.components.DaggerMainComponent;
 import com.moobasoft.damego.di.modules.MainModule;
 import com.moobasoft.damego.ui.presenters.ConnectPresenter;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import butterknife.Bind;
@@ -38,6 +40,8 @@ public class ConnectActivity extends BaseActivity implements ConnectPresenter.Vi
     @Bind(R.id.email_et)        EditText emailEt;
     @Bind(R.id.username_et)     EditText usernameEt;
     @Bind(R.id.password_et)     EditText passwordEt;
+    @Bind({R.id.email_et, R.id.username_et, R.id.password_et})
+    List<EditText> inputFields;
 
     @OnClick(R.id.btn_primary)
     public void clickPrimaryButton() {
@@ -151,6 +155,7 @@ public class ConnectActivity extends BaseActivity implements ConnectPresenter.Vi
     }
 
     private void setProcessing(boolean processing) {
+        for (EditText e : inputFields) e.setEnabled(!processing);
         processingView.setVisibility(processing ? VISIBLE : GONE);
         primaryBtn.setVisibility(processing ? GONE : VISIBLE);
     }
