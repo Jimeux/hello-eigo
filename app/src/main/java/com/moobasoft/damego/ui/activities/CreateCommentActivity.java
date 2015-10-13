@@ -44,7 +44,7 @@ public class CreateCommentActivity extends BaseActivity implements CommentPresen
 
         initialiseInjector();
         initialiseSearchInput();
-        postId = getIntent().getIntExtra(ShowFragment.POST_ID, -1);
+        postId = getIntent().getIntExtra(ShowFragment.POST_ID_KEY, -1);
         presenter.bindView(this);
     }
 

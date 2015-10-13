@@ -127,7 +127,7 @@ public class ConnectActivity extends BaseActivity implements ConnectPresenter.Vi
     @Override
     public void onRegisterSuccess(String username) {
         setProcessing(false);
-        Toast.makeText(this, getString(R.string.register_success, username), Toast.LENGTH_SHORT)
+        Toast.makeText(this, getString(R.string.register_success, username), Toast.LENGTH_LONG)
                 .show();
         finish();
     }

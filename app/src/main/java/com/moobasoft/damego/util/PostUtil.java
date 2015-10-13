@@ -14,8 +14,9 @@ public class PostUtil {
 
     public static void insertTags(Post post, LayoutInflater inflater, ViewGroup tags, boolean largeText) {
         float textSize = inflater.getContext().getResources().getDimension(
-                largeText ? R.dimen.tag_text_show : R.dimen.index_footer_text
+                largeText ? R.dimen.show_tag_text : R.dimen.main_footer_text
         );
+        int tagMargin = (int) inflater.getContext().getResources().getDimension(R.dimen.tag_margin);
         tags.removeAllViews();
         for (String tag : post.getTags()) {
             final TextView tagView = (TextView)
@@ -27,7 +28,9 @@ public class PostUtil {
                 //i.putExtra(IndexActivity.TAG_NAME, tag); //TODO: Fix
                 inflater.getContext().startActivity(i);
             });
-            tags.addView(tagView);
+            if (largeText) tagView.setPadding(0, 0, tagMargin, 0);
+            else           tagView.setPadding(tagMargin, 0, 0, 0);
+                tags.addView(tagView);
         }
     }
 

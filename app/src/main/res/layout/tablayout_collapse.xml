@@ -4,6 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/app_bar_layout"
     app:elevation="2dp"
+    fontPath="fonts/Roboto-Light.ttf"
     android:background="@color/colorPrimary"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

@@ -1,6 +1,7 @@
 package com.moobasoft.damego.ui.activities;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -10,6 +11,10 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.Slide;
+import android.transition.TransitionManager;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.moobasoft.damego.App;
 import com.moobasoft.damego.R;
@@ -28,7 +33,7 @@ import butterknife.OnClick;
 
 import static android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import static android.view.View.VISIBLE;
-import static com.moobasoft.damego.ui.fragments.ShowFragment.POST_ID;
+import static com.moobasoft.damego.ui.fragments.ShowFragment.POST_ID_KEY;
 
 public class CommentsActivity extends RxActivity implements ShowPresenter.ShowView, OnRefreshListener {
 
@@ -56,15 +61,15 @@ public class CommentsActivity extends RxActivity implements ShowPresenter.ShowVi
         presenter.bindView(this);
 
         if (savedInstanceState != null)
-            postId = savedInstanceState.getInt(POST_ID, -1);
+            postId = savedInstanceState.getInt(POST_ID_KEY, -1);
 
         if (postId <= 0)
-            postId = getIntent().getIntExtra(POST_ID, -1);
+            postId = getIntent().getIntExtra(POST_ID_KEY, -1);
 
         if (postId <= 0)
             onError("No post ID given!");
         else {
-            activateView(R.id.loading_view);
+            activateLoadingView();
             presenter.getPost(postId);
         }
     }
@@ -108,7 +113,7 @@ public class CommentsActivity extends RxActivity implements ShowPresenter.ShowVi
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
-        state.putInt(POST_ID, postId);
+        state.putInt(POST_ID_KEY, postId);
         state.putParcelable(LAYOUT_KEY, commentList.getLayoutManager().onSaveInstanceState());
     }
 
@@ -132,20 +137,27 @@ public class CommentsActivity extends RxActivity implements ShowPresenter.ShowVi
         refreshLayout.setRefreshing(false);
 
         if (post.getComments().isEmpty()) {
-            activateView(R.id.empty_view);
+            activateEmptyView(getString(R.string.comments_empty));
         } else {
+            if (commentsAdapter.getItemCount() == 0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+                ViewGroup rootView = (ViewGroup) findViewById(android.R.id.content);
+
+                TransitionManager.beginDelayedTransition(rootView, new Slide());
+                commentList.setVisibility(View.VISIBLE);
+            }
+
             commentsAdapter.loadComments(post.getComments());
-            activateView(R.id.content);
+            activateContentView();
         }
     }
 
     @Override
     public void onError(String message) {
         refreshLayout.setRefreshing(false);
-        if(loadingView.getVisibility() == VISIBLE || errorView.getVisibility() == VISIBLE) {
-            errorMessage.setText(message);
-            activateView(R.id.error_view);
-        } else
+        if(loadingView.getVisibility() == VISIBLE || errorView.getVisibility() == VISIBLE)
+            activateErrorView(message);
+        else
             Snackbar.make(toolbar, message, Snackbar.LENGTH_SHORT).show();
     }
 
@@ -158,7 +170,7 @@ public class CommentsActivity extends RxActivity implements ShowPresenter.ShowVi
     @OnClick(R.id.fab)
     public void clickFab() {
         Intent intent = new Intent(CommentsActivity.this, CreateCommentActivity.class);
-        intent.putExtra(POST_ID, postId);
+        intent.putExtra(POST_ID_KEY, postId);
         doIfLoggedIn(intent);
     }
 }

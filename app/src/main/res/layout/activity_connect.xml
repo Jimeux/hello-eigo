@@ -1,10 +1,11 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:background="@color/white"
     android:gravity="center"
     android:minWidth="350dp"
+    android:maxWidth="380dp"
     android:orientation="vertical"
     tools:context="com.moobasoft.damego.ui.activities.ConnectActivity">
 
@@ -13,8 +14,8 @@
         android:layout_height="wrap_content">
 
         <ImageView
-            android:paddingTop="15dp"
-            android:paddingRight="15dp"
+            android:paddingTop="20dp"
+            android:paddingRight="20dp"
             android:layout_alignParentRight="true"
             android:id="@+id/btn_close"
             android:layout_width="wrap_content"
@@ -24,7 +25,7 @@
             android:tint="@color/grey500" />
 
         <LinearLayout
-            android:padding="24dp"
+            android:padding="25dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -67,7 +68,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
-                android:background="@drawable/btn_primary"
+                android:background="@color/colorPrimary"
                 android:text="@string/register"
                 android:textColor="@color/white" />
 
@@ -79,9 +80,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:textSize="16sp"
-                android:background="@drawable/btn_secondary"
+                android:background="@color/grey100"
                 android:text="@string/login"
-                android:textColor="@color/grey700" />
+                android:textColor="@color/grey600" />
         </LinearLayout>
 
     </RelativeLayout>

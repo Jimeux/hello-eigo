@@ -1,0 +1,19 @@
+<resources>
+    <dimen name="activity_horizontal_margin">64dp</dimen>
+
+    <dimen name="comment_username_text">22sp</dimen>
+    <dimen name="comment_created_text">16sp</dimen>
+    <dimen name="comment_body_text">20sp</dimen>
+
+    <dimen name="main_footer_text">17dp</dimen>
+    <dimen name="main_title_text">19sp</dimen>
+    <dimen name="main_body_text">18sp</dimen>
+    <dimen name="main_image_width">80dp</dimen>
+
+    <dimen name="show_comment_link_text">22dp</dimen>
+    <dimen name="show_padding">36dp</dimen>
+    <dimen name="show_backdrop_height">300dp</dimen>
+    <dimen name="show_title_text">40sp</dimen>
+    <dimen name="show_body_text">24sp</dimen>
+    <dimen name="show_tag_text">22dp</dimen>
+</resources>

@@ -30,9 +30,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:text="jimbo"
                     android:textColor="@color/grey800"
-                    android:textSize="18sp" />
+                    android:textSize="@dimen/comment_username_text" />
 
                 <TextView
                     android:id="@+id/created_at"
@@ -40,9 +39,8 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:text="7/23"
                     android:textColor="@color/grey600"
-                    android:textSize="12sp" />
+                    android:textSize="@dimen/comment_created_text" />
 
             </RelativeLayout>
 
@@ -51,9 +49,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Should I blow this shit up? Should I blow this shit up? Should I blow this shit up? Should I blow this shit up? Should I blow this shit up?"
                 android:textColor="@color/grey800"
-                android:textSize="16sp" />
+                android:textSize="@dimen/comment_body_text" />
 
         </LinearLayout>
 

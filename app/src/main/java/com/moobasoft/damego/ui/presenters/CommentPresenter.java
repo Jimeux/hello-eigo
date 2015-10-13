@@ -1,7 +1,7 @@
 package com.moobasoft.damego.ui.presenters;
 
 import com.moobasoft.damego.rest.models.Comment;
-import com.moobasoft.damego.rest.models.CommentError;
+import com.moobasoft.damego.rest.errors.CommentError;
 import com.moobasoft.damego.rest.requests.CommentRequest;
 import com.moobasoft.damego.rest.services.PostService;
 import com.moobasoft.damego.ui.RxSubscriber;
@@ -38,7 +38,7 @@ public class CommentPresenter extends RxPresenter<CommentPresenter.View> {
 
         if (result.isError())
             handleError(result.error());
-        else if (response.code() == SUCCESS)
+        else if (response.isSuccess())
             view.onCommentSubmitted(response.body());
         else if (response.code() == UNPROCESSABLE_ENTITY)
             view.onError(getInputError(response.errorBody()));
@@ -48,7 +48,7 @@ public class CommentPresenter extends RxPresenter<CommentPresenter.View> {
 
     private String getInputError(ResponseBody errorBody) {
         try {
-            CommentError commentError = CommentError.CONVERTER.fromBody(errorBody);
+            CommentError commentError = CommentError.CONVERTER.convert(errorBody);
             return commentError.getBody().get(0);
         } catch (IOException e) {
             return "An unexpected error occurred";

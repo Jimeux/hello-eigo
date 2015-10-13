@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
@@ -14,15 +16,14 @@
             android:layout_height="wrap_content"
             android:textSize="18sp" />
 
-        <Button
+        <android.support.design.widget.FloatingActionButton
             android:id="@+id/empty_refresh_btn"
+            app:elevation="1dp"
             android:layout_width="wrap_content"
-            android:layout_height="28dp"
-            android:layout_marginTop="30dp"
-            android:background="@color/colorAccent"
-            android:text="@string/refresh"
-            android:textColor="@color/white"
-            android:textSize="10sp" />
+            android:layout_height="wrap_content"
+            android:layout_margin="25dp"
+            android:clickable="true"
+            android:src="@drawable/ic_refresh_white_24dp" />
     </LinearLayout>
 
     <LinearLayout style="@style/ListStatusView"
@@ -33,20 +34,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/error_default" />
-        <Button
+
+        <android.support.design.widget.FloatingActionButton
             android:id="@+id/error_refresh_btn"
+            app:elevation="1dp"
             android:layout_width="wrap_content"
-            android:layout_height="28dp"
-            android:layout_marginTop="30dp"
-            android:background="@color/colorAccent"
-            android:text="Refresh"
-            android:textColor="@color/white"
-            android:textSize="10sp" />
+            android:layout_height="wrap_content"
+            android:layout_margin="25dp"
+            android:clickable="true"
+            android:src="@drawable/ic_refresh_white_24dp" />
     </LinearLayout>
 
     <LinearLayout style="@style/ListStatusView"
-        android:id="@+id/loading_view">
+        android:id="@+id/loading_view"
+        android:padding="30dp">
         <include android:id="@+id/progress"
             layout="@layout/loading_view" />
     </LinearLayout>
+
 </LinearLayout>

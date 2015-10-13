@@ -4,13 +4,27 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="app_bar_height">180dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="tag_margin">8dp</dimen>
 
     <dimen name="shadow_height">2dp</dimen>
 
-    <dimen name="index_footer_text">14dp</dimen>
-    <dimen name="tag_text_show">17dp</dimen>
+    <dimen name="comment_layout_padding">0dp</dimen>
+    <dimen name="comment_username_text">18sp</dimen>
+    <dimen name="comment_created_text">12sp</dimen>
+    <dimen name="comment_body_text">16sp</dimen>
 
+    <dimen name="show_backdrop_height">230dp</dimen>
+    <dimen name="show_padding">22dp</dimen>
+    <dimen name="show_tag_text">17dp</dimen>
+    <dimen name="show_title_text">26sp</dimen>
+    <dimen name="show_body_text">18sp</dimen>
+    <dimen name="show_comment_link_text">18dp</dimen>
+
+    <dimen name="main_footer_text">14dp</dimen>
     <dimen name="main_card_margin">2dp</dimen>
+    <dimen name="main_image_width">60dp</dimen>
+    <dimen name="main_body_text">15sp</dimen>
+    <dimen name="main_title_text">17sp</dimen>
     <dimen name="main_list_margin_vert">6dp</dimen>
     <dimen name="main_list_margin_horiz">6dp</dimen>
 

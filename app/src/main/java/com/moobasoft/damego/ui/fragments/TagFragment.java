@@ -99,7 +99,7 @@ public class TagFragment extends BaseFragment
     public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
         appBarIsExpanded = verticalOffset == 0;
         setRefreshLayoutEnabled();
-    } //if (scrollRange == -1) scrollRange = appBarLayout.getTotalScrollRange();
+    }
 
     private void setRefreshLayoutEnabled() {
         if (refreshLayout == null || postList == null) return;
@@ -175,8 +175,10 @@ public class TagFragment extends BaseFragment
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
 
+        boolean showFeatures = getResources().getBoolean(R.bool.show_feature_views);
         int columns = getResources().getInteger(R.integer.main_list_columns);
-        postsAdapter = new PostsAdapter((IndexActivity)getActivity(), posts, columns);
+
+        postsAdapter = new PostsAdapter((IndexActivity)getActivity(), posts, columns, showFeatures);
         LinearLayoutManager layoutManager = new GridLayoutManager(getActivity(), columns);
 
         postList.setLayoutManager(layoutManager);

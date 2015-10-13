@@ -1,12 +1,13 @@
 package com.moobasoft.damego.ui.fragments;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.transition.Slide;
+import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +21,6 @@ import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.activities.BaseActivity;
 import com.moobasoft.damego.ui.activities.CommentsActivity;
 import com.moobasoft.damego.ui.activities.CreateCommentActivity;
-import com.moobasoft.damego.ui.activities.IndexActivity;
 import com.moobasoft.damego.ui.presenters.ShowPresenter;
 import com.moobasoft.damego.ui.views.CommentView;
 import com.moobasoft.damego.util.PostUtil;
@@ -37,12 +37,11 @@ import static android.view.View.VISIBLE;
 
 public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView {
 
-    public static final String POST_ID = "post_id";
+    public static final String POST_ID_KEY = "post_id";
     private int postId;
 
     @Inject ShowPresenter presenter;
 
-    @Nullable @Bind(R.id.app_bar) AppBarLayout appBarLayout;
     @Bind(R.id.title)             TextView title;
     @Bind(R.id.body)              TextView body;
     @Bind(R.id.tags)              ViewGroup tags;
@@ -56,38 +55,37 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
     public static ShowFragment newInstance(int postId) {
         ShowFragment fragment = new ShowFragment();
         Bundle args = new Bundle();
-        args.putInt(POST_ID, postId);
+        args.putInt(POST_ID_KEY, postId);
         fragment.setArguments(args);
         return fragment;
     }
 
     @Nullable @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.activity_show, container, false);
+        View view = inflater.inflate(R.layout.activity_show, container, false);
+        ButterKnife.bind(this, view);
+        return view;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
         getComponent().inject(this);
-
-        Toolbar toolbar = (Toolbar) getView().findViewById(R.id.toolbar);
-        if (toolbar != null) // TODO: Use callback in Activity
-            ((IndexActivity)getActivity()).setToolbar(toolbar, getClass().getName());
+        if (toolbar != null) toolbar.setTitle("");
 
         presenter.bindView(this);
-        postId = getArguments().getInt(POST_ID, -1);
+        postId = getArguments().getInt(POST_ID_KEY, 0);
 
-        if (savedInstanceState != null && postId == -1) //TODO: Restore instance state
-            postId = savedInstanceState.getInt(POST_ID);
+        if (savedInstanceState != null && postId == 0) //TODO: Restore instance state
+            postId = savedInstanceState.getInt(POST_ID_KEY);
         onRefresh();
+        if (appBarLayout != null) appBarLayout.setVisibility(View.GONE);
     }
 
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
-        state.putInt(POST_ID, postId);
+        state.putInt(POST_ID_KEY, postId);
     }
 
     @Override
@@ -99,6 +97,7 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
 
     @Override
     public void onRefresh() {
+        setAppBarExpanded(false);
         activateLoadingView();
         if (postId == -1) onError("No post ID given!");
         else presenter.getPost(postId);
@@ -106,6 +105,7 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
 
     @Override
     public void onPostRetrieved(Post post) {
+        postId = post.getId();
         title.setText(post.getTitle());
         commentTitle.setText(getString(
                 R.string.comments_title, post.getCommentsCount()));
@@ -118,10 +118,30 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
         insertComments(post);
         setAppBarExpanded(true);
         activateContentView();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && getView() != null) {
+            title.setVisibility(View.INVISIBLE);
+            body.setVisibility(View.INVISIBLE);
+            tags.setVisibility(View.INVISIBLE);
+            ViewGroup rootView = (ViewGroup) getView().getRootView();
+            TransitionManager.beginDelayedTransition(rootView, new Slide());
+            toggleVisibility(title, body, tags);
+        }
+    }
+
+    private static void toggleVisibility(View... views) {
+        for (View view : views) {
+            boolean isVisible = view.getVisibility() == View.VISIBLE;
+            view.setVisibility(isVisible ? View.INVISIBLE : View.VISIBLE);
+        }
     }
 
     private void setAppBarExpanded(boolean expanded) {
-        if (appBarLayout != null) appBarLayout.setExpanded(expanded, false);
+        if (appBarLayout != null) {
+            appBarLayout.setVisibility(View.INVISIBLE);
+            appBarLayout.setExpanded(expanded, false);
+            appBarLayout.setVisibility(View.VISIBLE);
+        }
     }
 
     private void insertComments(Post post) {
@@ -133,7 +153,6 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
             view.bindTo(comment);
             commentContainer.addView(view);
         }
-
         viewCommentsBtn.setVisibility(
                 comments.isEmpty() ? View.GONE : View.VISIBLE);
     }
@@ -155,14 +174,14 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
     @OnClick({R.id.comment_title, R.id.view_comments_btn})
     public void clickViewComments() {
         Intent i = new Intent(getActivity(), CommentsActivity.class);
-        i.putExtra(POST_ID, postId);
+        i.putExtra(POST_ID_KEY, postId);
         startActivity(i);
     }
 
     @OnClick(R.id.fab)
     public void clickFab() { // TODO: The Intent code should go in the activity, used through callback
         Intent intent = new Intent(getActivity(), CreateCommentActivity.class);
-        intent.putExtra(ShowFragment.POST_ID, postId);
+        intent.putExtra(ShowFragment.POST_ID_KEY, postId);
         ((BaseActivity)getActivity()).doIfLoggedIn(intent);
     }
 

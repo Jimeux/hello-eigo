@@ -73,7 +73,7 @@ public final class PostSummaryView extends LinearLayout {
     @OnClick(R.id.comment_strip)
     public void clickCommentStrip() {
         Intent i = new Intent(getContext(), CommentsActivity.class);
-        i.putExtra(ShowFragment.POST_ID, postId);
+        i.putExtra(ShowFragment.POST_ID_KEY, postId);
         getContext().startActivity(i);
     }
 

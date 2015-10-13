@@ -25,77 +25,75 @@ import com.moobasoft.damego.di.components.DaggerMainComponent;
 import com.moobasoft.damego.di.modules.MainModule;
 import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.PostsAdapter;
+import com.moobasoft.damego.ui.fragments.BaseFragment;
 import com.moobasoft.damego.ui.fragments.ShowFragment;
 import com.moobasoft.damego.ui.fragments.TagFragment;
+import com.moobasoft.damego.ui.presenters.MainPresenter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 import static android.support.design.widget.Snackbar.LENGTH_SHORT;
 
-public class IndexActivity extends BaseActivity implements PostsAdapter.PostClickListener, FragmentManager.OnBackStackChangedListener {
+public class IndexActivity extends RxActivity
+        implements PostsAdapter.PostClickListener, FragmentManager.OnBackStackChangedListener, MainPresenter.View {
 
-    public static final String HOME_PAGE = "home";
+    public static final String HOME_TAG = "home";
+    public static final String SHOW_TAG = "show";
 
-    @Nullable @Bind(R.id.fragment_container)  ViewGroup fragmentContainer;
-    @Nullable @Bind(R.id.show_post_container) ViewGroup showPostContainer;
+    @Nullable @Bind(R.id.fragment_container)   ViewGroup fragmentContainer;
+    @Nullable @Bind(R.id.show_post_container)  ViewGroup showPostContainer;
     @Nullable @Bind(R.id.post_index_container) ViewGroup postIndexContainer;
 
     @Bind(R.id.app_bar_layout) AppBarLayout appBarLayout;
     @Bind(R.id.view_pager)     ViewPager viewPager;
     @Bind(R.id.tab_layout)     TabLayout tabLayout;
+
     private Adapter adapter;
     private int currentPostId;
-    private String currentPage;
 
-    interface MainActions {
-        void promptLogin();
-        void setToolbar(Toolbar toolbar);
-    } // TODO: Use something like this for fragments
+    @Inject MainPresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        setSupportActionBar(toolbar);
         initialiseInjector();
-
-        adapter = new Adapter(getSupportFragmentManager());
-
-        List<String> tags = Arrays
-                .asList("すべて", "Cool", "和製英語", "TOEIC", "馬鹿野郎", "ワンキング", "ゲーム", "CM", "nyans");
-        for (String t : tags)
-            adapter.addFragment(TagFragment.newInstance(t), t);
-
-        viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);
-
         getSupportFragmentManager().addOnBackStackChangedListener(this);
 
-        if (savedInstanceState != null) {
-            currentPostId = savedInstanceState.getInt(ShowFragment.POST_ID, -1);
-            if (showPostContainer != null && currentPostId > 0) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(showPostContainer.getId(),
-                                ShowFragment.newInstance(currentPostId),
-                                ShowFragment.class.getName())
-                        .commit();
-            }
-        } else {
-            if (showPostContainer != null) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(showPostContainer.getId(),
-                                ShowFragment.newInstance(10),
-                                ShowFragment.class.getName())
-                        .commit();
-            }
-        }
-        setToolbar(toolbar, HOME_PAGE);
+        presenter.bindView(this);
+
+        if (savedInstanceState != null)
+            currentPostId = savedInstanceState.getInt(ShowFragment.POST_ID_KEY, 0);
+
+        tabLayout.setVisibility(View.GONE);
+        presenter.getTags();
+        activateLoadingView();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        setToolbar();
+    }
+
+    private void loadPost() {
+        if (showPostContainer == null) return;
+
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) // Test for specific tag
+            getSupportFragmentManager().popBackStack();
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(showPostContainer.getId(),
+                        ShowFragment.newInstance(currentPostId),
+                        SHOW_TAG)
+                .commit();
     }
 
     private void initialiseInjector() {
@@ -108,13 +106,83 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
     @Override
     protected void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
-        state.putInt(ShowFragment.POST_ID, currentPostId);
+        state.putInt(ShowFragment.POST_ID_KEY, currentPostId);
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle state) {
-        super.onRestoreInstanceState(state);
-        currentPostId = state.getInt(ShowFragment.POST_ID, -1);
+    public void onBackStackChanged() {
+        setToolbar();
+    }
+
+    //FIXME: Toolbar font is screwed when going back from show > main after config change
+    public void setToolbar() {
+        FragmentManager manager = getSupportFragmentManager();
+        int backStackEntryCount = manager.getBackStackEntryCount();
+        Toolbar newToolbar = null;
+
+        if (backStackEntryCount > 0) {
+            String current = manager.getBackStackEntryAt(backStackEntryCount - 1).getName();
+            newToolbar = ((BaseFragment) manager.findFragmentByTag(current)).getToolbar();
+        }
+
+        if (newToolbar == null) {
+            appBarLayout.setExpanded(true, false);
+            toolbar.setVisibility(View.VISIBLE);
+            if (adapter != null) tabLayout.setVisibility(View.VISIBLE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimary));
+            setSupportActionBar(toolbar);
+        } else {
+            setSupportActionBar(newToolbar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            toolbar.setVisibility(View.GONE);
+            tabLayout.setVisibility(View.GONE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
+    }
+
+    @Override
+    public void onSummaryClicked(Post post) {
+        int containerId = (showPostContainer != null) ?
+                showPostContainer.getId() : fragmentContainer.getId();
+        currentPostId = post.getId();
+        ShowFragment showFragment = ShowFragment.newInstance(currentPostId);
+
+        FragmentTransaction transaction = getSupportFragmentManager()
+                .beginTransaction()
+                .replace(containerId, showFragment, SHOW_TAG);
+        if (showPostContainer == null) transaction.addToBackStack(SHOW_TAG);
+        transaction.commit();
+    }
+
+    @Override
+    public void onTagClicked(String tag) {
+        viewPager.setCurrentItem(adapter.getIndex(tag), false);
+    }
+
+    @Override
+    public void onTagsRetrieved(List<String> tags) {
+        activateContentView();
+        loadPost();
+        adapter = new Adapter(getSupportFragmentManager());
+
+        for (String t : tags)
+            adapter.addFragment(TagFragment.newInstance(t), t);
+        viewPager.setAdapter(adapter);
+        tabLayout.setupWithViewPager(viewPager);
+        setToolbar();
+    }
+
+    @Override
+    public void onError(String message) {
+        activateErrorView(message);
+    }
+
+    @Override
+    public void onRefresh() {
+        activateLoadingView();
+        presenter.getTags();
     }
 
     static class Adapter extends FragmentStatePagerAdapter {
@@ -187,65 +255,6 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
         }
         supportInvalidateOptionsMenu();
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onBackStackChanged() {
-        Fragment current = getSupportFragmentManager().findFragmentByTag(ShowFragment.class.getName());
-        if (current != null && current.isVisible()) {
-        } else {
-            setToolbar(toolbar, HOME_PAGE);
-        }
-    }
-
-    public void setToolbar(Toolbar newToolbar, String tag) {
-        setSupportActionBar(newToolbar);
-
-        if (tag.equals(HOME_PAGE)) {
-            toolbar.setVisibility(View.VISIBLE);
-            tabLayout.setVisibility(View.VISIBLE);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimary));
-        } else if (tag.equals(ShowFragment.class.getName())) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            toolbar.setVisibility(View.GONE);
-            tabLayout.setVisibility(View.GONE);
-            setTitle(""); // TODO: make this unnecessary
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                getWindow().setStatusBarColor(Color.TRANSPARENT);
-        }
-    }
-
-    public void onHitBack(String tag) {
-        if (ShowFragment.class.getName().equals(tag)) {
-            // show home
-        }
-    }
-
-    @Override
-    public void onSummaryClicked(Post post) {
-        // TODO: This should be done on rotation!
-        // TODO: Maybe manage without backstack (onHitBack())
-        //TODO: If (land && ShowFragment on backstack) popBackstack()
-
-        currentPostId = post.getId();
-        int containerId = (showPostContainer != null) ?
-                showPostContainer.getId() : fragmentContainer.getId();
-
-        FragmentTransaction transaction = getSupportFragmentManager()
-                .beginTransaction()
-                .replace(containerId,
-                        ShowFragment.newInstance(post.getId()),
-                        ShowFragment.class.getName());
-        if (showPostContainer == null)
-            transaction.addToBackStack(ShowFragment.class.getName());
-
-        transaction.commit();
-    }
-
-    @Override
-    public void onTagClicked(String tag) {
-        viewPager.setCurrentItem(adapter.getIndex(tag), false);
     }
 
 }

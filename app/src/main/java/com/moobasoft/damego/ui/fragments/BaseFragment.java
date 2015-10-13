@@ -1,6 +1,9 @@
 package com.moobasoft.damego.ui.fragments;
 
+import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -19,6 +22,10 @@ import static android.view.View.VISIBLE;
 
 public abstract class BaseFragment extends Fragment {
 
+    @Nullable @Bind(R.id.app_bar) AppBarLayout appBarLayout;
+    @Nullable @Bind(R.id.toolbar) Toolbar toolbar;
+
+    @Bind(R.id.content)       ViewGroup contentView;
     @Bind(R.id.loading_view)  ViewGroup loadingView;
     @Bind(R.id.empty_view)    ViewGroup emptyView;
     @Bind(R.id.error_view)    ViewGroup errorView;
@@ -26,6 +33,11 @@ public abstract class BaseFragment extends Fragment {
     @Bind(R.id.empty_msg)     TextView emptyMessage;
     @Bind({R.id.loading_view, R.id.error_view, R.id.empty_view, R.id.content})
     List<ViewGroup> stateViews;
+
+    @Nullable
+    public Toolbar getToolbar() {
+        return toolbar;
+    }
 
     protected MainComponent getComponent() {
         return DaggerMainComponent.builder()

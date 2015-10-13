@@ -15,9 +15,11 @@
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh"
+        android:paddingLeft="@dimen/comment_layout_padding"
+        android:paddingRight="@dimen/comment_layout_padding"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/grey100">
+        android:background="@color/greyBackground">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -42,7 +44,5 @@
         </FrameLayout>
 
     </android.support.v4.widget.SwipeRefreshLayout>
-
-    <include layout="@layout/status_views" />
 
 </LinearLayout>

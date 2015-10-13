@@ -2,9 +2,10 @@ package com.moobasoft.damego.rest.services;
 
 import com.moobasoft.damego.rest.models.AccessToken;
 import com.moobasoft.damego.rest.models.User;
-import com.moobasoft.damego.rest.requests.UserRequest;
+import com.moobasoft.damego.rest.requests.RegistrationRequest;
 import com.squareup.okhttp.Response;
 
+import retrofit.Result;
 import retrofit.http.Body;
 import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;
@@ -17,7 +18,7 @@ public interface UserService {
 
     @FormUrlEncoded
     @POST("/oauth/token")
-    Observable<AccessToken> getAccessToken(
+    Observable<Result<AccessToken>> getAccessToken(
             @Field("username") String username,
             @Field("password") String password,
             @Field("grant_type") String grantType);
@@ -30,7 +31,7 @@ public interface UserService {
             @Field("grant_type") String grantType);
 
     @POST("/api/users")
-    Observable<AccessToken> register(@Body UserRequest user);
+    Observable<Result<AccessToken>> register(@Body RegistrationRequest user);
 
     @GET("/api/users/{username}")
     Observable<User> getUser(@Path("username") String username);

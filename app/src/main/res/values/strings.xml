@@ -28,7 +28,7 @@
 
     <string name="login_success">ログインしました</string>
     <string name="login_error">ログインできませんでした</string>
-    <string name="register_success">アカウントを登録しました</string>
+    <string name="register_success">Damegaへようこそ、%1$s</string>
     <string name="register">登録する</string>
     <string name="login">ログイン</string>
     <string name="username">ユーザー名</string>
@@ -42,5 +42,6 @@
     <string name="post_list_footer">ポストはノーモア残っている。</string>
     <string name="action_search">Search</string>
     <string name="fragment_image_trans">fragment_image_transition</string>
+    <string name="comments_empty">コメントはまだありません。</string>
 
 </resources>

@@ -19,15 +19,17 @@ public class PostsAdapter extends RecyclerView.Adapter<ViewHolder> {
     public static final int TYPE_FEATURED = 0;
     public static final int TYPE_NORMAL   = 1;
     public static final int TYPE_FOOTER   = 2;
+    private final boolean showFeatures;
 
     private PostClickListener summaryClickListener;
     private List<Post> postList;
     private final int columns;
 
-    public PostsAdapter(PostClickListener summaryClickListener, List<Post> posts, int columns) {
+    public PostsAdapter(PostClickListener summaryClickListener, List<Post> posts, int columns, boolean showFeatures) {
         this.summaryClickListener = summaryClickListener;
         this.postList = posts;
         this.columns = columns;
+        this.showFeatures = showFeatures;
     }
 
     public void loadPosts(List<Post> posts) {
@@ -65,7 +67,7 @@ public class PostsAdapter extends RecyclerView.Adapter<ViewHolder> {
     public int getItemViewType(int position) {
         if (position == postList.size())
             return TYPE_FOOTER;
-        else if (position % 6 == 0 || (columns == 2 && (position-1) % 6 == 0))
+        else if (showFeatures && (position % 10 == 0 || (columns == 2 && (position-1) % 10 == 0)))
             return TYPE_FEATURED;
         else
             return TYPE_NORMAL;
@@ -104,11 +106,11 @@ public class PostsAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     static class FooterHolder extends ViewHolder {
-        private final View view;
+        //private final View view;
 
         public FooterHolder(View itemView) {
             super(itemView);
-            this.view = itemView;
+            //this.view = itemView;
         }
     }
 }

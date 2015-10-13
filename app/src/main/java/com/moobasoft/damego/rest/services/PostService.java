@@ -22,6 +22,9 @@ public interface PostService {
     @GET("/api/posts")
     Observable<Result<List<Post>>> index(@Query("page") int page);
 
+    @GET("/api/tags")
+    Observable<Result<List<String>>> getTags();
+
     @GET("/api/tag/{name}")
     Observable<Result<List<Post>>> filterByTag(@Path("name")  String tag,
                                                @Query("page") int page);

@@ -1,4 +1,6 @@
-package com.moobasoft.damego.rest.models;
+package com.moobasoft.damego.rest.errors;
+
+import com.squareup.okhttp.ResponseBody;
 
 import java.util.List;
 
@@ -9,9 +11,9 @@ public class CommentError {
     private List<String> body;
 
     @SuppressWarnings("unchecked")
-    public static final Converter<CommentError> CONVERTER =
-            (Converter<CommentError>) GsonConverterFactory
-                    .create().get(CommentError.class);
+    public static final Converter<ResponseBody, CommentError> CONVERTER =
+            (Converter<ResponseBody, CommentError>) GsonConverterFactory
+                    .create().fromResponseBody(CommentError.class, null);
 
     public List<String> getBody() {
         return body;

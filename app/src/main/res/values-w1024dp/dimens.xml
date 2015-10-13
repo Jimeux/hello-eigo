@@ -1,0 +1,14 @@
+<resources>
+
+    <dimen name="comment_layout_padding">84dp</dimen>
+    <dimen name="comment_username_text">20sp</dimen>
+    <dimen name="comment_created_text">15sp</dimen>
+    <dimen name="comment_body_text">18sp</dimen>
+
+    <dimen name="show_backdrop_height">235dp</dimen>
+    <dimen name="show_padding">24dp</dimen>
+    <dimen name="show_tag_text">18dp</dimen>
+    <dimen name="show_title_text">28sp</dimen>
+    <dimen name="show_body_text">20sp</dimen>
+    <dimen name="show_comment_link_text">19dp</dimen>
+</resources>
