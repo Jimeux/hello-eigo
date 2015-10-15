@@ -119,20 +119,12 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
         setAppBarExpanded(true);
         activateContentView();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && getView() != null) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             title.setVisibility(View.INVISIBLE);
             body.setVisibility(View.INVISIBLE);
             tags.setVisibility(View.INVISIBLE);
-            ViewGroup rootView = (ViewGroup) getView().getRootView();
-            TransitionManager.beginDelayedTransition(rootView, new Slide());
+            TransitionManager.beginDelayedTransition((ViewGroup) getView().getRootView(), new Slide());
             toggleVisibility(title, body, tags);
-        }
-    }
-
-    private static void toggleVisibility(View... views) {
-        for (View view : views) {
-            boolean isVisible = view.getVisibility() == View.VISIBLE;
-            view.setVisibility(isVisible ? View.INVISIBLE : View.VISIBLE);
         }
     }
 

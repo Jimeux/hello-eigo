@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -33,6 +34,13 @@ public abstract class BaseFragment extends Fragment {
     @Bind(R.id.empty_msg)     TextView emptyMessage;
     @Bind({R.id.loading_view, R.id.error_view, R.id.empty_view, R.id.content})
     List<ViewGroup> stateViews;
+
+    protected static void toggleVisibility(View... views) {
+        for (View view : views) {
+            boolean isVisible = view.getVisibility() == View.VISIBLE;
+            view.setVisibility(isVisible ? View.INVISIBLE : View.VISIBLE);
+        }
+    }
 
     @Nullable
     public Toolbar getToolbar() {

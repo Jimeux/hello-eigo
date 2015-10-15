@@ -29,6 +29,7 @@ import com.moobasoft.damego.ui.fragments.BaseFragment;
 import com.moobasoft.damego.ui.fragments.ShowFragment;
 import com.moobasoft.damego.ui.fragments.TagFragment;
 import com.moobasoft.damego.ui.presenters.MainPresenter;
+import com.moobasoft.damego.util.Animate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -165,13 +166,16 @@ public class IndexActivity extends RxActivity
     public void onTagsRetrieved(List<String> tags) {
         activateContentView();
         loadPost();
+        setToolbar();
         adapter = new Adapter(getSupportFragmentManager());
 
         for (String t : tags)
             adapter.addFragment(TagFragment.newInstance(t), t);
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
-        setToolbar();
+
+        if (getSupportFragmentManager().getBackStackEntryCount() == 0)
+            Animate.fadeIn(tabLayout);
     }
 
     @Override

@@ -9,11 +9,25 @@
     android:fitsSystemWindows="true"
     tools:context="com.moobasoft.damego.ui.fragments.ShowFragment">
 
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <include layout="@layout/content_show" />
+
+    </android.support.v4.widget.NestedScrollView>
+
+    <include layout="@layout/status_views" />
+
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/show_backdrop_height"
         android:fitsSystemWindows="true"
+        android:clickable="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:elevation="0dp"
         app:statusBarBackground="@android:color/transparent">
@@ -50,18 +64,5 @@
 
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
-
-    <android.support.v4.widget.NestedScrollView
-        android:id="@+id/content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <include layout="@layout/content_show" />
-
-    </android.support.v4.widget.NestedScrollView>
-
-    <include layout="@layout/status_views" />
 
 </android.support.design.widget.CoordinatorLayout>

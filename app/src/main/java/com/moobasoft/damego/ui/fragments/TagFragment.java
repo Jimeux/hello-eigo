@@ -1,5 +1,6 @@
 package com.moobasoft.damego.ui.fragments;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
@@ -11,6 +12,8 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.transition.Slide;
+import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -200,12 +203,18 @@ public class TagFragment extends BaseFragment
         if (scrollListener.getCurrentPage() == 1)
             postsAdapter.clear();
         refreshLayout.setRefreshing(false);
-        postsAdapter.loadPosts(newPosts);
 
         if (posts.isEmpty() && newPosts.isEmpty())
             activateEmptyView(getString(R.string.no_posts_found));
-        else
+        else {
+            refreshLayout.setVisibility(View.INVISIBLE);
             activateContentView();
+            if (posts.isEmpty() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && getView() != null) {
+                TransitionManager.beginDelayedTransition((ViewGroup) getView().getRootView(), new Slide());
+            }
+            postsAdapter.loadPosts(newPosts);
+            refreshLayout.setVisibility(View.VISIBLE);
+        }
 
         if (posts.size() > 0 && newPosts.isEmpty());
             // Activate footer?
