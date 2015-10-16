@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/greyBackground"
     android:fitsSystemWindows="true">
 
-    <include layout="@layout/tablayout_collapse" />
-
-    <include layout="@layout/status_views" />
+    <include layout="@layout/toolbar_index" />
 
     <LinearLayout
         android:id="@+id/content"
@@ -18,14 +16,14 @@
         android:weightSum="10"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/view_pager"
+        <FrameLayout
+            android:id="@+id/index_container"
+            android:layout_weight="4.2"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="4.2" />
+            android:layout_height="match_parent" />
 
         <FrameLayout
-            android:id="@+id/show_post_container"
+            android:id="@+id/show_container"
             android:layout_weight="5.8"
             android:layout_width="0dp"
             android:layout_height="match_parent" />

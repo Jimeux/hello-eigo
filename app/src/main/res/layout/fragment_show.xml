@@ -9,6 +9,8 @@
     android:fitsSystemWindows="true"
     tools:context="com.moobasoft.damego.ui.fragments.ShowFragment">
 
+    <include layout="@layout/status_views" />
+
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/content"
         android:layout_width="match_parent"
@@ -19,8 +21,6 @@
         <include layout="@layout/content_show" />
 
     </android.support.v4.widget.NestedScrollView>
-
-    <include layout="@layout/status_views" />
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"

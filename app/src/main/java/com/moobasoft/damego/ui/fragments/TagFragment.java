@@ -12,8 +12,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.transition.Slide;
-import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +20,6 @@ import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.EndlessOnScrollListener;
 import com.moobasoft.damego.ui.PostsAdapter;
-import com.moobasoft.damego.ui.activities.BaseActivity;
 import com.moobasoft.damego.ui.activities.IndexActivity;
 import com.moobasoft.damego.ui.presenters.IndexPresenter;
 
@@ -67,6 +64,7 @@ public class TagFragment extends BaseFragment
 
     @Bind(R.id.post_list)     RecyclerView postList;
     @Bind(R.id.swipe_refresh) SwipeRefreshLayout refreshLayout;
+    private LinearLayoutManager layoutManager;
 
     public TagFragment() {}
 
@@ -80,22 +78,23 @@ public class TagFragment extends BaseFragment
 
     @Nullable @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.content_main, container, false);
+        View view = inflater.inflate(R.layout.content_main, container, false);
+        ButterKnife.bind(this, view);
+        getComponent().inject(this);
+        appBarLayout = (AppBarLayout) getActivity().findViewById(R.id.app_bar_layout);
+        presenter.bindView(this);
+        posts = new ArrayList<>();
+        tagName = getArguments().getString(TAG_NAME);
+        return view;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
-        getComponent().inject(this);
-
-        appBarLayout = (AppBarLayout) getActivity().findViewById(R.id.app_bar_layout);
-        presenter.bindView(this);
-        posts = new ArrayList<>();
-        tagName = getArguments().getString(TAG_NAME);
         initialiseRecyclerView();
-
-        if (savedInstanceState == null) loadPosts(1);
+        if (savedInstanceState == null) {
+            loadPosts(1);
+        }
     }
 
     @Override
@@ -126,6 +125,7 @@ public class TagFragment extends BaseFragment
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
+
         if (postList == null || posts == null || scrollListener == null)
             return;
         state.putParcelable(LAYOUT_KEY, postList.getLayoutManager().onSaveInstanceState());
@@ -159,8 +159,8 @@ public class TagFragment extends BaseFragment
     }
 
     private void loadPosts(int page) {
-        if (page == 1) activateLoadingView();
-        else refreshLayout.setRefreshing(true);
+        //if (page == 1) activateLoadingView();
+        refreshLayout.setRefreshing(true);
 
         if (tagName.equals(SHOW_ALL_TAG) || TextUtils.isEmpty(tagName))
             presenter.postsIndex(page);
@@ -182,10 +182,7 @@ public class TagFragment extends BaseFragment
         int columns = getResources().getInteger(R.integer.main_list_columns);
 
         postsAdapter = new PostsAdapter((IndexActivity)getActivity(), posts, columns, showFeatures);
-        LinearLayoutManager layoutManager = new GridLayoutManager(getActivity(), columns);
-
-        postList.setLayoutManager(layoutManager);
-        postList.setAdapter(postsAdapter);
+        layoutManager = new GridLayoutManager(getActivity(), columns);
         scrollListener = new EndlessOnScrollListener(layoutManager) {
             @Override public void onLoadMore(int currentPage) {
                 loadPosts(currentPage);
@@ -195,6 +192,9 @@ public class TagFragment extends BaseFragment
                 return refreshLayout.isRefreshing();
             }
         };
+
+        postList.setLayoutManager(layoutManager);
+        postList.setAdapter(postsAdapter);
         postList.addOnScrollListener(scrollListener);
     }
 
@@ -210,7 +210,7 @@ public class TagFragment extends BaseFragment
             refreshLayout.setVisibility(View.INVISIBLE);
             activateContentView();
             if (posts.isEmpty() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && getView() != null) {
-                TransitionManager.beginDelayedTransition((ViewGroup) getView().getRootView(), new Slide());
+                //TransitionManager.beginDelayedTransition((ViewGroup) getView().getRootView(), new Slide());
             }
             postsAdapter.loadPosts(newPosts);
             refreshLayout.setVisibility(View.VISIBLE);
@@ -218,11 +218,6 @@ public class TagFragment extends BaseFragment
 
         if (posts.size() > 0 && newPosts.isEmpty());
             // Activate footer?
-    }
-
-    @Override
-    public void promptForLogin() {
-        ((BaseActivity)getActivity()).promptForLogin(); // TODO: Use callback interface?
     }
 
     @Override
@@ -238,9 +233,10 @@ public class TagFragment extends BaseFragment
     @Override
     public void onRefresh() {
         if (errorView.getVisibility() == VISIBLE || emptyView.getVisibility() == VISIBLE)
-            activateView(R.id.loading_view);
+            activateLoadingView();
         else
             refreshLayout.setRefreshing(true);
+
         scrollListener.reset();
         loadPosts(1);
     }

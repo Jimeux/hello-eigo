@@ -1,5 +1,7 @@
 package com.moobasoft.damego.ui.presenters.base;
 
+import android.util.Log;
+
 import com.moobasoft.damego.ui.RxSubscriber;
 
 import java.net.SocketTimeoutException;
@@ -54,8 +56,10 @@ public abstract class RxPresenter<V extends RxPresenter.RxView> extends BasePres
             view.onError("Couldn't connect to server.");
         else if (throwable instanceof SocketTimeoutException)
             view.onError("Request timed out.");
-        else
+        else {
+            Log.d("TAGGART", throwable.getMessage());
             view.onError("An unexpected error occurred.");
+        }
     }
 
 }

@@ -1,7 +1,6 @@
 package com.moobasoft.damego.ui.fragments;
 
 import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -13,6 +12,7 @@ import com.moobasoft.damego.R;
 import com.moobasoft.damego.di.components.DaggerMainComponent;
 import com.moobasoft.damego.di.components.MainComponent;
 import com.moobasoft.damego.di.modules.MainModule;
+import com.moobasoft.damego.ui.activities.BaseActivity;
 
 import java.util.List;
 
@@ -23,7 +23,6 @@ import static android.view.View.VISIBLE;
 
 public abstract class BaseFragment extends Fragment {
 
-    @Nullable @Bind(R.id.app_bar) AppBarLayout appBarLayout;
     @Nullable @Bind(R.id.toolbar) Toolbar toolbar;
 
     @Bind(R.id.content)       ViewGroup contentView;
@@ -40,6 +39,10 @@ public abstract class BaseFragment extends Fragment {
             boolean isVisible = view.getVisibility() == View.VISIBLE;
             view.setVisibility(isVisible ? View.INVISIBLE : View.VISIBLE);
         }
+    }
+
+    public void promptForLogin() {
+        ((BaseActivity) getActivity()).promptForLogin();
     }
 
     @Nullable

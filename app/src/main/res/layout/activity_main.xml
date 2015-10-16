@@ -1,35 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/post_index_container"
+
+<FrameLayout
+    android:id="@+id/index_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-    <android.support.design.widget.CoordinatorLayout
-        android:id="@+id/fragment_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
-        tools:context=".IndexActivity">
-
-        <include layout="@layout/tablayout_collapse" />
-
-        <LinearLayout
-            android:id="@+id/content"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <android.support.v4.view.ViewPager
-                android:id="@+id/view_pager"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </LinearLayout>
-
-
-        <include layout="@layout/status_views" />
-
-    </android.support.design.widget.CoordinatorLayout>
-</FrameLayout>
+    xmlns:android="http://schemas.android.com/apk/res/android" />

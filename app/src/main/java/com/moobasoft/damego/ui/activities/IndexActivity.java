@@ -1,22 +1,14 @@
 package com.moobasoft.damego.ui.activities;
 
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.moobasoft.damego.App;
@@ -25,40 +17,21 @@ import com.moobasoft.damego.di.components.DaggerMainComponent;
 import com.moobasoft.damego.di.modules.MainModule;
 import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.PostsAdapter;
-import com.moobasoft.damego.ui.fragments.BaseFragment;
+import com.moobasoft.damego.ui.fragments.IndexFragment;
 import com.moobasoft.damego.ui.fragments.ShowFragment;
-import com.moobasoft.damego.ui.fragments.TagFragment;
-import com.moobasoft.damego.ui.presenters.MainPresenter;
-import com.moobasoft.damego.util.Animate;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-import static android.support.design.widget.Snackbar.LENGTH_SHORT;
+public class IndexActivity extends BaseActivity implements PostsAdapter.PostClickListener {
 
-public class IndexActivity extends RxActivity
-        implements PostsAdapter.PostClickListener, FragmentManager.OnBackStackChangedListener, MainPresenter.View {
+    public static final String INDEX_TAG = "index";
+    public static final String SHOW_TAG  = "show";
 
-    public static final String HOME_TAG = "home";
-    public static final String SHOW_TAG = "show";
-
-    @Nullable @Bind(R.id.fragment_container)   ViewGroup fragmentContainer;
-    @Nullable @Bind(R.id.show_post_container)  ViewGroup showPostContainer;
-    @Nullable @Bind(R.id.post_index_container) ViewGroup postIndexContainer;
-
-    @Bind(R.id.app_bar_layout) AppBarLayout appBarLayout;
-    @Bind(R.id.view_pager)     ViewPager viewPager;
-    @Bind(R.id.tab_layout)     TabLayout tabLayout;
-
-    private Adapter adapter;
-    private int currentPostId;
-
-    @Inject MainPresenter presenter;
+    @Nullable @Bind(R.id.toolbar)    Toolbar toolbar;
+    @Nullable @Bind(R.id.tab_layout) TabLayout tabLayout;
+    @Nullable @Bind(R.id.show_container)  ViewGroup showContainer;
+    @Bind(R.id.index_container) ViewGroup indexContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,35 +39,30 @@ public class IndexActivity extends RxActivity
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         initialiseInjector();
-        getSupportFragmentManager().addOnBackStackChangedListener(this);
 
-        presenter.bindView(this);
-
-        if (savedInstanceState != null)
-            currentPostId = savedInstanceState.getInt(ShowFragment.POST_ID_KEY, 0);
-
-        tabLayout.setVisibility(View.GONE);
-        presenter.getTags();
-        activateLoadingView();
+        if (savedInstanceState != null) {
+            if (showContainer != null) {
+                Fragment showFrag  = getSupportFragmentManager().findFragmentByTag(SHOW_TAG);
+                if (showFrag == null)
+                    showFrag = ShowFragment.newInstance(0); // Default
+                getSupportFragmentManager().popBackStack();
+                getSupportFragmentManager().beginTransaction().remove(showFrag).commit();
+                getSupportFragmentManager().executePendingTransactions();
+                loadFragment(showContainer.getId(), showFrag, SHOW_TAG, false);
+            }
+        } else {
+            loadFragment(indexContainer.getId(), new IndexFragment(), INDEX_TAG, false);
+            if (showContainer != null)
+                loadFragment(showContainer.getId(), ShowFragment.newInstance(0), SHOW_TAG, true);
+        }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        setToolbar();
+    @Nullable public Toolbar getToolbar() {
+        return toolbar;
     }
 
-    private void loadPost() {
-        if (showPostContainer == null) return;
-
-        if (getSupportFragmentManager().getBackStackEntryCount() > 0) // Test for specific tag
-            getSupportFragmentManager().popBackStack();
-
-        getSupportFragmentManager().beginTransaction()
-                .replace(showPostContainer.getId(),
-                        ShowFragment.newInstance(currentPostId),
-                        SHOW_TAG)
-                .commit();
+    @Nullable public TabLayout getTabLayout() {
+        return tabLayout;
     }
 
     private void initialiseInjector() {
@@ -105,132 +73,36 @@ public class IndexActivity extends RxActivity
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle state) {
-        super.onSaveInstanceState(state);
-        state.putInt(ShowFragment.POST_ID_KEY, currentPostId);
-    }
-
-    @Override
-    public void onBackStackChanged() {
-        setToolbar();
-    }
-
-    //FIXME: Toolbar font is screwed when going back from show > main after config change
-    public void setToolbar() {
-        FragmentManager manager = getSupportFragmentManager();
-        int backStackEntryCount = manager.getBackStackEntryCount();
-        Toolbar newToolbar = null;
-
-        if (backStackEntryCount > 0) {
-            String current = manager.getBackStackEntryAt(backStackEntryCount - 1).getName();
-            newToolbar = ((BaseFragment) manager.findFragmentByTag(current)).getToolbar();
-        }
-
-        if (newToolbar == null) {
-            appBarLayout.setExpanded(true, false);
-            toolbar.setVisibility(View.VISIBLE);
-            if (adapter != null) tabLayout.setVisibility(View.VISIBLE);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimary));
-            setSupportActionBar(toolbar);
-        } else {
-            setSupportActionBar(newToolbar);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            toolbar.setVisibility(View.GONE);
-            tabLayout.setVisibility(View.GONE);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                getWindow().setStatusBarColor(Color.TRANSPARENT);
-        }
-    }
-
-    @Override
     public void onSummaryClicked(Post post) {
-        int containerId = (showPostContainer != null) ?
-                showPostContainer.getId() : fragmentContainer.getId();
-        currentPostId = post.getId();
-        ShowFragment showFragment = ShowFragment.newInstance(currentPostId);
+        boolean notTabletLayout = showContainer == null;
+        int containerId = (notTabletLayout) ?
+                indexContainer.getId() : showContainer.getId() ;
+        ShowFragment showFragment = ShowFragment.newInstance(post.getId());
+        loadFragment(containerId, showFragment, SHOW_TAG, notTabletLayout);
+    }
 
+    private void loadFragment(int containerId, Fragment fragment, String tag, boolean addToBackstack) {
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction()
-                .replace(containerId, showFragment, SHOW_TAG);
-        if (showPostContainer == null) transaction.addToBackStack(SHOW_TAG);
+                .replace(containerId, fragment, tag);
+        if (addToBackstack) transaction.addToBackStack(tag);
         transaction.commit();
     }
 
     @Override
     public void onTagClicked(String tag) {
-        viewPager.setCurrentItem(adapter.getIndex(tag), false);
-    }
-
-    @Override
-    public void onTagsRetrieved(List<String> tags) {
-        activateContentView();
-        loadPost();
-        setToolbar();
-        adapter = new Adapter(getSupportFragmentManager());
-
-        for (String t : tags)
-            adapter.addFragment(TagFragment.newInstance(t), t);
-        viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);
-
-        if (getSupportFragmentManager().getBackStackEntryCount() == 0)
-            Animate.fadeIn(tabLayout);
-    }
-
-    @Override
-    public void onError(String message) {
-        activateErrorView(message);
-    }
-
-    @Override
-    public void onRefresh() {
-        activateLoadingView();
-        presenter.getTags();
-    }
-
-    static class Adapter extends FragmentStatePagerAdapter {
-        private final List<Fragment> mFragments = new ArrayList<>();
-        private final List<String> mFragmentTitles = new ArrayList<>();
-
-        public Adapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        public void addFragment(Fragment fragment, String title) {
-            mFragments.add(fragment);
-            mFragmentTitles.add(title);
-        }
-
-        public int getIndex(String tag) {
-            return mFragmentTitles.indexOf(tag);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return mFragments.get(position);
-        }
-
-        @Override
-        public int getCount() {
-            return mFragments.size();
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return mFragmentTitles.get(position);
-        }
+        //viewPager.setCurrentItem(adapter.getIndex(tag), false);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
-        boolean loggedIn = credentialStore.isLoggedIn();
+        /*boolean loggedIn = credentialStore.isLoggedIn();
 
         menu.findItem(R.id.action_logout).setVisible(loggedIn);
         menu.findItem(R.id.action_login).setVisible(!loggedIn);
-        menu.findItem(R.id.action_register).setVisible(!loggedIn);
+        menu.findItem(R.id.action_register).setVisible(!loggedIn);*/
 
         return true;
     }
@@ -253,8 +125,8 @@ public class IndexActivity extends RxActivity
                 break;
 
             case R.id.action_logout:
-                credentialStore.delete();
-                Snackbar.make(toolbar, getString(R.string.logout_success), LENGTH_SHORT).show();
+                // credentialStore.delete(); TODO: REACTIVATE
+                //Snackbar.make(toolbar, getString(R.string.logout_success), LENGTH_SHORT).show();
                 break;
         }
         supportInvalidateOptionsMenu();

@@ -1,10 +1,13 @@
 package com.moobasoft.damego.ui.fragments;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.transition.Slide;
 import android.transition.TransitionManager;
@@ -42,6 +45,7 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
 
     @Inject ShowPresenter presenter;
 
+    @Nullable @Bind(R.id.app_bar)           AppBarLayout appBarLayout;
     @Bind(R.id.title)             TextView title;
     @Bind(R.id.body)              TextView body;
     @Bind(R.id.tags)              ViewGroup tags;
@@ -62,8 +66,9 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
 
     @Nullable @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_show, container, false);
+        View view = inflater.inflate(R.layout.fragment_show, container, false);
         ButterKnife.bind(this, view);
+        if (appBarLayout != null) appBarLayout.setVisibility(View.GONE);
         return view;
     }
 
@@ -71,7 +76,6 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         getComponent().inject(this);
-        if (toolbar != null) toolbar.setTitle("");
 
         presenter.bindView(this);
         postId = getArguments().getInt(POST_ID_KEY, 0);
@@ -79,7 +83,6 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
         if (savedInstanceState != null && postId == 0) //TODO: Restore instance state
             postId = savedInstanceState.getInt(POST_ID_KEY);
         onRefresh();
-        if (appBarLayout != null) appBarLayout.setVisibility(View.GONE);
     }
 
     @Override
@@ -119,6 +122,17 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
         setAppBarExpanded(true);
         activateContentView();
 
+        if (toolbar != null) {
+            // FIXME Called on config change even when fragment isn't in foreground
+            toolbar.setTitle("");
+            ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                getActivity().getWindow().setStatusBarColor(Color.TRANSPARENT);
+
+            appBarLayout.setVisibility(View.VISIBLE);
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             title.setVisibility(View.INVISIBLE);
             body.setVisibility(View.INVISIBLE);
@@ -129,11 +143,11 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
     }
 
     private void setAppBarExpanded(boolean expanded) {
-        if (appBarLayout != null) {
+        /*if (appBarLayout != null) {
             appBarLayout.setVisibility(View.INVISIBLE);
             appBarLayout.setExpanded(expanded, false);
             appBarLayout.setVisibility(View.VISIBLE);
-        }
+        }*/
     }
 
     private void insertComments(Post post) {
