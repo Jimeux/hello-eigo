@@ -82,27 +82,6 @@ public class TagFragment extends BaseFragment
         posts = new ArrayList<>();
         tagName = getArguments().getString(TAG_NAME);
         columns = getResources().getInteger(R.integer.main_list_columns);
-        layoutManager = new GridLayoutManager(getActivity(), columns);
-        postsAdapter = new PostsAdapter((IndexActivity)getActivity(), posts, columns,
-                getResources().getBoolean(R.bool.show_feature_views));
-        scrollListener = new EndlessOnScrollListener(layoutManager) {
-            @Override public void onLoadMore(int currentPage) {
-                loadPosts(currentPage);
-            }
-            @Override public boolean isRefreshing() {
-                setRefreshLayoutEnabled();
-                return refreshLayout.isRefreshing();
-            }
-        };
-
-        if (state != null) {
-            posts = Parcels.unwrap(state.getParcelable(POSTS_KEY));
-            layoutManager.onRestoreInstanceState(state.getParcelable(LAYOUT_KEY));
-
-            scrollListener.restoreState(Parcels.unwrap(state.getParcelable(SCROLL_KEY)));
-            if (scrollListener.isFinished())
-                postsAdapter.setFinished();
-        }
     }
 
     @Nullable @Override
@@ -119,6 +98,14 @@ public class TagFragment extends BaseFragment
     @Override
     public void onViewStateRestored(@Nullable Bundle state) {
         super.onViewStateRestored(state);
+
+        if (state != null) {
+            posts = Parcels.unwrap(state.getParcelable(POSTS_KEY));
+            layoutManager.onRestoreInstanceState(state.getParcelable(LAYOUT_KEY));
+            scrollListener.restoreState(Parcels.unwrap(state.getParcelable(SCROLL_KEY)));
+            if (scrollListener.isFinished())
+                postsAdapter.setFinished();
+        }
 
         if (state != null && posts.isEmpty() && postsAdapter.isEmpty())
             activateEmptyView(getString(R.string.no_posts_found));
@@ -152,22 +139,57 @@ public class TagFragment extends BaseFragment
         }
     }
 
+    public void saveStateToArguments() {
+        if (layoutManager != null && posts != null && scrollListener != null) {
+            Bundle b = getArguments();
+            b.putParcelable(LAYOUT_KEY, layoutManager.onSaveInstanceState());
+            b.putParcelable(POSTS_KEY, Parcels.wrap(posts));
+            b.putParcelable(SCROLL_KEY, Parcels.wrap(scrollListener.getOutState()));
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        saveStateToArguments();
+    }
+
+    private void restoreStateFromArguments() {
+        Bundle state = getArguments();
+        Parcelable postState = state.getParcelable(POSTS_KEY);
+        if (postState != null) {
+            posts = Parcels.unwrap(postState);
+            layoutManager.onRestoreInstanceState(state.getParcelable(LAYOUT_KEY));
+            scrollListener.restoreState(Parcels.unwrap(state.getParcelable(SCROLL_KEY)));
+            if (scrollListener.isFinished())
+                postsAdapter.setFinished();
+        }
+    }
+
     @Override
     public void onDestroyView() {
+        //saveStateToArguments();
         presenter.releaseView();
-        ButterKnife.unbind(this); // Comment out for the sake of layoutManager
+        ButterKnife.unbind(this);
         super.onDestroyView();
     }
 
     private void initialiseRecyclerView() {
+        layoutManager = new GridLayoutManager(getActivity(), columns);
+        postsAdapter = new PostsAdapter((IndexActivity)getActivity(), posts, columns,
+                getResources().getBoolean(R.bool.show_feature_views));
+        scrollListener = new EndlessOnScrollListener(layoutManager) {
+            @Override public void onLoadMore(int currentPage) {
+                loadPosts(currentPage);
+            }
+            @Override public boolean isRefreshing() {
+                setRefreshLayoutEnabled();
+                return refreshLayout.isRefreshing();
+            }
+        };
+
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
-
-        /* Reset layoutManager just in case backstack was popped (LM can't be reattached) */
-        Parcelable instanceState = layoutManager.onSaveInstanceState();
-        layoutManager = null;
-        layoutManager = new GridLayoutManager(getActivity(), columns);
-        layoutManager.onRestoreInstanceState(instanceState);
 
         postsRecyclerView.setLayoutManager(layoutManager);
         postsRecyclerView.setAdapter(postsAdapter);

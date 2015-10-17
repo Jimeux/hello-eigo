@@ -136,7 +136,7 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             toggleVisibility(title, body, tags);
-            TransitionManager.beginDelayedTransition((ViewGroup) getView().getRootView(), new Slide());
+            TransitionManager.beginDelayedTransition(contentView, new Slide());
             toggleVisibility(title, body, tags);
         }
         setAppBarExpanded(true);
@@ -150,7 +150,6 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
             ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                 getActivity().getWindow().setStatusBarColor(Color.TRANSPARENT);
-            toolbar.setVisibility(View.GONE);
         }
     }
 

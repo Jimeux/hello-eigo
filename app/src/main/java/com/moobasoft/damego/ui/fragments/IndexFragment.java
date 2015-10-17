@@ -29,52 +29,66 @@ import butterknife.ButterKnife;
 public class IndexFragment extends BaseFragment implements MainPresenter.View  {
     @Inject MainPresenter presenter;
 
-    @Nullable @Bind(R.id.tab_layout)
-    TabLayout tabLayout;
-    @Bind(R.id.view_pager)
-    ViewPager viewPager;
+    @Nullable @Bind(R.id.tab_layout) TabLayout tabLayout;
+    @Bind(R.id.view_pager)           ViewPager viewPager;
 
-    public static final String TAGS_TAG = "tags";
+    public static final String TAGS_TAG    = "tags_tag";
+    public static final String ADAPTER_TAG = "adapter_tag";
     private ArrayList<String> tags;
+    private Adapter adapter;
 
     public IndexFragment() {}
+
+    public static IndexFragment newInstance() {
+        IndexFragment fragment = new IndexFragment();
+        Bundle args = new Bundle();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getComponent().inject(this);
-        presenter.bindView(this);
-        if (savedInstanceState != null)
-            tags = savedInstanceState.getStringArrayList(TAGS_TAG);
+        adapter = new Adapter(getChildFragmentManager());
     }
 
     @Nullable @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state) {
         View view = inflater.inflate(R.layout.fragment_index, container, false);
+        getComponent().inject(this);
+        presenter.bindView(this);
         ButterKnife.bind(this, view);
+
+        if (state != null) {
+            adapter.restoreState(state.getParcelable(ADAPTER_TAG), getActivity().getClassLoader());
+            tags = state.getStringArrayList(TAGS_TAG);
+        }
+
         return view;
     }
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
+
         if (toolbar == null) {
             toolbar = ((IndexActivity)getActivity()).getToolbar(); //TODO: Use interface?
             tabLayout = ((IndexActivity)getActivity()).getTabLayout();
         }
 
-        if (tags == null) {
+        if (tags == null)
             onRefresh();
-        } else {
+        else
             loadTagFragments();
-        }
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (tags == null) return;
-        outState.putStringArrayList(TAGS_TAG, tags);
+    public void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        if (adapter != null && tags != null) {
+            state.putParcelable(ADAPTER_TAG, adapter.saveState());
+            state.putStringArrayList(TAGS_TAG, tags);
+        }
     }
 
     @Override
@@ -98,14 +112,9 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
     }
 
     private void loadTagFragments() {
-        Adapter adapter = new Adapter(getChildFragmentManager());
-        for (String tag : tags) {
-            Fragment frag = getChildFragmentManager().findFragmentByTag(tag);
-            if (frag != null)
-                adapter.addFragment(frag, tag);
-            else
-                adapter.addFragment(TagFragment.newInstance(tag), tag);
-        }
+        for (String tag : tags)
+             adapter.addFragment(TagFragment.newInstance(tag), tag);
+
         viewPager.setAdapter(adapter);
         if (Build.VERSION.SDK_INT >= 11)
             viewPager.setPageTransformer(true, new DepthPageTransformer());
@@ -126,8 +135,8 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
     @Override
     public void onDestroyView() {
         presenter.releaseView();
-        super.onDestroyView();
         ButterKnife.unbind(this);
+        super.onDestroyView();
     }
 
     static class Adapter extends FragmentStatePagerAdapter {

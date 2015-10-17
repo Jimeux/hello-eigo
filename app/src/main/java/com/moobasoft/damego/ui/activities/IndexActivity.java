@@ -47,12 +47,12 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
                 getSupportFragmentManager().popBackStack();
                 getSupportFragmentManager().beginTransaction().remove(showFrag).commit();
                 getSupportFragmentManager().executePendingTransactions();
-                loadFragment(showContainer.getId(), showFrag, SHOW_TAG, false);
+                loadFragment(showContainer.getId(), showFrag, SHOW_TAG, false, true);
             }
         } else {
-            loadFragment(indexContainer.getId(), new IndexFragment(), INDEX_TAG, false);
+            loadFragment(indexContainer.getId(), IndexFragment.newInstance(), INDEX_TAG, false, true);
             if (showContainer != null)
-                loadFragment(showContainer.getId(), ShowFragment.newInstance(0), SHOW_TAG, false);
+                loadFragment(showContainer.getId(), ShowFragment.newInstance(0), SHOW_TAG, false, true);
         }
     }
 
@@ -82,16 +82,20 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
         int containerId = (notTabletLayout) ?
                 indexContainer.getId() : showContainer.getId() ;
         ShowFragment showFragment = ShowFragment.newInstance(post.getId());
-        loadFragment(containerId, showFragment, SHOW_TAG, notTabletLayout);
+        loadFragment(containerId, showFragment, SHOW_TAG, notTabletLayout, true);
     }
 
-    private void loadFragment(int containerId, Fragment fragment, String tag, boolean addToBackstack) {
+    private void loadFragment(int containerId, Fragment fragment, String tag, boolean addToBackstack, boolean add) {
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction()
-                .setCustomAnimations(R.anim.slide_in_x, R.anim.slide_out_x,
-                        android.R.anim.fade_in, R.anim.slide_y);
+                .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right,
+                        android.R.anim.slide_in_left, R.anim.slide_y);
         if (addToBackstack) transaction.addToBackStack(tag);
-        transaction.replace(containerId, fragment, tag).commit();
+        if (add && showContainer == null)
+            transaction.add(containerId, fragment, tag);
+        else
+            transaction.replace(containerId, fragment, tag);
+        transaction.commit();
     }
 
     @Override
