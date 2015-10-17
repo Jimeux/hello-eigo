@@ -55,7 +55,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="8dp"
+            android:paddingBottom="@dimen/show_comment_link_padding"
             android:paddingLeft="5dp"
             android:paddingRight="5dp">
 
@@ -100,7 +100,7 @@
             android:gravity="center|right"
             android:orientation="horizontal"
             android:paddingBottom="20dp"
-            android:paddingTop="15dp">
+            android:paddingTop="25dp">
 
             <TextView
                 fontPath="fonts/Roboto-Medium.ttf"

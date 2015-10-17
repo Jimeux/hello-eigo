@@ -11,12 +11,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 
-import com.moobasoft.damego.App;
 import com.moobasoft.damego.R;
-import com.moobasoft.damego.di.components.DaggerMainComponent;
-import com.moobasoft.damego.di.modules.MainModule;
 import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.PostsAdapter;
+import com.moobasoft.damego.ui.fragments.BaseFragment;
 import com.moobasoft.damego.ui.fragments.IndexFragment;
 import com.moobasoft.damego.ui.fragments.ShowFragment;
 
@@ -38,11 +36,12 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        initialiseInjector();
+        getComponent().inject(this);
+        getSupportFragmentManager().addOnBackStackChangedListener(this::setMainToolbar);
 
         if (savedInstanceState != null) {
             if (showContainer != null) {
-                Fragment showFrag  = getSupportFragmentManager().findFragmentByTag(SHOW_TAG);
+                Fragment showFrag   = getSupportFragmentManager().findFragmentByTag(SHOW_TAG);
                 if (showFrag == null)
                     showFrag = ShowFragment.newInstance(0); // Default
                 getSupportFragmentManager().popBackStack();
@@ -53,8 +52,20 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
         } else {
             loadFragment(indexContainer.getId(), new IndexFragment(), INDEX_TAG, false);
             if (showContainer != null)
-                loadFragment(showContainer.getId(), ShowFragment.newInstance(0), SHOW_TAG, true);
+                loadFragment(showContainer.getId(), ShowFragment.newInstance(0), SHOW_TAG, false);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setMainToolbar();
+    }
+
+    public void setMainToolbar() {
+        Fragment mainFrag = getSupportFragmentManager()
+                .findFragmentById(indexContainer.getId());
+        if (mainFrag != null) ((BaseFragment)mainFrag).setToolbar();
     }
 
     @Nullable public Toolbar getToolbar() {
@@ -63,13 +74,6 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
 
     @Nullable public TabLayout getTabLayout() {
         return tabLayout;
-    }
-
-    private void initialiseInjector() {
-        DaggerMainComponent.builder()
-                .mainModule(new MainModule())
-                .appComponent(((App) getApplication()).getAppComponent())
-                .build().inject(this);
     }
 
     @Override

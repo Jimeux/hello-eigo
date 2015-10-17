@@ -7,8 +7,12 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import com.moobasoft.damego.App;
 import com.moobasoft.damego.CredentialStore;
 import com.moobasoft.damego.R;
+import com.moobasoft.damego.di.components.DaggerMainComponent;
+import com.moobasoft.damego.di.components.MainComponent;
+import com.moobasoft.damego.di.modules.MainModule;
 
 import javax.inject.Inject;
 
@@ -26,6 +30,13 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
+    protected MainComponent getComponent() {
+        return DaggerMainComponent.builder()
+                .mainModule(new MainModule())
+                .appComponent(((App) getApplication()).getAppComponent())
+                .build();
     }
 
     @Override

@@ -45,7 +45,7 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
 
     @Inject ShowPresenter presenter;
 
-    @Nullable @Bind(R.id.app_bar)           AppBarLayout appBarLayout;
+    @Nullable @Bind(R.id.app_bar) AppBarLayout appBarLayout;
     @Bind(R.id.title)             TextView title;
     @Bind(R.id.body)              TextView body;
     @Bind(R.id.tags)              ViewGroup tags;
@@ -53,6 +53,7 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
     @Bind(R.id.comment_title)     TextView commentTitle;
     @Bind(R.id.comments_preview)  ViewGroup commentContainer;
     @Bind(R.id.view_comments_btn) ViewGroup viewCommentsBtn;
+    private Post post;
 
     public ShowFragment() {}
 
@@ -64,25 +65,30 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
         return fragment;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getComponent().inject(this);
+        presenter.bindView(this);
+        postId = getArguments().getInt(POST_ID_KEY, 0);
+    }
+
     @Nullable @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_show, container, false);
         ButterKnife.bind(this, view);
-        if (appBarLayout != null) appBarLayout.setVisibility(View.GONE);
+        if (appBarLayout != null) {
+            appBarLayout.setVisibility(View.GONE);
+        }
         return view;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getComponent().inject(this);
-
-        presenter.bindView(this);
-        postId = getArguments().getInt(POST_ID_KEY, 0);
-
         if (savedInstanceState != null && postId == 0) //TODO: Restore instance state
             postId = savedInstanceState.getInt(POST_ID_KEY);
-        onRefresh();
+        if (post == null) onRefresh();
     }
 
     @Override
@@ -108,6 +114,11 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
 
     @Override
     public void onPostRetrieved(Post post) {
+        this.post = post;
+        loadPost(post);
+    }
+
+    private void loadPost(Post post) {
         postId = post.getId();
         title.setText(post.getTitle());
         commentTitle.setText(getString(
@@ -122,8 +133,16 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
         setAppBarExpanded(true);
         activateContentView();
 
-        if (toolbar != null) {
-            // FIXME Called on config change even when fragment isn't in foreground
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            toggleVisibility(title, body, tags);
+            TransitionManager.beginDelayedTransition((ViewGroup) getView().getRootView(), new Slide());
+            toggleVisibility(title, body, tags);
+        }
+    }
+
+    @Override
+    public void setToolbar() {
+        if (toolbar != null) { // && getFragmentManager().getBackStackEntryCount() > 0) {
             toolbar.setTitle("");
             ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
             ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -131,14 +150,6 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
                 getActivity().getWindow().setStatusBarColor(Color.TRANSPARENT);
 
             appBarLayout.setVisibility(View.VISIBLE);
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            title.setVisibility(View.INVISIBLE);
-            body.setVisibility(View.INVISIBLE);
-            tags.setVisibility(View.INVISIBLE);
-            TransitionManager.beginDelayedTransition((ViewGroup) getView().getRootView(), new Slide());
-            toggleVisibility(title, body, tags);
         }
     }
 

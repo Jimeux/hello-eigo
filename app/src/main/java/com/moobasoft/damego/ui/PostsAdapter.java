@@ -9,9 +9,10 @@ import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.views.PostSummaryView;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static android.support.v7.widget.RecyclerView.*;
+import static android.support.v7.widget.RecyclerView.ViewHolder;
 
 public class PostsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
@@ -20,12 +21,13 @@ public class PostsAdapter extends RecyclerView.Adapter<ViewHolder> {
     public static final int TYPE_NORMAL   = 1;
     public static final int TYPE_FOOTER   = 2;
     private final boolean showFeatures;
+    private boolean hideFooter = true;
 
     private PostClickListener summaryClickListener;
-    private List<Post> postList;
+    private ArrayList<Post> postList;
     private final int columns;
 
-    public PostsAdapter(PostClickListener summaryClickListener, List<Post> posts, int columns, boolean showFeatures) {
+    public PostsAdapter(PostClickListener summaryClickListener, ArrayList<Post> posts, int columns, boolean showFeatures) {
         this.summaryClickListener = summaryClickListener;
         this.postList = posts;
         this.columns = columns;
@@ -75,11 +77,17 @@ public class PostsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     @Override
     public int getItemCount() {
-        return postList.size() + 1; // Add 1 for the footer
+        int size = postList.size();
+        return hideFooter ? size : size + 1;
     }
 
     public void clear() {
         postList.clear();
+        notifyDataSetChanged();
+    }
+
+    public void setFinished() {
+        hideFooter = false;
         notifyDataSetChanged();
     }
 

@@ -3,19 +3,23 @@ package com.moobasoft.damego.ui;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import org.parceler.Parcel;
+
 /**
  * Adapted from this gist: https://gist.github.com/ssinss/e06f12ef66c51252563e
  */
 public abstract class EndlessOnScrollListener extends RecyclerView.OnScrollListener {
 
     // The minimum amount of items to have below your current scroll position before loading more.
-    private static final int VISIBLE_THRESHOLD = 1;
+    static final int VISIBLE_THRESHOLD = 1;
     // True if we are still waiting for the last set of data to load.
-    private boolean loading = true;
+    boolean loading = true;
     // The total number of items in the dataset after the last load
-    private int previousTotal = 0;
+    int previousTotal = 0;
     // The current page
-    private int currentPage = 1;
+    int currentPage = 1;
+    // True if setFinished() has been called
+    boolean isFinished = false;
 
     private final LinearLayoutManager layoutManager;
 
@@ -25,7 +29,7 @@ public abstract class EndlessOnScrollListener extends RecyclerView.OnScrollListe
 
     @Override
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-        if (isRefreshing()) return;
+        if (isRefreshing() || isFinished) return;
 
         super.onScrolled(recyclerView, dx, dy);
 
@@ -54,20 +58,30 @@ public abstract class EndlessOnScrollListener extends RecyclerView.OnScrollListe
     public void reset() {
         previousTotal = 0;
         currentPage = 1;
+        isFinished = false;
+        loading = false;
+    }
+
+    public void setFinished() {
+        isFinished = true;
     }
 
     /**
      * Restore state from a previous instance of EndlessOnScrollListener.
      * Use in onRestoreInstanceState()
      */
-    public void restorePage(int currentPage, int previousTotal) {
-        this.currentPage   = currentPage;
-        this.previousTotal = previousTotal;
-        this.loading = false;
+    public void restorePage(ScrollOutState state) {
+        this.currentPage   = state.currentPage;
+        this.previousTotal = state.previousTotal;
+        this.isFinished    = state.isFinished;
+        this.loading       = false;
+    }
+
+    public ScrollOutState getOutState() {
+        return new ScrollOutState(currentPage, previousTotal, isFinished);
     }
 
     public int getCurrentPage()   { return currentPage; }
-    public int getPreviousTotal() { return previousTotal; }
 
     /**
      * Allow client to define behaviour when next page is loaded.
@@ -76,4 +90,23 @@ public abstract class EndlessOnScrollListener extends RecyclerView.OnScrollListe
 
     public abstract boolean isRefreshing();
 
+    public boolean isFinished() {
+        return isFinished;
+    }
+
+    @Parcel
+    public static class ScrollOutState {
+        public int currentPage;
+        public int previousTotal;
+        public boolean isFinished;
+        public boolean loading;
+
+        public ScrollOutState() {}
+
+        public ScrollOutState(int currentPage, int previousTotal, boolean isFinished) {
+            this.currentPage = currentPage;
+            this.previousTotal = previousTotal;
+            this.isFinished = isFinished;
+        }
+    }
 }

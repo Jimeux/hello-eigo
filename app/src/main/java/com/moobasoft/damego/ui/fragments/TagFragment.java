@@ -1,6 +1,5 @@
 package com.moobasoft.damego.ui.fragments;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
@@ -38,19 +37,19 @@ import static android.view.View.VISIBLE;
 public class TagFragment extends BaseFragment
         implements IndexPresenter.View, SwipeRefreshLayout.OnRefreshListener, AppBarLayout.OnOffsetChangedListener {
 
-    public static final String POSTS_KEY          = "posts";
-    public static final String LAYOUT_KEY         = "layout";
-    public static final String CURRENT_PAGE_KEY   = "current_page";
-    public static final String PREVIOUS_TOTAL_KEY = "previous_total";
-    public static final String TAG_NAME           = "tag_name";
-    public static final String SHOW_ALL_TAG       = "すべて";
+    public static final String POSTS_KEY    = "posts";
+    public static final String LAYOUT_KEY   = "layout";
+    public static final String SCROLL_KEY   = "scroll_key";
+    public static final String TAG_NAME     = "tag_name";
+    public static final String SHOW_ALL_TAG = "すべて";
 
     private PostsAdapter postsAdapter;
+    private LinearLayoutManager layoutManager;
+    /** The collection that will feed {@code postsAdapter} */
+    private ArrayList<Post> posts;
     /** The tag name of the posts to be loaded. */
     private String tagName;
-    /** A list of {@code Post} instances that will be loaded into {@code postList} */
-    private List<Post> posts;
-    /** OnScrollListener for {@code postList} */
+    /** OnScrollListener for {@code postsRecyclerView} */
     private EndlessOnScrollListener scrollListener;
     /** A reference to the Activity's AppBarLayout. */
     private AppBarLayout appBarLayout;
@@ -59,12 +58,13 @@ public class TagFragment extends BaseFragment
      *  Makes use of {@code AppBarLayout.OnOffsetChangedListener}.
      */
     private boolean appBarIsExpanded = true;
+    /** The number of columns {@code layoutManager} should display */
+    private int columns;
 
     @Inject IndexPresenter presenter;
 
-    @Bind(R.id.post_list)     RecyclerView postList;
+    @Bind(R.id.post_recycler) RecyclerView postsRecyclerView;
     @Bind(R.id.swipe_refresh) SwipeRefreshLayout refreshLayout;
-    private LinearLayoutManager layoutManager;
 
     public TagFragment() {}
 
@@ -76,38 +76,57 @@ public class TagFragment extends BaseFragment
         return fragment;
     }
 
-    @Nullable @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.content_main, container, false);
-        ButterKnife.bind(this, view);
+    @Override
+    public void onCreate(@Nullable Bundle state) {
+        super.onCreate(state);
         getComponent().inject(this);
-        appBarLayout = (AppBarLayout) getActivity().findViewById(R.id.app_bar_layout);
         presenter.bindView(this);
         posts = new ArrayList<>();
         tagName = getArguments().getString(TAG_NAME);
+        columns = getResources().getInteger(R.integer.main_list_columns);
+        layoutManager = new GridLayoutManager(getActivity(), columns);
+        postsAdapter = new PostsAdapter((IndexActivity)getActivity(), posts, columns,
+                getResources().getBoolean(R.bool.show_feature_views));
+        scrollListener = new EndlessOnScrollListener(layoutManager) {
+            @Override public void onLoadMore(int currentPage) {
+                loadPosts(currentPage);
+            }
+            @Override public boolean isRefreshing() {
+                setRefreshLayoutEnabled();
+                return refreshLayout.isRefreshing();
+            }
+        };
+
+        if (state != null) {
+            posts = Parcels.unwrap(state.getParcelable(POSTS_KEY));
+            layoutManager.onRestoreInstanceState(state.getParcelable(LAYOUT_KEY));
+            scrollListener.restorePage(Parcels.unwrap(state.getParcelable(SCROLL_KEY)));
+            if (scrollListener.isFinished())
+                postsAdapter.setFinished();
+        }
+    }
+
+    @Nullable @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.content_main, container, false);
+        appBarLayout = (AppBarLayout) getActivity().findViewById(R.id.app_bar_layout);
+        ButterKnife.bind(this, view);
+        initialiseRecyclerView();
         return view;
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        initialiseRecyclerView();
-        if (savedInstanceState == null) {
-            loadPosts(1);
+    public void onViewStateRestored(@Nullable Bundle state) {
+        super.onViewStateRestored(state);
+
+        if (state != null && posts.isEmpty() && postsAdapter.isEmpty())
+            activateEmptyView(getString(R.string.no_posts_found));
+        else if (!posts.isEmpty() && postsAdapter.isEmpty()) {
+            postsAdapter.loadPosts(posts);
+            activateContentView();
         }
-    }
-
-    @Override
-    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-        appBarIsExpanded = verticalOffset == 0;
-        setRefreshLayoutEnabled();
-    }
-
-    private void setRefreshLayoutEnabled() {
-        if (refreshLayout == null || postList == null) return;
-        boolean canRefresh = appBarIsExpanded &&
-                !ViewCompat.canScrollVertically(postList, -1);
-        refreshLayout.setEnabled(canRefresh);
+        else if (postsAdapter.isEmpty())
+            onRefresh();
     }
 
     @Override
@@ -125,41 +144,42 @@ public class TagFragment extends BaseFragment
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
-
-        if (postList == null || posts == null || scrollListener == null)
-            return;
-        state.putParcelable(LAYOUT_KEY, postList.getLayoutManager().onSaveInstanceState());
-        state.putParcelable(POSTS_KEY, Parcels.wrap(posts));
-        state.putInt(CURRENT_PAGE_KEY, scrollListener.getCurrentPage());
-        state.putInt(PREVIOUS_TOTAL_KEY, scrollListener.getPreviousTotal());
+        if (layoutManager != null && posts != null && scrollListener != null) {
+            state.putParcelable(LAYOUT_KEY, layoutManager.onSaveInstanceState());
+            state.putParcelable(POSTS_KEY, Parcels.wrap(posts));
+            state.putParcelable(SCROLL_KEY, Parcels.wrap(scrollListener.getOutState()));
+        }
     }
 
     @Override
-    public void onViewStateRestored(@Nullable Bundle state) {
-        super.onViewStateRestored(state);
-        if (state == null) return;
-        List<Post> savedPosts = Parcels.unwrap(state.getParcelable(POSTS_KEY));
+    public void onDestroyView() {
+        presenter.releaseView();
+        super.onDestroyView();
+        ButterKnife.unbind(this);
+    }
 
-        if (savedPosts != null && savedPosts.isEmpty())
-            activateEmptyView(getString(R.string.no_posts_found));
-        else if (savedPosts != null) {
-            postsAdapter.loadPosts(savedPosts);
-            /* Restore RecyclerView's state */
-            Parcelable savedRecyclerLayoutState = state.getParcelable(LAYOUT_KEY);
-            if (savedRecyclerLayoutState != null)
-                postList.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
-            /* Restore RecyclerView's scroll listener's state */
-            int currentPage   = state.getInt(CURRENT_PAGE_KEY, scrollListener.getCurrentPage());
-            int previousTotal = state.getInt(PREVIOUS_TOTAL_KEY, scrollListener.getPreviousTotal());
-            scrollListener.restorePage(currentPage, previousTotal);
+    private void initialiseRecyclerView() {
+        refreshLayout.setOnRefreshListener(this);
+        refreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
+        /* Reset layoutManager just in case backstack was popped (LM can't be reattached) */
+        Parcelable instanceState = layoutManager.onSaveInstanceState();
+        layoutManager = new GridLayoutManager(getActivity(), columns);
+        layoutManager.onRestoreInstanceState(instanceState);
 
-            activateContentView();
-        }
-        else onRefresh();
+        postsRecyclerView.setLayoutManager(layoutManager);
+        postsRecyclerView.setAdapter(postsAdapter);
+        postsRecyclerView.addOnScrollListener(scrollListener);
+    }
+
+    private void setRefreshLayoutEnabled() {
+        if (refreshLayout == null || postsRecyclerView == null) return;
+        boolean canRefresh = appBarIsExpanded &&
+                !ViewCompat.canScrollVertically(postsRecyclerView, -1);
+        refreshLayout.setEnabled(canRefresh);
     }
 
     private void loadPosts(int page) {
-        //if (page == 1) activateLoadingView();
+        if (page == 1) activateLoadingView();
         refreshLayout.setRefreshing(true);
 
         if (tagName.equals(SHOW_ALL_TAG) || TextUtils.isEmpty(tagName))
@@ -168,56 +188,21 @@ public class TagFragment extends BaseFragment
             presenter.filterByTag(tagName, page);
     }
 
-    @Override public void onDestroyView() {
-        presenter.releaseView();
-        super.onDestroyView();
-        ButterKnife.unbind(this);
-    }
-
-    protected void initialiseRecyclerView() {
-        refreshLayout.setOnRefreshListener(this);
-        refreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
-
-        boolean showFeatures = getResources().getBoolean(R.bool.show_feature_views);
-        int columns = getResources().getInteger(R.integer.main_list_columns);
-
-        postsAdapter = new PostsAdapter((IndexActivity)getActivity(), posts, columns, showFeatures);
-        layoutManager = new GridLayoutManager(getActivity(), columns);
-        scrollListener = new EndlessOnScrollListener(layoutManager) {
-            @Override public void onLoadMore(int currentPage) {
-                loadPosts(currentPage);
-            }
-            @Override public boolean isRefreshing() {
-                setRefreshLayoutEnabled();
-                return refreshLayout.isRefreshing();
-            }
-        };
-
-        postList.setLayoutManager(layoutManager);
-        postList.setAdapter(postsAdapter);
-        postList.addOnScrollListener(scrollListener);
-    }
-
     @Override
     public void onPostsRetrieved(List<Post> newPosts) {
         if (scrollListener.getCurrentPage() == 1)
             postsAdapter.clear();
         refreshLayout.setRefreshing(false);
 
-        if (posts.isEmpty() && newPosts.isEmpty())
+        if (postsAdapter.isEmpty() && newPosts.isEmpty())
             activateEmptyView(getString(R.string.no_posts_found));
-        else {
-            refreshLayout.setVisibility(View.INVISIBLE);
+        else if (!postsAdapter.isEmpty() && newPosts.isEmpty()) {
+            scrollListener.setFinished();
+            postsAdapter.setFinished();
+        } else {
             activateContentView();
-            if (posts.isEmpty() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && getView() != null) {
-                //TransitionManager.beginDelayedTransition((ViewGroup) getView().getRootView(), new Slide());
-            }
             postsAdapter.loadPosts(newPosts);
-            refreshLayout.setVisibility(View.VISIBLE);
         }
-
-        if (posts.size() > 0 && newPosts.isEmpty());
-            // Activate footer?
     }
 
     @Override
@@ -227,7 +212,7 @@ public class TagFragment extends BaseFragment
             errorMessage.setText(message);
             activateView(R.id.error_view);
         } else
-            Snackbar.make(postList, message, Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(postsRecyclerView, message, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
@@ -239,5 +224,11 @@ public class TagFragment extends BaseFragment
 
         scrollListener.reset();
         loadPosts(1);
+    }
+
+    @Override
+    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+        appBarIsExpanded = verticalOffset == 0;
+        setRefreshLayoutEnabled();
     }
 }

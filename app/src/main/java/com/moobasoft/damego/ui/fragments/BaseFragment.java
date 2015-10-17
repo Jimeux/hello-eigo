@@ -50,6 +50,8 @@ public abstract class BaseFragment extends Fragment {
         return toolbar;
     }
 
+    public void setToolbar() {}
+
     protected MainComponent getComponent() {
         return DaggerMainComponent.builder()
                 .mainModule(new MainModule())

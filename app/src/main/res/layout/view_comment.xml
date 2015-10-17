@@ -18,7 +18,7 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="16dp">
+            android:padding="@dimen/comment_view_padding">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -48,7 +48,7 @@
                 android:id="@+id/body"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="15dp"
                 android:textColor="@color/grey800"
                 android:textSize="@dimen/comment_body_text" />
 

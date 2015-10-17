@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,30 +35,36 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
     ViewPager viewPager;
 
     public static final String TAGS_TAG = "tags";
-    private List<String> tags;
+    private ArrayList<String> tags;
 
     public IndexFragment() {}
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getComponent().inject(this);
+        presenter.bindView(this);
+        if (savedInstanceState != null)
+            tags = savedInstanceState.getStringArrayList(TAGS_TAG);
+    }
 
     @Nullable @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_index, container, false);
-        getComponent().inject(this);
         ButterKnife.bind(this, view);
-        presenter.bindView(this);
         return view;
     }
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        setToolbar();
+        if (toolbar == null) {
+            toolbar = ((IndexActivity)getActivity()).getToolbar(); //TODO: Use interface?
+            tabLayout = ((IndexActivity)getActivity()).getTabLayout();
+        }
 
-        if (savedInstanceState == null && tags == null) {
-            presenter.getTags();
-            activateLoadingView();
-        } else if (savedInstanceState != null) {
-            tags = savedInstanceState.getStringArrayList(TAGS_TAG);
-            loadTagFragments();
+        if (tags == null) {
+            onRefresh();
         } else {
             loadTagFragments();
         }
@@ -66,22 +73,27 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putStringArrayList(TAGS_TAG, new ArrayList<>(tags));
+        Log.d("TAGGART", "onSave tags == null ? -- " + (tags == null));
+        if (tags == null) return;
+        outState.putStringArrayList(TAGS_TAG, tags);
     }
 
-    private void setToolbar() {
+    @Override
+    public void setToolbar() {
         if (toolbar == null) {
             toolbar = ((IndexActivity)getActivity()).getToolbar(); //TODO: Use interface?
             tabLayout = ((IndexActivity)getActivity()).getTabLayout();
         }
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            getActivity().getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimary));
+        if (toolbar != null) {
+            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                getActivity().getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimary));
+        }
     }
 
     @Override
     public void onTagsRetrieved(List<String> tags) {
-        this.tags = tags;
+        this.tags = new ArrayList<>(tags);
         activateContentView();
         loadTagFragments();
     }
@@ -112,9 +124,28 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
 
     @Override
     public void onDestroyView() {
+        Log.d("TAGGART", "destroyed yo!");
         presenter.releaseView();
         super.onDestroyView();
         ButterKnife.unbind(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d("TAGGART", "Destroyed muva!");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.d("TAGGART", "Detached yo!");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+//        getArguments().putStringArrayList(TAGS_TAG, tags);
     }
 
     static class Adapter extends FragmentStatePagerAdapter {
