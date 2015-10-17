@@ -77,8 +77,9 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_show, container, false);
         ButterKnife.bind(this, view);
-        if (appBarLayout != null) {
+        if (appBarLayout != null && toolbar != null) {
             appBarLayout.setVisibility(View.GONE);
+            toolbar.setVisibility(View.GONE);
         }
         return view;
     }
@@ -130,7 +131,7 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
         body.setText(Html.fromHtml(post.getBody().trim().replaceAll("[\n\r]", "")));
         PostUtil.insertTags(post, getActivity().getLayoutInflater(), tags, true);
         insertComments(post);
-        setAppBarExpanded(true);
+
         activateContentView();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -138,27 +139,27 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
             TransitionManager.beginDelayedTransition((ViewGroup) getView().getRootView(), new Slide());
             toggleVisibility(title, body, tags);
         }
+        setAppBarExpanded(true);
     }
 
     @Override
     public void setToolbar() {
-        if (toolbar != null) { // && getFragmentManager().getBackStackEntryCount() > 0) {
+        if (toolbar != null && appBarLayout != null) {
             toolbar.setTitle("");
             ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
             ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                 getActivity().getWindow().setStatusBarColor(Color.TRANSPARENT);
-
-            appBarLayout.setVisibility(View.VISIBLE);
+            toolbar.setVisibility(View.GONE);
         }
     }
 
     private void setAppBarExpanded(boolean expanded) {
-        /*if (appBarLayout != null) {
-            appBarLayout.setVisibility(View.INVISIBLE);
+        if (appBarLayout != null && toolbar != null) {
             appBarLayout.setExpanded(expanded, false);
             appBarLayout.setVisibility(View.VISIBLE);
-        }*/
+            toolbar.setVisibility(View.VISIBLE);
+        }
     }
 
     private void insertComments(Post post) {

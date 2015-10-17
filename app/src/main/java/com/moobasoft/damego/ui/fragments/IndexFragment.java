@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import com.moobasoft.damego.R;
 import com.moobasoft.damego.ui.activities.IndexActivity;
 import com.moobasoft.damego.ui.presenters.MainPresenter;
+import com.moobasoft.damego.util.DepthPageTransformer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -108,6 +109,8 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
                 adapter.addFragment(TagFragment.newInstance(tag), tag);
         }
         viewPager.setAdapter(adapter);
+        if (Build.VERSION.SDK_INT >= 11)
+            viewPager.setPageTransformer(true, new DepthPageTransformer());
         tabLayout.setupWithViewPager(viewPager);
     }
 

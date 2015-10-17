@@ -11,21 +11,23 @@ import org.parceler.Parcel;
 public abstract class EndlessOnScrollListener extends RecyclerView.OnScrollListener {
 
     // The minimum amount of items to have below your current scroll position before loading more.
-    static final int VISIBLE_THRESHOLD = 1;
-    // True if we are still waiting for the last set of data to load.
-    boolean loading = true;
+    private static final int VISIBLE_THRESHOLD = 1;
     // The total number of items in the dataset after the last load
-    int previousTotal = 0;
+    private int previousTotal = 0;
     // The current page
-    int currentPage = 1;
+    private int currentPage = 1;
     // True if setFinished() has been called
-    boolean isFinished = false;
+    private boolean isFinished = false;
 
     private final LinearLayoutManager layoutManager;
 
     public EndlessOnScrollListener(LinearLayoutManager layoutManager) {
         this.layoutManager = layoutManager;
     }
+
+    /** Getters */
+    public int getCurrentPage() { return currentPage; }
+    public boolean isFinished() { return isFinished; }
 
     @Override
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -37,17 +39,14 @@ public abstract class EndlessOnScrollListener extends RecyclerView.OnScrollListe
         int totalItemCount   = layoutManager.getItemCount();
         int firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
 
-        if (loading && totalItemCount > previousTotal) {
-            loading = false;
+        if (totalItemCount > previousTotal)
             previousTotal = totalItemCount;
-        }
 
         boolean endReached = (totalItemCount - visibleItemCount)
                 <= (firstVisibleItem + VISIBLE_THRESHOLD);
 
-        if (!loading && endReached) {
+        if (endReached) {
             currentPage++;
-            loading = true;
             onLoadMore(currentPage);
         }
     }
@@ -59,47 +58,48 @@ public abstract class EndlessOnScrollListener extends RecyclerView.OnScrollListe
         previousTotal = 0;
         currentPage = 1;
         isFinished = false;
-        loading = false;
     }
 
+    /**
+     * Set flag to show that no more data should be loaded
+     */
     public void setFinished() {
         isFinished = true;
     }
 
     /**
-     * Restore state from a previous instance of EndlessOnScrollListener.
+     * Restore state from a previous instance.
      * Use in onRestoreInstanceState()
      */
-    public void restorePage(ScrollOutState state) {
+    public void restoreState(ScrollOutState state) {
         this.currentPage   = state.currentPage;
         this.previousTotal = state.previousTotal;
         this.isFinished    = state.isFinished;
-        this.loading       = false;
     }
 
+    /**
+     * The necessary state to restore this instance.
+     * Use in onSaveInstanceState()
+     */
     public ScrollOutState getOutState() {
         return new ScrollOutState(currentPage, previousTotal, isFinished);
     }
-
-    public int getCurrentPage()   { return currentPage; }
 
     /**
      * Allow client to define behaviour when next page is loaded.
      */
     public abstract void onLoadMore(int currentPage);
 
+    /**
+     * Is previous request still loading?
+     */
     public abstract boolean isRefreshing();
-
-    public boolean isFinished() {
-        return isFinished;
-    }
 
     @Parcel
     public static class ScrollOutState {
         public int currentPage;
         public int previousTotal;
         public boolean isFinished;
-        public boolean loading;
 
         public ScrollOutState() {}
 

@@ -79,8 +79,6 @@ public class TagFragment extends BaseFragment
     @Override
     public void onCreate(@Nullable Bundle state) {
         super.onCreate(state);
-        getComponent().inject(this);
-        presenter.bindView(this);
         posts = new ArrayList<>();
         tagName = getArguments().getString(TAG_NAME);
         columns = getResources().getInteger(R.integer.main_list_columns);
@@ -100,7 +98,7 @@ public class TagFragment extends BaseFragment
         if (state != null) {
             posts = Parcels.unwrap(state.getParcelable(POSTS_KEY));
             layoutManager.onRestoreInstanceState(state.getParcelable(LAYOUT_KEY));
-            scrollListener.restorePage(Parcels.unwrap(state.getParcelable(SCROLL_KEY)));
+            scrollListener.restoreState(Parcels.unwrap(state.getParcelable(SCROLL_KEY)));
             if (scrollListener.isFinished())
                 postsAdapter.setFinished();
         }
@@ -110,6 +108,8 @@ public class TagFragment extends BaseFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.content_main, container, false);
         appBarLayout = (AppBarLayout) getActivity().findViewById(R.id.app_bar_layout);
+        getComponent().inject(this);
+        presenter.bindView(this);
         ButterKnife.bind(this, view);
         initialiseRecyclerView();
         return view;

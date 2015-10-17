@@ -88,9 +88,10 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
     private void loadFragment(int containerId, Fragment fragment, String tag, boolean addToBackstack) {
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction()
-                .replace(containerId, fragment, tag);
+                .setCustomAnimations(R.anim.slide_in_x, R.anim.slide_out_x,
+                        android.R.anim.fade_in, R.anim.slide_y);
         if (addToBackstack) transaction.addToBackStack(tag);
-        transaction.commit();
+        transaction.replace(containerId, fragment, tag).commit();
     }
 
     @Override
