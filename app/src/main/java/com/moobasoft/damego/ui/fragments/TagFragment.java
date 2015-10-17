@@ -98,6 +98,7 @@ public class TagFragment extends BaseFragment
         if (state != null) {
             posts = Parcels.unwrap(state.getParcelable(POSTS_KEY));
             layoutManager.onRestoreInstanceState(state.getParcelable(LAYOUT_KEY));
+
             scrollListener.restoreState(Parcels.unwrap(state.getParcelable(SCROLL_KEY)));
             if (scrollListener.isFinished())
                 postsAdapter.setFinished();
@@ -154,15 +155,17 @@ public class TagFragment extends BaseFragment
     @Override
     public void onDestroyView() {
         presenter.releaseView();
+        ButterKnife.unbind(this); // Comment out for the sake of layoutManager
         super.onDestroyView();
-        ButterKnife.unbind(this);
     }
 
     private void initialiseRecyclerView() {
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
+
         /* Reset layoutManager just in case backstack was popped (LM can't be reattached) */
         Parcelable instanceState = layoutManager.onSaveInstanceState();
+        layoutManager = null;
         layoutManager = new GridLayoutManager(getActivity(), columns);
         layoutManager.onRestoreInstanceState(instanceState);
 

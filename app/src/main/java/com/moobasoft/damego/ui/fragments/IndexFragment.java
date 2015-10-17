@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,7 +73,6 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.d("TAGGART", "onSave tags == null ? -- " + (tags == null));
         if (tags == null) return;
         outState.putStringArrayList(TAGS_TAG, tags);
     }
@@ -127,28 +125,9 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
 
     @Override
     public void onDestroyView() {
-        Log.d("TAGGART", "destroyed yo!");
         presenter.releaseView();
         super.onDestroyView();
         ButterKnife.unbind(this);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d("TAGGART", "Destroyed muva!");
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        Log.d("TAGGART", "Detached yo!");
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-//        getArguments().putStringArrayList(TAGS_TAG, tags);
     }
 
     static class Adapter extends FragmentStatePagerAdapter {
