@@ -1,7 +1,6 @@
 package com.moobasoft.damego.ui.fragments;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
@@ -24,7 +23,6 @@ import com.moobasoft.damego.ui.presenters.IndexPresenter;
 
 import org.parceler.Parcels;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -45,8 +43,6 @@ public class TagFragment extends BaseFragment
 
     private PostsAdapter postsAdapter;
     private LinearLayoutManager layoutManager;
-    /** The collection that will feed {@code postsAdapter} */
-    private ArrayList<Post> posts;
     /** The tag name of the posts to be loaded. */
     private String tagName;
     /** OnScrollListener for {@code postsRecyclerView} */
@@ -58,8 +54,6 @@ public class TagFragment extends BaseFragment
      *  Makes use of {@code AppBarLayout.OnOffsetChangedListener}.
      */
     private boolean appBarIsExpanded = true;
-    /** The number of columns {@code layoutManager} should display */
-    private int columns;
 
     @Inject IndexPresenter presenter;
 
@@ -79,9 +73,21 @@ public class TagFragment extends BaseFragment
     @Override
     public void onCreate(@Nullable Bundle state) {
         super.onCreate(state);
-        posts = new ArrayList<>();
         tagName = getArguments().getString(TAG_NAME);
-        columns = getResources().getInteger(R.integer.main_list_columns);
+        int columns = getResources().getInteger(R.integer.main_list_columns);
+
+        layoutManager = new GridLayoutManager(getActivity(), columns);
+        postsAdapter = new PostsAdapter((IndexActivity)getActivity(), columns,
+                getResources().getBoolean(R.bool.show_feature_views));
+        scrollListener = new EndlessOnScrollListener(layoutManager) {
+            @Override public void onLoadMore(int currentPage) {
+                loadPosts(currentPage);
+            }
+            @Override public boolean isRefreshing() {
+                setRefreshLayoutEnabled();
+                return refreshLayout.isRefreshing();
+            }
+        };
     }
 
     @Nullable @Override
@@ -99,22 +105,21 @@ public class TagFragment extends BaseFragment
     public void onViewStateRestored(@Nullable Bundle state) {
         super.onViewStateRestored(state);
 
-        if (state != null) {
-            posts = Parcels.unwrap(state.getParcelable(POSTS_KEY));
+        if (state == null)
+            onRefresh();
+        else {
+            List<Post> posts = Parcels.unwrap(state.getParcelable(POSTS_KEY));
             layoutManager.onRestoreInstanceState(state.getParcelable(LAYOUT_KEY));
             scrollListener.restoreState(Parcels.unwrap(state.getParcelable(SCROLL_KEY)));
-            if (scrollListener.isFinished())
-                postsAdapter.setFinished();
-        }
+            if (scrollListener.isFinished()) postsAdapter.setFinished();
 
-        if (state != null && posts.isEmpty() && postsAdapter.isEmpty())
-            activateEmptyView(getString(R.string.no_posts_found));
-        else if (!posts.isEmpty() && postsAdapter.isEmpty()) {
-            postsAdapter.loadPosts(posts);
-            activateContentView();
+            if (posts.isEmpty())
+                activateEmptyView(getString(R.string.no_posts_found));
+            else {
+                postsAdapter.loadPosts(posts);
+                activateContentView();
+            }
         }
-        else if (postsAdapter.isEmpty())
-            onRefresh();
     }
 
     @Override
@@ -132,62 +137,22 @@ public class TagFragment extends BaseFragment
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
-        if (layoutManager != null && posts != null && scrollListener != null) {
+        if (layoutManager != null && scrollListener != null &&
+            postsAdapter != null  && postsAdapter.getPostList() != null ) {
             state.putParcelable(LAYOUT_KEY, layoutManager.onSaveInstanceState());
-            state.putParcelable(POSTS_KEY, Parcels.wrap(posts));
+            state.putParcelable(POSTS_KEY, Parcels.wrap(postsAdapter.getPostList()));
             state.putParcelable(SCROLL_KEY, Parcels.wrap(scrollListener.getOutState()));
-        }
-    }
-
-    public void saveStateToArguments() {
-        if (layoutManager != null && posts != null && scrollListener != null) {
-            Bundle b = getArguments();
-            b.putParcelable(LAYOUT_KEY, layoutManager.onSaveInstanceState());
-            b.putParcelable(POSTS_KEY, Parcels.wrap(posts));
-            b.putParcelable(SCROLL_KEY, Parcels.wrap(scrollListener.getOutState()));
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        saveStateToArguments();
-    }
-
-    private void restoreStateFromArguments() {
-        Bundle state = getArguments();
-        Parcelable postState = state.getParcelable(POSTS_KEY);
-        if (postState != null) {
-            posts = Parcels.unwrap(postState);
-            layoutManager.onRestoreInstanceState(state.getParcelable(LAYOUT_KEY));
-            scrollListener.restoreState(Parcels.unwrap(state.getParcelable(SCROLL_KEY)));
-            if (scrollListener.isFinished())
-                postsAdapter.setFinished();
         }
     }
 
     @Override
     public void onDestroyView() {
-        //saveStateToArguments();
         presenter.releaseView();
         ButterKnife.unbind(this);
         super.onDestroyView();
     }
 
     private void initialiseRecyclerView() {
-        layoutManager = new GridLayoutManager(getActivity(), columns);
-        postsAdapter = new PostsAdapter((IndexActivity)getActivity(), posts, columns,
-                getResources().getBoolean(R.bool.show_feature_views));
-        scrollListener = new EndlessOnScrollListener(layoutManager) {
-            @Override public void onLoadMore(int currentPage) {
-                loadPosts(currentPage);
-            }
-            @Override public boolean isRefreshing() {
-                setRefreshLayoutEnabled();
-                return refreshLayout.isRefreshing();
-            }
-        };
-
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
 

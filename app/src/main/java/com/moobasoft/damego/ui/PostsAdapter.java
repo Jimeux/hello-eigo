@@ -27,11 +27,15 @@ public class PostsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private ArrayList<Post> postList;
     private final int columns;
 
-    public PostsAdapter(PostClickListener summaryClickListener, ArrayList<Post> posts, int columns, boolean showFeatures) {
+    public PostsAdapter(PostClickListener summaryClickListener, int columns, boolean showFeatures) {
         this.summaryClickListener = summaryClickListener;
-        this.postList = posts;
+        this.postList = new ArrayList<>();
         this.columns = columns;
         this.showFeatures = showFeatures;
+    }
+
+    public ArrayList<Post> getPostList() {
+        return postList; // TODO: Protective copy?
     }
 
     public void loadPosts(List<Post> posts) {
