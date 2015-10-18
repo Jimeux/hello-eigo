@@ -6,7 +6,6 @@
     android:background="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:context="com.moobasoft.damego.ui.fragments.ShowFragment">
 
     <include layout="@layout/status_views" />
@@ -15,18 +14,15 @@
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/show_backdrop_height"
-        android:fitsSystemWindows="true"
         android:clickable="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:elevation="0dp"
-        app:statusBarBackground="@android:color/transparent">
+        app:elevation="0dp">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fitsSystemWindows="true"
-            app:contentScrim="#ef4db6ac"
             android:background="@color/white"
+            app:contentScrim="@color/colorPrimaryTranslucent"
             app:expandedTitleTextAppearance="@style/CollapsingToolbarLayoutExpandedTextStyle"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:statusBarScrim="@android:color/transparent"
@@ -38,7 +34,6 @@
                 android:layout_height="match_parent"
                 android:adjustViewBounds="true"
                 android:background="@color/white"
-                android:fitsSystemWindows="true"
                 android:scaleType="centerCrop"
                 app:layout_collapseMode="parallax" />
 

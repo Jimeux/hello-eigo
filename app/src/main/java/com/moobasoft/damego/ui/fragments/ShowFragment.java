@@ -1,7 +1,6 @@
 package com.moobasoft.damego.ui.fragments;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -87,6 +86,7 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         if (savedInstanceState != null && postId == 0) //TODO: Restore instance state
             postId = savedInstanceState.getInt(POST_ID_KEY);
         if (post == null) onRefresh();
@@ -136,7 +136,7 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             toggleVisibility(title, body, tags);
-            TransitionManager.beginDelayedTransition(contentView, new Slide());
+            TransitionManager.beginDelayedTransition((ViewGroup) getView().getRootView(), new Slide());
             toggleVisibility(title, body, tags);
         }
         setAppBarExpanded(true);
@@ -148,8 +148,6 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
             toolbar.setTitle("");
             ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
             ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                getActivity().getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
     }
 
@@ -158,6 +156,10 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
             appBarLayout.setExpanded(expanded, false);
             appBarLayout.setVisibility(View.VISIBLE);
             toolbar.setVisibility(View.VISIBLE);
+            if (expanded  && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getActivity().getWindow().setStatusBarColor(
+                        getResources().getColor(R.color.colorPrimaryDark));
+            }
         }
     }
 

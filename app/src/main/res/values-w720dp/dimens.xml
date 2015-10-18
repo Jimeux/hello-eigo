@@ -14,7 +14,7 @@
     <dimen name="show_comment_link_text">22dp</dimen>
     <dimen name="show_comment_link_padding">18dp</dimen>
     <dimen name="show_padding">36dp</dimen>
-    <dimen name="show_backdrop_height">300dp</dimen>
+    <dimen name="show_backdrop_height">310dp</dimen>
     <dimen name="show_title_text">40sp</dimen>
     <dimen name="show_body_text">24sp</dimen>
     <dimen name="show_tag_text">22dp</dimen>
