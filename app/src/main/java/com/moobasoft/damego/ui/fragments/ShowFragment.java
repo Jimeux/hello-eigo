@@ -135,9 +135,11 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
         activateContentView();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (toolbar != null) toggleVisibility(toolbar);
             toggleVisibility(title, body, tags);
             TransitionManager.beginDelayedTransition((ViewGroup) getView().getRootView(), new Slide());
             toggleVisibility(title, body, tags);
+            if (toolbar != null) toggleVisibility(toolbar);
         }
         setAppBarExpanded(true);
     }
@@ -156,10 +158,8 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
             appBarLayout.setExpanded(expanded, false);
             appBarLayout.setVisibility(View.VISIBLE);
             toolbar.setVisibility(View.VISIBLE);
-            if (expanded  && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getActivity().getWindow().setStatusBarColor(
-                        getResources().getColor(R.color.colorPrimaryDark));
-            }
+            //if (expanded  && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                //getActivity().getWindow().setStatusBarColor(getResources().getColor(android.R.color.transparent));
         }
     }
 

@@ -99,8 +99,8 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
         }
         if (toolbar != null) {
             ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                getActivity().getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimary));
+            //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+              //  getActivity().getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimary));
         }
     }
 

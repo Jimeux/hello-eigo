@@ -14,7 +14,7 @@
     <dimen name="comment_created_text">12sp</dimen>
     <dimen name="comment_body_text">16sp</dimen>
 
-    <dimen name="show_backdrop_height">230dp</dimen>
+    <dimen name="show_backdrop_height">250dp</dimen>
     <dimen name="show_padding">22dp</dimen>
     <dimen name="show_tag_text">17dp</dimen>
     <dimen name="show_title_text">26sp</dimen>
