@@ -60,9 +60,9 @@ public class RestModule {
         // TODO: Debug build only
         client.networkInterceptors().add(new StethoInterceptor());
 
-        client.setConnectTimeout(7, SECONDS);
-        client.setReadTimeout(7, SECONDS);
-        client.setWriteTimeout(7, SECONDS);
+        client.setConnectTimeout(10, SECONDS);
+        client.setReadTimeout(10, SECONDS);
+        client.setWriteTimeout(10, SECONDS);
 
         // Install an HTTP cache in the application cache directory.
         File cacheDir = new File(context.getCacheDir(), "http");

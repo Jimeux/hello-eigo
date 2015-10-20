@@ -3,13 +3,20 @@ package com.moobasoft.damego.ui.fragments;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.transition.Slide;
+import android.transition.TransitionManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -29,7 +36,9 @@ import butterknife.ButterKnife;
 public class IndexFragment extends BaseFragment implements MainPresenter.View  {
     @Inject MainPresenter presenter;
 
+    @Nullable @Bind(R.id.app_bar) AppBarLayout appBarLayout;
     @Nullable @Bind(R.id.tab_layout) TabLayout tabLayout;
+    @Nullable @Bind(R.id.search_bar) Toolbar searchBar;
     @Bind(R.id.view_pager)           ViewPager viewPager;
 
     public static final String TAGS_KEY = "tags_tag";
@@ -50,9 +59,14 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
         viewPager.setCurrentItem(adapter.indexOf(tag));
     }
 
+    public CharSequence getCurrentTitle() {
+        return adapter.getPageTitle(viewPager.getCurrentItem());
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         adapter = new Adapter(getChildFragmentManager());
     }
 
@@ -75,10 +89,12 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
 
-        if (toolbar == null) {
-            toolbar = ((IndexActivity)getActivity()).getToolbar(); //TODO: Use interface?
+        if (tabLayout == null) {
+            appBarLayout = ((IndexActivity)getActivity()).getAppBar(); //TODO: Use interface?
+            toolbar = ((IndexActivity)getActivity()).getToolbar();
             tabLayout = ((IndexActivity)getActivity()).getTabLayout();
         }
+        if (tabLayout != null) tabLayout.setVisibility(View.GONE);
 
         if (tags == null)
             onRefresh();
@@ -97,11 +113,8 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
 
     @Override
     public void setToolbar() {
-        if (toolbar == null) {
-            toolbar = ((IndexActivity)getActivity()).getToolbar(); //TODO: Use interface?
-            tabLayout = ((IndexActivity)getActivity()).getTabLayout();
-        }
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        if (toolbar != null)
+            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
     }
 
     @Override
@@ -118,7 +131,13 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
         viewPager.setAdapter(adapter);
         if (Build.VERSION.SDK_INT >= 11)
             viewPager.setPageTransformer(true, new DepthPageTransformer());
-        tabLayout.setupWithViewPager(viewPager);
+        if (tabLayout != null) {
+            tabLayout.setupWithViewPager(viewPager);
+            tabLayout.setVisibility(View.GONE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && getView() != null)
+                TransitionManager.beginDelayedTransition(appBarLayout, new Slide());
+            tabLayout.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -130,6 +149,23 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
     public void onRefresh() {
         activateLoadingView();
         presenter.getTags();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_search) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && getView() != null) {
+                toggleVisibility(toolbar);
+                TransitionManager.beginDelayedTransition(appBarLayout, new Slide());
+                toggleVisibility(searchBar);
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

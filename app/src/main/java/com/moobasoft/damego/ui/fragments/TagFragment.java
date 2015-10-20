@@ -93,7 +93,7 @@ public class TagFragment extends BaseFragment
     @Nullable @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.content_main, container, false);
-        appBarLayout = (AppBarLayout) getActivity().findViewById(R.id.app_bar_layout);
+        appBarLayout = (AppBarLayout) getActivity().findViewById(R.id.app_bar);
         getComponent().inject(this);
         presenter.bindView(this);
         ButterKnife.bind(this, view);

@@ -3,6 +3,7 @@ package com.moobasoft.damego.ui.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,7 @@ import com.moobasoft.damego.ui.PostsAdapter;
 import com.moobasoft.damego.ui.fragments.BaseFragment;
 import com.moobasoft.damego.ui.fragments.IndexFragment;
 import com.moobasoft.damego.ui.fragments.ShowFragment;
+import com.moobasoft.damego.ui.fragments.TagFragment;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -27,10 +29,15 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
     public static final String INDEX_TAG = "index";
     public static final String SHOW_TAG  = "show";
 
+    @Nullable @Bind(R.id.app_bar)    AppBarLayout appBar;
     @Nullable @Bind(R.id.toolbar)    Toolbar toolbar;
     @Nullable @Bind(R.id.tab_layout) TabLayout tabLayout;
     @Nullable @Bind(R.id.show_container)  ViewGroup showContainer;
     @Bind(R.id.index_container) ViewGroup indexContainer;
+
+    @Nullable public AppBarLayout getAppBar() { return appBar; }
+    @Nullable public Toolbar getToolbar() { return toolbar; }
+    @Nullable public TabLayout getTabLayout() { return tabLayout; }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +51,7 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
             if (showContainer != null) {
                 Fragment showFrag = getSupportFragmentManager().findFragmentByTag(SHOW_TAG);
                 if (showFrag == null)
-                    showFrag = ShowFragment.newInstance(0); // Default
+                    showFrag = ShowFragment.newInstance(0, TagFragment.SHOW_ALL_TAG); // Default
                 getSupportFragmentManager().popBackStack();
                 getSupportFragmentManager().beginTransaction().remove(showFrag).commit();
                 getSupportFragmentManager().executePendingTransactions();
@@ -53,7 +60,8 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
         } else {
             loadFragment(indexContainer.getId(), IndexFragment.newInstance(), INDEX_TAG, false, true);
             if (showContainer != null)
-                loadFragment(showContainer.getId(), ShowFragment.newInstance(0), SHOW_TAG, false, true);
+                loadFragment(showContainer.getId(),
+                        ShowFragment.newInstance(0, TagFragment.SHOW_ALL_TAG), SHOW_TAG, false, true);
         }
     }
 
@@ -69,16 +77,15 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
         if (mainFrag != null) ((BaseFragment)mainFrag).setToolbar();
     }
 
-    @Nullable public Toolbar getToolbar() { return toolbar; }
-
-    @Nullable public TabLayout getTabLayout() { return tabLayout; }
-
     @Override
     public void onSummaryClicked(Post post) {
         boolean notTabletLayout = showContainer == null;
         int containerId = (notTabletLayout) ?
-                indexContainer.getId() : showContainer.getId() ;
-        ShowFragment showFragment = ShowFragment.newInstance(post.getId());
+                indexContainer.getId() : showContainer.getId();
+        CharSequence currentTitle = ((IndexFragment) getSupportFragmentManager().findFragmentByTag(INDEX_TAG))
+                .getCurrentTitle();
+
+        ShowFragment showFragment = ShowFragment.newInstance(post.getId(), currentTitle.toString());
         loadFragment(containerId, showFragment, SHOW_TAG, notTabletLayout, true);
     }
 
@@ -121,6 +128,8 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_search:
+                return false;
             case R.id.action_login:
                 Intent loginIntent = new Intent(this, ConnectActivity.class);
                 loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -141,7 +150,7 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
                 break;
         }
         supportInvalidateOptionsMenu();
-        return super.onOptionsItemSelected(item);
+        return false;
     }
 
 }

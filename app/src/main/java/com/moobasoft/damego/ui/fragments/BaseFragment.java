@@ -38,7 +38,7 @@ public abstract class BaseFragment extends Fragment {
         for (View view : views) {
             if (view == null) return;
             boolean isVisible = view.getVisibility() == View.VISIBLE;
-            view.setVisibility(isVisible ? View.INVISIBLE : View.VISIBLE);
+            view.setVisibility(isVisible ? View.GONE : View.VISIBLE);
         }
     }
 

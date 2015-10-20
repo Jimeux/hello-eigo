@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
 
-    <item android:id="@+id/action_searcg" android:title="@string/action_search"
+    <item android:id="@+id/action_search" android:title="@string/action_search"
         android:icon="@drawable/ic_search_white_24dp" android:orderInCategory="100" app:showAsAction="ifRoom" />
     <item android:id="@+id/action_register" android:title="@string/register"
         android:orderInCategory="100" app:showAsAction="never" />

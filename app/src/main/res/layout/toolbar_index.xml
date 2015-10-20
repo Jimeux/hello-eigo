@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     fontPath="fonts/Roboto-Light.ttf"
-    android:id="@+id/app_bar_layout"
+    android:id="@+id/app_bar"
     app:elevation="2dp"
     android:background="@color/colorPrimary"
     android:layout_width="match_parent"
@@ -16,6 +16,8 @@
         android:layout_height="?attr/actionBarSize"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:layout_scrollFlags="scroll|enterAlways" />
+
+    <include layout="@layout/toolbar_search" />
 
     <android.support.design.widget.TabLayout
         android:id="@+id/tab_layout"

@@ -9,7 +9,7 @@
 
     <dimen name="main_footer_text">17dp</dimen>
     <dimen name="main_title_text">19sp</dimen>
-    <dimen name="main_body_text">18sp</dimen>
+    <dimen name="main_body_text">17sp</dimen>
     <dimen name="main_image_width">80dp</dimen>
 
     <dimen name="show_comment_link_text">22dp</dimen>

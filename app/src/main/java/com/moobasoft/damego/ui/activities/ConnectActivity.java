@@ -1,10 +1,13 @@
 package com.moobasoft.damego.ui.activities;
 
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +34,7 @@ public class ConnectActivity extends BaseActivity implements ConnectPresenter.Vi
 
     @Inject ConnectPresenter presenter;
 
+    @Bind(R.id.progress_bar)    ProgressBar progressBar;
     @Bind(R.id.btn_primary)     Button primaryBtn;
     @Bind(R.id.btn_secondary)   Button secondaryBtn;
     @Bind(R.id.processing_view) ViewGroup processingView;
@@ -98,9 +102,12 @@ public class ConnectActivity extends BaseActivity implements ConnectPresenter.Vi
         ButterKnife.bind(this);
         initialiseInjector();
         presenter.bindView(this);
-
         boolean isRegisterForm = getIntent().getBooleanExtra(REGISTER, true);
         switchForms(isRegisterForm);
+
+        ViewCompat.setTranslationZ(progressBar, 5);
+        progressBar.getIndeterminateDrawable()
+                .setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_IN);
     }
 
     private void initialiseInjector() {

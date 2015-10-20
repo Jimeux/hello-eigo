@@ -50,12 +50,12 @@ public abstract class RxPresenter<V extends RxPresenter.RxView> extends BasePres
     public void handleError(Throwable throwable) {
         String message = throwable.getMessage();
 
-        if (message.contains(OFFLINE_CODE))
+        if (throwable instanceof SocketTimeoutException)
+            view.onError("Request timed out.");
+        else if (message.contains(OFFLINE_CODE))
             view.onError("Not connected to the Internet.");
         else if (message.contains(SERVER_DOWN_CODE))
             view.onError("Couldn't connect to server.");
-        else if (throwable instanceof SocketTimeoutException)
-            view.onError("Request timed out.");
         else {
             Log.d("TAGGART", throwable.getMessage());
             view.onError("An unexpected error occurred.");

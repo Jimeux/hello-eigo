@@ -43,7 +43,9 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
 
     public static final String POST_KEY    = "post_key";
     public static final String POST_ID_KEY = "post_id";
+    public static final String TAG_NAME_KEY = "tag_name";
     private int postIdArg;
+    private String tagNameArg;
     private Post post;
 
     @Inject ShowPresenter presenter;
@@ -58,10 +60,11 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
 
     public ShowFragment() {}
 
-    public static ShowFragment newInstance(int postId) {
+    public static ShowFragment newInstance(int postId, String tagName) {
         ShowFragment fragment = new ShowFragment();
         Bundle args = new Bundle();
         args.putInt(POST_ID_KEY, postId);
+        args.putString(TAG_NAME_KEY, tagName);
         fragment.setArguments(args);
         return fragment;
     }
@@ -72,6 +75,7 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
         getComponent().inject(this);
         presenter.bindView(this);
         postIdArg = getArguments().getInt(POST_ID_KEY, 0);
+        tagNameArg = getArguments().getString(TAG_NAME_KEY);
     }
 
     @Nullable @Override
@@ -148,7 +152,7 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
     @Override
     public void setToolbar() {
         if (toolbar != null) {
-            toolbar.setTitle("");
+            toolbar.setTitle(tagNameArg);
             ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
             ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
