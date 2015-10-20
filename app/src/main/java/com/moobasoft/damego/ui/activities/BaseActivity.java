@@ -57,7 +57,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     public void promptForLogin() {
-        Snackbar.make(toolbar, getString(R.string.unauthorized), LENGTH_INDEFINITE)
+        Snackbar.make(findViewById(android.R.id.content), getString(R.string.unauthorized), LENGTH_INDEFINITE)
                 .setActionTextColor(getResources().getColor(R.color.green400))
                 .setAction(getString(R.string.login), v -> {
                     Intent intent = new Intent(getApplicationContext(), ConnectActivity.class);

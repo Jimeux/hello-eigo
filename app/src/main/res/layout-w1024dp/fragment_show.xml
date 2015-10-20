@@ -22,23 +22,7 @@
             card_view:cardElevation="2dp"
             card_view:cardUseCompatPadding="true">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/backdrop"
-                    android:layout_width="match_parent"
-                    android:layout_height="260dp"
-                    android:adjustViewBounds="true"
-                    android:background="@color/greyBackground"
-                    android:fitsSystemWindows="true"
-                    android:scaleType="centerCrop" />
-
-                <include layout="@layout/content_show" />
-
-            </LinearLayout>
+            <include layout="@layout/content_show" />
 
         </android.support.v7.widget.CardView>
 
@@ -48,5 +32,5 @@
 
 </LinearLayout>
 
-    <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:behavior_overlapTop="64dp">-->
+<!--app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    app:behavior_overlapTop="64dp">-->

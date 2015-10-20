@@ -1,6 +1,5 @@
 package com.moobasoft.damego.util;
 
-import android.content.Intent;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -8,7 +7,6 @@ import android.widget.TextView;
 
 import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
-import com.moobasoft.damego.ui.activities.IndexActivity;
 
 public class PostUtil {
 
@@ -23,11 +21,6 @@ public class PostUtil {
                     inflater.inflate(R.layout.element_tag, tags, false);
             tagView.setText(tag);
             tagView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-            tagView.setOnClickListener(v -> {
-                Intent i = new Intent(inflater.getContext(), IndexActivity.class);
-                //i.putExtra(IndexActivity.TAG_NAME, tag); //TODO: Fix
-                inflater.getContext().startActivity(i);
-            });
             if (largeText) tagView.setPadding(0, 0, tagMargin, 0);
             else           tagView.setPadding(tagMargin, 0, 0, 0);
                 tags.addView(tagView);

@@ -32,8 +32,8 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
     @Nullable @Bind(R.id.tab_layout) TabLayout tabLayout;
     @Bind(R.id.view_pager)           ViewPager viewPager;
 
-    public static final String TAGS_TAG    = "tags_tag";
-    public static final String ADAPTER_TAG = "adapter_tag";
+    public static final String TAGS_KEY = "tags_tag";
+    public static final String ADAPTER_KEY = "adapter_tag";
     private ArrayList<String> tags;
     private Adapter adapter;
 
@@ -44,6 +44,10 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    public void setCurrentTag(String tag) {
+        viewPager.setCurrentItem(adapter.indexOf(tag));
     }
 
     @Override
@@ -60,8 +64,8 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
         ButterKnife.bind(this, view);
 
         if (state != null) {
-            adapter.restoreState(state.getParcelable(ADAPTER_TAG), getActivity().getClassLoader());
-            tags = state.getStringArrayList(TAGS_TAG);
+            adapter.restoreState(state.getParcelable(ADAPTER_KEY), getActivity().getClassLoader());
+            tags = state.getStringArrayList(TAGS_KEY);
         }
 
         return view;
@@ -86,8 +90,8 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
         if (adapter != null && tags != null) {
-            state.putParcelable(ADAPTER_TAG, adapter.saveState());
-            state.putStringArrayList(TAGS_TAG, tags);
+            state.putParcelable(ADAPTER_KEY, adapter.saveState());
+            state.putStringArrayList(TAGS_KEY, tags);
         }
     }
 
@@ -97,11 +101,7 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
             toolbar = ((IndexActivity)getActivity()).getToolbar(); //TODO: Use interface?
             tabLayout = ((IndexActivity)getActivity()).getTabLayout();
         }
-        if (toolbar != null) {
-            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-            //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-              //  getActivity().getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimary));
-        }
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
     }
 
     @Override
@@ -165,6 +165,10 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
         @Override
         public CharSequence getPageTitle(int position) {
             return fragmentTitles.get(position);
+        }
+
+        public int indexOf(String tag) {
+            return fragmentTitles.indexOf(tag);
         }
     }
 

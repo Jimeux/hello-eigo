@@ -3,6 +3,7 @@ package com.moobasoft.damego.ui.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -41,7 +42,7 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
 
         if (savedInstanceState != null) {
             if (showContainer != null) {
-                Fragment showFrag   = getSupportFragmentManager().findFragmentByTag(SHOW_TAG);
+                Fragment showFrag = getSupportFragmentManager().findFragmentByTag(SHOW_TAG);
                 if (showFrag == null)
                     showFrag = ShowFragment.newInstance(0); // Default
                 getSupportFragmentManager().popBackStack();
@@ -68,13 +69,9 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
         if (mainFrag != null) ((BaseFragment)mainFrag).setToolbar();
     }
 
-    @Nullable public Toolbar getToolbar() {
-        return toolbar;
-    }
+    @Nullable public Toolbar getToolbar() { return toolbar; }
 
-    @Nullable public TabLayout getTabLayout() {
-        return tabLayout;
-    }
+    @Nullable public TabLayout getTabLayout() { return tabLayout; }
 
     @Override
     public void onSummaryClicked(Post post) {
@@ -100,18 +97,23 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
 
     @Override
     public void onTagClicked(String tag) {
-        //viewPager.setCurrentItem(adapter.getIndex(tag), false);
+        IndexFragment indexFrag =
+                (IndexFragment) getSupportFragmentManager().findFragmentByTag(INDEX_TAG);
+
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0)
+            getSupportFragmentManager().popBackStack();
+
+        indexFrag.setCurrentTag(tag);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
-
-        /*boolean loggedIn = credentialStore.isLoggedIn();
+        boolean loggedIn = credentialStore.isLoggedIn();
 
         menu.findItem(R.id.action_logout).setVisible(loggedIn);
         menu.findItem(R.id.action_login).setVisible(!loggedIn);
-        menu.findItem(R.id.action_register).setVisible(!loggedIn);*/
+        menu.findItem(R.id.action_register).setVisible(!loggedIn);
 
         return true;
     }
@@ -134,8 +136,8 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
                 break;
 
             case R.id.action_logout:
-                // credentialStore.delete(); TODO: REACTIVATE
-                //Snackbar.make(toolbar, getString(R.string.logout_success), LENGTH_SHORT).show();
+                credentialStore.delete();
+                Snackbar.make(indexContainer, getString(R.string.logout_success), Snackbar.LENGTH_SHORT).show();
                 break;
         }
         supportInvalidateOptionsMenu();
