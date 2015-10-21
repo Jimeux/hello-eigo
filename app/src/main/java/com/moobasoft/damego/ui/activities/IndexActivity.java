@@ -7,6 +7,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -24,10 +25,11 @@ import com.moobasoft.damego.ui.fragments.TagFragment;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class IndexActivity extends BaseActivity implements PostsAdapter.PostClickListener {
+public class IndexActivity extends BaseActivity implements PostsAdapter.PostClickListener, FragmentManager.OnBackStackChangedListener {
 
     public static final String INDEX_TAG = "index";
     public static final String SHOW_TAG  = "show";
+    private FragmentManager manager;
 
     @Nullable @Bind(R.id.app_bar)    AppBarLayout appBar;
     @Nullable @Bind(R.id.toolbar)    Toolbar toolbar;
@@ -35,9 +37,12 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
     @Nullable @Bind(R.id.show_container)  ViewGroup showContainer;
     @Bind(R.id.index_container) ViewGroup indexContainer;
 
-    @Nullable public AppBarLayout getAppBar() { return appBar; }
-    @Nullable public Toolbar getToolbar() { return toolbar; }
+    @Nullable public AppBarLayout getAppBar() { return appBar;    }
+    @Nullable public Toolbar getToolbar()     { return toolbar;   }
     @Nullable public TabLayout getTabLayout() { return tabLayout; }
+
+    private boolean isTwoPaneLayout()    { return showContainer != null; }
+    private boolean isSinglePaneLayout() { return showContainer == null; }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,24 +50,44 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         getComponent().inject(this);
-        getSupportFragmentManager().addOnBackStackChangedListener(this::setMainToolbar);
+        manager = getSupportFragmentManager();
+        manager.addOnBackStackChangedListener(this);
 
         if (savedInstanceState != null) {
-            if (showContainer != null) {
-                Fragment showFrag = getSupportFragmentManager().findFragmentByTag(SHOW_TAG);
-                if (showFrag == null)
-                    showFrag = ShowFragment.newInstance(0, TagFragment.SHOW_ALL_TAG); // Default
-                getSupportFragmentManager().popBackStack();
-                getSupportFragmentManager().beginTransaction().remove(showFrag).commit();
-                getSupportFragmentManager().executePendingTransactions();
-                loadFragment(showContainer.getId(), showFrag, SHOW_TAG, false, true);
-            }
+            Fragment showFragment = manager.findFragmentByTag(SHOW_TAG);
+            if (showContainer != null)
+                restore1024Layout(showFragment);
+            else
+                restorePortraitLayout(showFragment);
         } else {
             loadFragment(indexContainer.getId(), IndexFragment.newInstance(), INDEX_TAG, false, true);
-            if (showContainer != null)
-                loadFragment(showContainer.getId(),
-                        ShowFragment.newInstance(0, TagFragment.SHOW_ALL_TAG), SHOW_TAG, false, true);
+            if (showContainer != null) {
+                ShowFragment showFragment = ShowFragment.newInstance(0, TagFragment.SHOW_ALL_TAG);
+                loadFragment(showContainer.getId(), showFragment, SHOW_TAG, false, true);
+            }
         }
+    }
+
+    private void restorePortraitLayout(Fragment showFragment) {
+        if (showFragment != null) {
+            manager.beginTransaction().remove(showFragment).commit();
+            manager.executePendingTransactions();
+            loadFragment(indexContainer.getId(), showFragment, SHOW_TAG, true, true);
+        }
+    }
+
+    private void restore1024Layout(Fragment showFragment) {
+        if (showFragment == null)
+            showFragment = ShowFragment.newInstance(0, TagFragment.SHOW_ALL_TAG); // Default
+        else {
+            if (indexFragmentIsOnTop())
+                manager.popBackStackImmediate(SHOW_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            else
+                manager.popBackStackImmediate();
+            manager.beginTransaction().remove(showFragment).commit();
+            manager.executePendingTransactions();
+        }
+        loadFragment(showContainer.getId(), showFragment, SHOW_TAG, false, true);
     }
 
     @Override
@@ -72,28 +97,25 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
     }
 
     public void setMainToolbar() {
-        Fragment mainFrag = getSupportFragmentManager()
-                .findFragmentById(indexContainer.getId());
+        Fragment mainFrag = manager.findFragmentById(indexContainer.getId());
         if (mainFrag != null) ((BaseFragment)mainFrag).setToolbar();
     }
 
     @Override
     public void onSummaryClicked(Post post) {
-        boolean notTabletLayout = showContainer == null;
-        int containerId = (notTabletLayout) ?
-                indexContainer.getId() : showContainer.getId();
-        CharSequence currentTitle = ((IndexFragment) getSupportFragmentManager().findFragmentByTag(INDEX_TAG))
-                .getCurrentTitle();
-
+        int containerId = (isSinglePaneLayout()) ? indexContainer.getId() : showContainer.getId();
+        IndexFragment indexFragment = (IndexFragment) manager.findFragmentByTag(INDEX_TAG);
+        if (isSinglePaneLayout()) indexFragment.savePagerPosition();
+        CharSequence currentTitle = indexFragment.getCurrentTitle();
         ShowFragment showFragment = ShowFragment.newInstance(post.getId(), currentTitle.toString());
-        loadFragment(containerId, showFragment, SHOW_TAG, notTabletLayout, true);
+        loadFragment(containerId, showFragment, SHOW_TAG, isSinglePaneLayout(), true);
     }
 
     private void loadFragment(int containerId, Fragment fragment, String tag, boolean addToBackstack, boolean add) {
-        FragmentTransaction transaction = getSupportFragmentManager()
+        FragmentTransaction transaction = manager
                 .beginTransaction()
                 .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right,
-                        android.R.anim.slide_in_left, R.anim.slide_y);
+                                     android.R.anim.slide_in_left, R.anim.slide_y);
         if (addToBackstack) transaction.addToBackStack(tag);
         if (add && showContainer == null)
             transaction.add(containerId, fragment, tag);
@@ -104,24 +126,47 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
 
     @Override
     public void onTagClicked(String tag) {
-        IndexFragment indexFrag =
-                (IndexFragment) getSupportFragmentManager().findFragmentByTag(INDEX_TAG);
+        IndexFragment indexFragment = (IndexFragment) manager.findFragmentByTag(INDEX_TAG);
+        ShowFragment showFragment   = (ShowFragment)  manager.findFragmentByTag(SHOW_TAG);
 
-        if (getSupportFragmentManager().getBackStackEntryCount() > 0)
-            getSupportFragmentManager().popBackStack();
+        boolean clickedInShowFragment =
+                manager.getBackStackEntryCount() > 0 && (showFragment != null && showFragment.isVisible());
 
-        indexFrag.setCurrentTag(tag);
+        if (clickedInShowFragment)
+            loadFragment(indexContainer.getId(), indexFragment, INDEX_TAG, true, false);
+
+        indexFragment.setCurrentTag(tag);
+    }
+
+    /** Disable back button for 2-pane layout */
+    @Override
+    public void onBackPressed() {
+        if (isTwoPaneLayout()) return;
+        super.onBackPressed();
+        if (isSinglePaneLayout() && indexFragmentIsOnTop()) {
+            IndexFragment indexFragment = (IndexFragment) manager.findFragmentByTag(INDEX_TAG);
+            indexFragment.restorePagerPosition();
+        }
+    }
+
+    private boolean indexFragmentIsOnTop() {
+        int entryCount = manager.getBackStackEntryCount();
+        return entryCount <= 0 || manager.getBackStackEntryAt(entryCount-1).getName().equals(INDEX_TAG);
+    }
+
+    /** Restore ViewPager position when naviagating back to IndexFragment */
+    @Override
+    public void onBackStackChanged() {
+        setMainToolbar();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         boolean loggedIn = credentialStore.isLoggedIn();
-
         menu.findItem(R.id.action_logout).setVisible(loggedIn);
         menu.findItem(R.id.action_login).setVisible(!loggedIn);
         menu.findItem(R.id.action_register).setVisible(!loggedIn);
-
         return true;
     }
 

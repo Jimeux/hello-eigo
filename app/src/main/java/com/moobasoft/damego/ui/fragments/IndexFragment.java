@@ -25,7 +25,9 @@ import com.moobasoft.damego.ui.activities.IndexActivity;
 import com.moobasoft.damego.ui.presenters.MainPresenter;
 import com.moobasoft.damego.util.DepthPageTransformer;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -41,6 +43,7 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
     @Nullable @Bind(R.id.search_bar) Toolbar searchBar;
     @Bind(R.id.view_pager)           ViewPager viewPager;
 
+    public static final String POSITION_STACK_KEY = "position_stack_key";
     public static final String TAGS_KEY = "tags_tag";
     public static final String ADAPTER_KEY = "adapter_tag";
     private ArrayList<String> tags;
@@ -57,6 +60,20 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
 
     public void setCurrentTag(String tag) {
         viewPager.setCurrentItem(adapter.indexOf(tag));
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    private Deque<Integer> positionStack = new ArrayDeque<>();
+
+    public void savePagerPosition() {
+        positionStack.push(viewPager.getCurrentItem());
+    }
+
+    public void restorePagerPosition() {
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(positionStack.size() > 1);
+        if (!positionStack.isEmpty())
+            viewPager.setCurrentItem(positionStack.pop());
     }
 
     public CharSequence getCurrentTitle() {
@@ -78,6 +95,8 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
         ButterKnife.bind(this, view);
 
         if (state != null) {
+            ArrayList<Integer> savedStack = state.getIntegerArrayList(POSITION_STACK_KEY);
+            if (savedStack != null) positionStack.addAll(savedStack);
             adapter.restoreState(state.getParcelable(ADAPTER_KEY), getActivity().getClassLoader());
             tags = state.getStringArrayList(TAGS_KEY);
         }
@@ -108,6 +127,7 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
         if (adapter != null && tags != null) {
             state.putParcelable(ADAPTER_KEY, adapter.saveState());
             state.putStringArrayList(TAGS_KEY, tags);
+            state.putIntegerArrayList(POSITION_STACK_KEY, new ArrayList<>(positionStack));
         }
     }
 
