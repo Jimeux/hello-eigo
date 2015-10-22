@@ -19,6 +19,7 @@ import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.PostsAdapter;
 import com.moobasoft.damego.ui.fragments.BaseFragment;
 import com.moobasoft.damego.ui.fragments.IndexFragment;
+import com.moobasoft.damego.ui.fragments.SearchFragment;
 import com.moobasoft.damego.ui.fragments.ShowFragment;
 import com.moobasoft.damego.ui.fragments.TagFragment;
 
@@ -27,8 +28,11 @@ import butterknife.ButterKnife;
 
 public class IndexActivity extends BaseActivity implements PostsAdapter.PostClickListener, FragmentManager.OnBackStackChangedListener {
 
-    public static final String INDEX_TAG = "index";
-    public static final String SHOW_TAG  = "show";
+    public static final String CHANGED_FROM_2PANE_KEY = "switch_from_two_pane";
+    public static final String INDEX_TAG       = "index";
+    public static final String SHOW_TAG        = "show";
+    public static final String SEARCH_TAG      = "search";
+
     private FragmentManager manager;
 
     @Nullable @Bind(R.id.app_bar)    AppBarLayout appBar;
@@ -45,20 +49,24 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
     private boolean isSinglePaneLayout() { return showContainer == null; }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onCreate(Bundle state) {
+        super.onCreate(state);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         getComponent().inject(this);
         manager = getSupportFragmentManager();
         manager.addOnBackStackChangedListener(this);
 
-        if (savedInstanceState != null) {
+        if (state != null) {
+            boolean changedFromTwoPaneLayout =
+                    (isSinglePaneLayout() && state.getBoolean(CHANGED_FROM_2PANE_KEY));
             Fragment showFragment = manager.findFragmentByTag(SHOW_TAG);
-            if (showContainer != null)
-                restore1024Layout(showFragment);
-            else
-                restorePortraitLayout(showFragment);
+
+            if (isTwoPaneLayout())
+                restoreTwoPaneLayout(showFragment);
+            else if (isSinglePaneLayout() && changedFromTwoPaneLayout)
+                restoreSingleLayout(showFragment);
+            //else if (isSinglePaneLayout()) // Restore single pane layout
         } else {
             loadFragment(indexContainer.getId(), IndexFragment.newInstance(), INDEX_TAG, false, true);
             if (showContainer != null) {
@@ -68,7 +76,18 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
         }
     }
 
-    private void restorePortraitLayout(Fragment showFragment) {
+    @Override
+    protected void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        state.putBoolean(CHANGED_FROM_2PANE_KEY, isTwoPaneLayout());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    private void restoreSingleLayout(Fragment showFragment) {
         if (showFragment != null) {
             manager.beginTransaction().remove(showFragment).commit();
             manager.executePendingTransactions();
@@ -76,7 +95,7 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
         }
     }
 
-    private void restore1024Layout(Fragment showFragment) {
+    private void restoreTwoPaneLayout(Fragment showFragment) {
         if (showFragment == null)
             showFragment = ShowFragment.newInstance(0, TagFragment.SHOW_ALL_TAG); // Default
         else {
@@ -87,7 +106,7 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
             manager.beginTransaction().remove(showFragment).commit();
             manager.executePendingTransactions();
         }
-        loadFragment(showContainer.getId(), showFragment, SHOW_TAG, false, true);
+        loadFragment(showContainer.getId(), showFragment, SHOW_TAG, false, false);
     }
 
     @Override
@@ -141,11 +160,20 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
     /** Disable back button for 2-pane layout */
     @Override
     public void onBackPressed() {
-        if (isTwoPaneLayout()) return;
         super.onBackPressed();
-        if (isSinglePaneLayout() && indexFragmentIsOnTop()) {
-            IndexFragment indexFragment = (IndexFragment) manager.findFragmentByTag(INDEX_TAG);
-            indexFragment.restorePagerPosition();
+        if (isSinglePaneLayout() && indexFragmentIsOnTop())
+            ((IndexFragment) manager.findFragmentByTag(INDEX_TAG)).restorePagerPosition();
+
+        int backStackEntryCount = manager.getBackStackEntryCount();
+        if (isTwoPaneLayout() && backStackEntryCount > 0) {
+            String name = manager.getBackStackEntryAt(backStackEntryCount - 1).getName();
+            if (name != null && name.equals(SHOW_TAG)) {
+                ShowFragment showFragment = (ShowFragment) manager.findFragmentByTag(SHOW_TAG);
+                manager.popBackStack();
+                manager.executePendingTransactions();
+                loadFragment(showContainer.getId(), showFragment, SHOW_TAG, false, false);
+                ((IndexFragment) manager.findFragmentByTag(INDEX_TAG)).restorePagerPosition();
+            }
         }
     }
 
@@ -174,7 +202,9 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_search:
+                loadFragment(indexContainer.getId(), new SearchFragment(), SEARCH_TAG, true, true);
                 return false;
+
             case R.id.action_login:
                 Intent loginIntent = new Intent(this, ConnectActivity.class);
                 loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

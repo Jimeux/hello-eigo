@@ -9,14 +9,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
 import android.transition.TransitionManager;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -40,13 +37,13 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
 
     @Nullable @Bind(R.id.app_bar) AppBarLayout appBarLayout;
     @Nullable @Bind(R.id.tab_layout) TabLayout tabLayout;
-    @Nullable @Bind(R.id.search_bar) Toolbar searchBar;
     @Bind(R.id.view_pager)           ViewPager viewPager;
 
     public static final String POSITION_STACK_KEY = "position_stack_key";
     public static final String TAGS_KEY = "tags_tag";
     public static final String ADAPTER_KEY = "adapter_tag";
     private ArrayList<String> tags;
+    private Deque<Integer> positionStack;
     private Adapter adapter;
 
     public IndexFragment() {}
@@ -64,16 +61,19 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    private Deque<Integer> positionStack = new ArrayDeque<>();
-
     public void savePagerPosition() {
         positionStack.push(viewPager.getCurrentItem());
     }
 
     public void restorePagerPosition() {
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(positionStack.size() > 1);
         if (!positionStack.isEmpty())
             viewPager.setCurrentItem(positionStack.pop());
+        setDisplayHomeAsUpEnabled();
+    }
+
+    private void setDisplayHomeAsUpEnabled() {
+        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (actionBar != null) actionBar.setDisplayHomeAsUpEnabled(positionStack.size() > 0);
     }
 
     public CharSequence getCurrentTitle() {
@@ -83,8 +83,8 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         adapter = new Adapter(getChildFragmentManager());
+        positionStack = new ArrayDeque<>();
     }
 
     @Nullable @Override
@@ -133,8 +133,10 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
 
     @Override
     public void setToolbar() {
-        if (toolbar != null)
+        if (toolbar != null) {
             ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+            setDisplayHomeAsUpEnabled();
+        }
     }
 
     @Override
@@ -169,23 +171,6 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
     public void onRefresh() {
         activateLoadingView();
         presenter.getTags();
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_search) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && getView() != null) {
-                toggleVisibility(toolbar);
-                TransitionManager.beginDelayedTransition(appBarLayout, new Slide());
-                toggleVisibility(searchBar);
-            }
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override

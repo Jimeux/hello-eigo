@@ -58,6 +58,11 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
     @Bind(R.id.comments_preview)  ViewGroup commentContainer;
     @Bind(R.id.view_comments_btn) ViewGroup viewCommentsBtn;
 
+    public String getName() {
+        if (post != null) return post.getTitle();
+        else return "No post!";
+    }
+
     public ShowFragment() {}
 
     public static ShowFragment newInstance(int postId, String tagName) {
