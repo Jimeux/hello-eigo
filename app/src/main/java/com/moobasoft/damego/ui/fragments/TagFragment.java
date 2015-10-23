@@ -3,7 +3,6 @@ package com.moobasoft.damego.ui.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
@@ -198,11 +197,7 @@ public class TagFragment extends BaseFragment
     @Override
     public void onError(String message) {
         refreshLayout.setRefreshing(false);
-        if (loadingView.getVisibility() == VISIBLE || errorView.getVisibility() == VISIBLE) {
-            errorMessage.setText(message);
-            activateView(R.id.error_view);
-        } else
-            Snackbar.make(postsRecyclerView, message, Snackbar.LENGTH_SHORT).show();
+        activateErrorView(message);
     }
 
     @Override

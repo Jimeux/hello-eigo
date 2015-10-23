@@ -20,8 +20,6 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 
-import static android.view.View.VISIBLE;
-
 public class SearchFragment extends BaseFragment implements IndexPresenter.View {
 
     @Inject IndexPresenter presenter;
@@ -76,11 +74,8 @@ public class SearchFragment extends BaseFragment implements IndexPresenter.View 
 
     @Override
     public void onError(String message) {
-        if (loadingView.getVisibility() == VISIBLE || errorView.getVisibility() == VISIBLE) {
-            errorMessage.setText(message);
-            activateView(R.id.error_view);
-        } else
-            Snackbar.make(getView().getRootView(), message, Snackbar.LENGTH_SHORT).show();
+        activateErrorView(message);
+        Snackbar.make(getView().getRootView(), message, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override

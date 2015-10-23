@@ -20,7 +20,7 @@
     <android.support.design.widget.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="@dimen/tab_layout_height"
         app:layout_collapseMode="pin"
         app:tabMode="scrollable"
         app:tabBackground="@color/colorPrimary"

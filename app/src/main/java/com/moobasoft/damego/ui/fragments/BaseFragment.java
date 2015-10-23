@@ -1,6 +1,7 @@
 package com.moobasoft.damego.ui.fragments;
 
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -60,32 +61,35 @@ public abstract class BaseFragment extends Fragment {
                 .build();
     }
 
-    protected void activateView(int id) {
+    protected void activateView(View view) {
         for (ViewGroup vg : stateViews)
             vg.setVisibility(android.view.View.GONE);
-        try {
-            getView().findViewById(id).setVisibility(VISIBLE);
-        } catch (NullPointerException e) {
+
+        if (view == null)
             activateErrorView(getString(R.string.error_default));
-        }
+        else
+            view.setVisibility(VISIBLE);
     }
 
     protected void activateEmptyView(String message) {
-        activateView(R.id.empty_view);
+        activateView(emptyView);
         emptyMessage.setText(message);
     }
 
     protected void activateErrorView(String message) {
-        activateView(R.id.error_view);
-        errorMessage.setText(message);
+        if (loadingView.getVisibility() == VISIBLE || errorView.getVisibility() == VISIBLE) {
+            errorMessage.setText(message);
+            activateView(errorView);
+        } else
+           Snackbar.make(getActivity().findViewById(android.R.id.content), message, Snackbar.LENGTH_SHORT).show();
     }
 
     protected void activateContentView() {
-        activateView(R.id.content);
+        activateView(contentView);
     }
     
     protected void activateLoadingView() {
-        activateView(R.id.loading_view);
+        activateView(loadingView);
     }
     
     public abstract void onRefresh();

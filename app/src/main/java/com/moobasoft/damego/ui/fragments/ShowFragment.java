@@ -4,14 +4,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -72,16 +75,31 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         getComponent().inject(this);
         presenter.bindView(this);
         postIdArg = getArguments().getInt(POST_ID_KEY, 0);
         tagNameArg = getArguments().getString(TAG_NAME_KEY);
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        MenuItem menuItem = menu.add(0, 723, 1, R.string.action_share)
+                .setIcon(R.drawable.ic_share_white_24dp);
+        MenuItemCompat.setShowAsAction(menuItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
+
     @Nullable @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_show, container, false);
         ButterKnife.bind(this, view);
+        tabLayout.setVisibility(GONE);
         return view;
     }
 
@@ -92,8 +110,10 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
         if (savedInstanceState != null)
             post = Parcels.unwrap(savedInstanceState.getParcelable(POST_KEY));
 
-        //if (post != null) loadPost(post);
-        else    onRefresh();
+        if (post != null)
+            loadPost(post);
+        else
+            onRefresh();
     }
 
     @Override
@@ -125,14 +145,15 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
         showAdapter = new ShowAdapter(getChildFragmentManager(), post);
         viewPager.setAdapter(showAdapter);
         tabLayout.setupWithViewPager(viewPager);
-        tabLayout.getTabAt(CONTENT_PAGE).setIcon(R.drawable.ic_subject_white_18dp);
-        tabLayout.getTabAt(COMMENTS_PAGE).setIcon(R.drawable.ic_comment_white_18dp);
+        tabLayout.getTabAt(CONTENT_PAGE).setIcon(R.drawable.ic_subject_white_24dp);
+        tabLayout.getTabAt(COMMENTS_PAGE).setIcon(R.drawable.ic_comment_white_24dp);
         viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(final int position) {
                 fab.setVisibility(position == COMMENTS_PAGE ? VISIBLE : GONE);
             }
         });
+        tabLayout.setVisibility(VISIBLE);
         activateContentView();
     }
 
@@ -147,10 +168,7 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
 
     @Override
     public void onError(String message) {
-        if (loadingView.getVisibility() == VISIBLE || errorView.getVisibility() == VISIBLE)
-            activateErrorView(message);
-        else
-            Snackbar.make(getView().getRootView(), message, Snackbar.LENGTH_SHORT).show();
+        activateErrorView(message);
     }
 
     public static class ShowAdapter extends FragmentPagerAdapter {

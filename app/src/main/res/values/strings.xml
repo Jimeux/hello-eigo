@@ -43,5 +43,6 @@
     <string name="action_search">Search</string>
     <string name="fragment_image_trans">fragment_image_transition</string>
     <string name="comments_empty">コメントはまだありません。</string>
+    <string name="action_share">シェア</string>
 
 </resources>
