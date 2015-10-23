@@ -1,35 +1,26 @@
 package com.moobasoft.damego.ui.fragments;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Html;
-import android.transition.Slide;
-import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.moobasoft.damego.R;
-import com.moobasoft.damego.rest.models.Comment;
 import com.moobasoft.damego.rest.models.Post;
-import com.moobasoft.damego.ui.activities.BaseActivity;
-import com.moobasoft.damego.ui.activities.CommentsActivity;
 import com.moobasoft.damego.ui.activities.CreateCommentActivity;
-import com.moobasoft.damego.ui.activities.IndexActivity;
 import com.moobasoft.damego.ui.presenters.ShowPresenter;
-import com.moobasoft.damego.ui.views.CommentView;
-import com.moobasoft.damego.util.PostUtil;
 
 import org.parceler.Parcels;
-
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -37,6 +28,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView {
@@ -44,23 +36,26 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
     public static final String POST_KEY    = "post_key";
     public static final String POST_ID_KEY = "post_id";
     public static final String TAG_NAME_KEY = "tag_name";
+    public static final int CONTENT_PAGE = 0;
+    public static final int COMMENTS_PAGE = 1;
+
     private int postIdArg;
     private String tagNameArg;
     private Post post;
+    private ShowAdapter showAdapter;
 
     @Inject ShowPresenter presenter;
 
-    @Bind(R.id.title)             TextView title;
-    @Bind(R.id.body)              TextView body;
-    @Bind(R.id.tags)              ViewGroup tags;
-    @Bind(R.id.backdrop)          ImageView backdrop;
-    @Bind(R.id.comment_title)     TextView commentTitle;
-    @Bind(R.id.comments_preview)  ViewGroup commentContainer;
-    @Bind(R.id.view_comments_btn) ViewGroup viewCommentsBtn;
+    @Bind(R.id.tab_layout) TabLayout tabLayout;
+    @Bind(R.id.view_pager) ViewPager viewPager;
+    @Bind(R.id.fab)        FloatingActionButton fab;
 
-    public String getName() {
-        if (post != null) return post.getTitle();
-        else return "No post!";
+    @OnClick(R.id.fab)
+    public void clickFab() {
+        Intent intent = new Intent(getActivity(), CreateCommentActivity.class);
+        intent.putExtra(POST_ID_KEY, post.getId());
+        startActivity(intent);
+        //doIfLoggedIn(intent); TODO: Forward to activity?
     }
 
     public ShowFragment() {}
@@ -94,13 +89,11 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-       if (savedInstanceState != null)
+        if (savedInstanceState != null)
             post = Parcels.unwrap(savedInstanceState.getParcelable(POST_KEY));
 
-        if (post != null)
-            loadPost(post);
-        else
-            onRefresh();
+        //if (post != null) loadPost(post);
+        else    onRefresh();
     }
 
     @Override
@@ -129,29 +122,18 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
     }
 
     private void loadPost(Post post) {
-        title.setText(post.getTitle());
-        commentTitle.setText(getString(
-                R.string.comments_title, post.getCommentsCount()));
-        body.setText(Html.fromHtml(post.getBody().trim().replaceAll("[\n\r]", "")));
-        insertComments(post);
-        Glide.with(this)
-                .load(post.getImageUrl())
-                .into(backdrop);
-
-        PostUtil.insertTags(post, getActivity().getLayoutInflater(), tags, true);
-        for (int i = 0; i < tags.getChildCount(); i++) {
-            TextView tag = (TextView) tags.getChildAt(i);
-            tag.setOnClickListener(v ->
-                    ((IndexActivity) getActivity()).onTagClicked(tag.getText().toString()));
-        }
-
+        showAdapter = new ShowAdapter(getChildFragmentManager(), post);
+        viewPager.setAdapter(showAdapter);
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.getTabAt(CONTENT_PAGE).setIcon(R.drawable.ic_subject_white_18dp);
+        tabLayout.getTabAt(COMMENTS_PAGE).setIcon(R.drawable.ic_comment_white_18dp);
+        viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(final int position) {
+                fab.setVisibility(position == COMMENTS_PAGE ? VISIBLE : GONE);
+            }
+        });
         activateContentView();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && getView() != null) {
-            toggleVisibility(title, body, tags);
-            TransitionManager.beginDelayedTransition((ViewGroup) getView().getRootView(), new Slide());
-            toggleVisibility(title, body, tags);
-        }
     }
 
     @Override
@@ -163,39 +145,32 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
         }
     }
 
-    private void insertComments(Post post) {
-        int end = (post.getComments().size() >= 3) ? 3 : post.getComments().size();
-        List<Comment> comments = post.getComments().subList(0, end);
-        for (Comment comment : comments) {
-            CommentView view = (CommentView)
-                    getActivity().getLayoutInflater().inflate(R.layout.view_comment, null);
-            view.bindTo(comment);
-            commentContainer.addView(view);
-        }
-        viewCommentsBtn.setVisibility(
-                comments.isEmpty() ? View.GONE : View.VISIBLE);
-    }
-
     @Override
     public void onError(String message) {
         if (loadingView.getVisibility() == VISIBLE || errorView.getVisibility() == VISIBLE)
             activateErrorView(message);
         else
-            Snackbar.make(title, message, Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(getView().getRootView(), message, Snackbar.LENGTH_SHORT).show();
     }
 
-    @OnClick({R.id.comment_title, R.id.view_comments_btn})
-    public void clickViewComments() {
-        Intent i = new Intent(getActivity(), CommentsActivity.class);
-        i.putExtra(POST_ID_KEY, postIdArg);
-        startActivity(i);
-    }
+    public static class ShowAdapter extends FragmentPagerAdapter {
 
-    @OnClick(R.id.fab)
-    public void clickFab() {
-        Intent intent = new Intent(getActivity(), CreateCommentActivity.class);
-        intent.putExtra(ShowFragment.POST_ID_KEY, postIdArg);
-        ((BaseActivity)getActivity()).doIfLoggedIn(intent);
-    }
+        private final Post post;
 
+        public ShowAdapter(FragmentManager fm, Post post) {
+            super(fm);
+            this.post = post;
+        }
+
+        @Override
+        public int getCount() { return 2; }
+
+        @Override
+        public Fragment getItem(int position) {
+            if (position == CONTENT_PAGE)
+                return ContentFragment.newInstance(post);
+            else
+                return CommentsFragment.newInstance(post);
+        }
+    }
 }

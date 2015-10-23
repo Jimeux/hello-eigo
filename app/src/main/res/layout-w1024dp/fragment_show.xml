@@ -22,7 +22,7 @@
             card_view:cardElevation="2dp"
             card_view:cardUseCompatPadding="true">
 
-            <include layout="@layout/content_show" />
+            <include layout="@layout/fragment_content" />
 
         </android.support.v7.widget.CardView>
 

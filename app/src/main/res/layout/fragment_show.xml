@@ -8,20 +8,31 @@
     android:layout_height="match_parent"
     tools:context="com.moobasoft.damego.ui.fragments.ShowFragment">
 
-    <include layout="@layout/status_views" />
-
     <include layout="@layout/toolbar_show" />
 
-    <android.support.v4.widget.NestedScrollView
+    <include layout="@layout/status_views" />
+
+    <LinearLayout
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:id="@+id/content"
-        android:background="@color/grey100"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_height="match_parent">
 
-        <include layout="@layout/content_show" />
+        <android.support.v4.view.ViewPager
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
 
-    </android.support.v4.widget.NestedScrollView>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="@dimen/fab_margin"
+        android:clickable="true"
+        android:src="@drawable/ic_create_white_18dp"
+        app:elevation="4dp" />
 
 </android.support.design.widget.CoordinatorLayout>

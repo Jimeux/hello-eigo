@@ -1,131 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:showIn="@layout/fragment_show"
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <ImageView
-        android:id="@+id/backdrop"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/show_backdrop_height"
-        android:adjustViewBounds="true"
-        android:background="@color/white"
-        android:scaleType="centerCrop" />
+    android:background="@color/grey100"
+    android:clipToPadding="false">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:orientation="vertical"
-        android:padding="@dimen/show_padding">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/title"
+        <ImageView
+            android:id="@+id/backdrop"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
-            android:layout_marginTop="10dp"
-            android:textColor="@color/grey900"
-            android:textSize="@dimen/show_title_text" />
-
-        <TextView
-            android:id="@+id/body"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:lineSpacingMultiplier="1.35"
-            android:textColor="@color/grey800"
-            android:textSize="@dimen/show_body_text" />
-
-        <include
-            layout="@layout/element_tag_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="26dp"
-            android:layout_marginTop="0dp" />
-
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="0.8dp"
-        android:background="@color/grey300" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:background="@color/greyBackground"
-        android:orientation="vertical"
-        android:padding="@dimen/show_padding">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/show_comment_link_padding"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp">
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fab"
-                app:elevation="3dp"
-                app:fabSize="mini"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_margin="5dp"
-                android:clickable="true"
-                android:scaleType="center"
-                android:src="@drawable/ic_create_white_18dp" />
-
-            <TextView
-                android:id="@+id/comment_title"
-                fontPath="fonts/Roboto-Medium.ttf"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:textColor="@color/grey700"
-                android:textSize="@dimen/show_comment_link_text" />
-        </RelativeLayout>
+            android:layout_height="@dimen/show_backdrop_height"
+            android:adjustViewBounds="true"
+            android:background="@color/white"
+            android:scaleType="centerCrop" />
 
         <LinearLayout
-            android:id="@+id/comments_preview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="5dp"
-            android:orientation="vertical">
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:padding="@dimen/show_padding">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/grey900"
+                android:textSize="@dimen/show_title_text" />
+
+            <TextView
+                android:id="@+id/body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:lineSpacingMultiplier="1.35"
+                android:textColor="@color/grey800"
+                android:textSize="@dimen/show_body_text" />
+
+            <include
+                layout="@layout/element_tag_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="26dp"
+                android:layout_marginTop="0dp" />
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/view_comments_btn"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:gravity="center|right"
-            android:orientation="horizontal"
-            android:paddingBottom="20dp"
-            android:paddingTop="25dp">
-
-            <TextView
-                fontPath="fonts/Roboto-Medium.ttf"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/comments_view"
-                android:textColor="@color/colorPrimary"
-                android:textSize="@dimen/show_comment_link_text"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:src="@drawable/ic_arrow_forward_teal_500_24dp"
-                android:tint="@color/colorPrimary" />
-        </LinearLayout>
-
     </LinearLayout>
-</LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>

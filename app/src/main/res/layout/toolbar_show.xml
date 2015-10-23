@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:background="@color/colorPrimary"
     android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-    app:elevation="0dp">
+    app:elevation="1dp">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -15,5 +15,18 @@
         android:layout_height="?attr/actionBarSize"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:layout_scrollFlags="scroll|enterAlways" />
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        app:layout_collapseMode="pin"
+        app:tabGravity="fill"
+        app:tabPaddingStart="30dp"
+        app:tabPaddingEnd="30dp"
+        app:tabIndicatorColor="@color/white"
+        app:tabTextColor="@color/white"
+        app:tabMode="fixed" />
 
 </android.support.design.widget.AppBarLayout>

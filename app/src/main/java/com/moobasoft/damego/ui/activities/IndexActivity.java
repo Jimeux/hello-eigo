@@ -157,12 +157,13 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
         indexFragment.setCurrentTag(tag);
     }
 
-    /** Disable back button for 2-pane layout */
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if (isSinglePaneLayout() && indexFragmentIsOnTop())
-            ((IndexFragment) manager.findFragmentByTag(INDEX_TAG)).restorePagerPosition();
+        if (isSinglePaneLayout() && indexFragmentIsOnTop()) {
+            IndexFragment indexFragment = (IndexFragment) manager.findFragmentByTag(INDEX_TAG);
+            indexFragment.restorePagerPosition();
+        }
 
         int backStackEntryCount = manager.getBackStackEntryCount();
         if (isTwoPaneLayout() && backStackEntryCount > 0) {
@@ -182,7 +183,6 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
         return entryCount <= 0 || manager.getBackStackEntryAt(entryCount-1).getName().equals(INDEX_TAG);
     }
 
-    /** Restore ViewPager position when naviagating back to IndexFragment */
     @Override
     public void onBackStackChanged() {
         setMainToolbar();
