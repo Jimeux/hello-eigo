@@ -44,5 +44,8 @@
     <string name="fragment_image_trans">fragment_image_transition</string>
     <string name="comments_empty">コメントはまだありません。</string>
     <string name="action_share">シェア</string>
+    <string name="action_bookmark">保存する</string>
+    <string name="action_unbookmark">削除</string>
+    <string name="action_bookmarks">ブックマーク</string>
 
 </resources>

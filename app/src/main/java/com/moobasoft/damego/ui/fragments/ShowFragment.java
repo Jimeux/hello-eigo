@@ -9,8 +9,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -49,9 +51,10 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
 
     @Inject ShowPresenter presenter;
 
-    @Bind(R.id.tab_layout) TabLayout tabLayout;
-    @Bind(R.id.view_pager) ViewPager viewPager;
-    @Bind(R.id.fab)        FloatingActionButton fab;
+    @Nullable @Bind(R.id.card_view) CardView cardView;
+    @Bind(R.id.tab_layout)          TabLayout tabLayout;
+    @Bind(R.id.view_pager)          ViewPager viewPager;
+    @Bind(R.id.fab)                 FloatingActionButton fab;
 
     @OnClick(R.id.fab)
     public void clickFab() {
@@ -84,10 +87,17 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        MenuItem menuItem = menu.add(0, 723, 1, R.string.action_share)
+        MenuItem shareItem = menu.add(0, R.id.action_share, 1, R.string.action_share)
                 .setIcon(R.drawable.ic_share_white_24dp);
-        MenuItemCompat.setShowAsAction(menuItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        MenuItemCompat.setShowAsAction(shareItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        MenuItem bookmarkItem = menu.add(0, R.id.action_bookmark, 0, R.string.action_bookmark)
+                .setIcon(R.drawable.ic_bookmark_outline_white_24dp);
+        MenuItemCompat.setShowAsAction(bookmarkItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
         super.onCreateOptionsMenu(menu, inflater);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        if (searchItem != null) searchItem.setVisible(false);
+        MenuItem bookmarksItem = menu.findItem(R.id.action_bookmarks);
+        if (bookmarksItem != null) bookmarksItem.setVisible(false);
     }
 
     @Override
@@ -100,6 +110,7 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
         View view = inflater.inflate(R.layout.fragment_show, container, false);
         ButterKnife.bind(this, view);
         tabLayout.setVisibility(GONE);
+        if (cardView != null) ViewCompat.setTranslationZ(tabLayout, 2F); // For tablet layout
         return view;
     }
 
@@ -150,6 +161,10 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
         viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(final int position) {
+                if (cardView != null) {
+                    float elevation = (position == CONTENT_PAGE) ? 2F : 0F;
+                    ViewCompat.setElevation(cardView, elevation);
+                }
                 fab.setVisibility(position == COMMENTS_PAGE ? VISIBLE : GONE);
             }
         });

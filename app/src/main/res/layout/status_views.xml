@@ -17,19 +17,15 @@
             android:layout_height="wrap_content"
             android:textSize="18sp" />
 
-        <android.support.design.widget.FloatingActionButton
+        <include
             android:id="@+id/empty_refresh_btn"
-            app:elevation="1dp"
-            app:fabSize="mini"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="25dp"
-            android:clickable="true"
-            android:src="@drawable/ic_refresh_white_24dp" />
+            layout="@layout/element_fab_refresh" />
+
     </LinearLayout>
 
     <LinearLayout style="@style/ListStatusView"
         android:id="@+id/error_view">
+
         <TextView
             android:id="@+id/error_msg"
             android:textSize="18sp"
@@ -37,22 +33,19 @@
             android:layout_height="wrap_content"
             android:text="@string/error_default" />
 
-        <android.support.design.widget.FloatingActionButton
+        <include
             android:id="@+id/error_refresh_btn"
-            app:elevation="1dp"
-            app:fabSize="mini"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="25dp"
-            android:clickable="true"
-            android:src="@drawable/ic_refresh_white_24dp" />
+            layout="@layout/element_fab_refresh" />
+
     </LinearLayout>
 
     <LinearLayout style="@style/ListStatusView"
         android:id="@+id/loading_view"
         android:padding="30dp">
+
         <include android:id="@+id/progress"
             layout="@layout/loading_view" />
+
     </LinearLayout>
 
 </LinearLayout>

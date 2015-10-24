@@ -18,13 +18,13 @@
 
         <FrameLayout
             android:id="@+id/index_container"
-            android:layout_weight="4"
+            android:layout_weight="3.8"
             android:layout_width="0dp"
             android:layout_height="match_parent" />
 
         <FrameLayout
             android:id="@+id/show_container"
-            android:layout_weight="6"
+            android:layout_weight="6.2"
             android:layout_width="0dp"
             android:layout_height="match_parent" />
 

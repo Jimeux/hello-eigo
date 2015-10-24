@@ -26,57 +26,7 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:layout_collapseMode="pin">
 
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginTop="0dp"
-            app:cardBackgroundColor="@color/white"
-            app:cardPreventCornerOverlap="false"
-            app:cardUseCompatPadding="false">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:focusableInTouchMode="true"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:paddingLeft="5dp"
-                android:paddingRight="10dp">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:src="@drawable/ic_search_white_24dp"
-                    android:tint="@color/grey400" />
-
-                <EditText
-                    style="@style/SearchText"
-                    android:id="@+id/search_field"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:singleLine="true"
-                    android:maxLines="1"
-                    android:inputType="textCapSentences"
-                    android:background="@color/white"
-                    android:hint="Enter a search term..."
-                    android:textColor="@color/grey700"
-                    android:textColorHint="@color/grey300"
-                    android:textSize="18sp" />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/ic_close_white_24dp"
-                    android:tint="@color/grey400"
-                    android:visibility="gone" />
-
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
+        <include layout="@layout/element_search_bar" />
 
     </android.support.v7.widget.Toolbar>
 

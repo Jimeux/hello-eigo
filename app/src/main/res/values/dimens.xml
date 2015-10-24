@@ -9,11 +9,15 @@
 
     <dimen name="shadow_height">2dp</dimen>
 
-    <dimen name="comment_layout_padding">0dp</dimen>
+    <dimen name="comment_elevation">1dp</dimen>
+    <dimen name="comment_card_margin_vert">2dp</dimen>
+    <dimen name="comment_card_margin_horiz">2dp</dimen>
     <dimen name="comment_view_padding">16dp</dimen>
     <dimen name="comment_username_text">18sp</dimen>
     <dimen name="comment_created_text">12sp</dimen>
     <dimen name="comment_body_text">16sp</dimen>
+    <dimen name="comment_list_margin_vert">6dp</dimen>
+    <dimen name="comment_list_margin_horiz">6dp</dimen>
 
     <dimen name="show_backdrop_height">250dp</dimen>
     <dimen name="show_padding">22dp</dimen>

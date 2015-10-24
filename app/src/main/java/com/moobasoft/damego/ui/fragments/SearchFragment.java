@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -34,6 +35,8 @@ public class SearchFragment extends BaseFragment implements IndexPresenter.View 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         menu.findItem(R.id.action_search).setVisible(false);
+        MenuItem bookmarksItem = menu.findItem(R.id.action_bookmarks);
+        if (bookmarksItem != null) bookmarksItem.setVisible(false);
     }
 
     @Override

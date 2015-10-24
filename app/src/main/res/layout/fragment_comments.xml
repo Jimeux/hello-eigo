@@ -16,19 +16,17 @@
             android:id="@+id/swipe_refresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/greyBackground"
-            android:paddingLeft="@dimen/comment_layout_padding"
-            android:paddingRight="@dimen/comment_layout_padding">
+            android:background="@color/greyBackground">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/comment_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:paddingBottom="@dimen/main_list_margin_vert"
-                android:paddingLeft="@dimen/main_list_margin_horiz"
-                android:paddingRight="@dimen/main_list_margin_horiz"
-                android:paddingTop="@dimen/main_list_margin_vert"
+                android:paddingBottom="@dimen/comment_list_margin_vert"
+                android:paddingLeft="@dimen/comment_list_margin_horiz"
+                android:paddingRight="@dimen/comment_list_margin_horiz"
+                android:paddingTop="@dimen/comment_list_margin_vert"
                 android:scrollbars="none" />
 
         </android.support.v4.widget.SwipeRefreshLayout>

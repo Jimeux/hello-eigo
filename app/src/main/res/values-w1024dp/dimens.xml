@@ -1,9 +1,12 @@
 <resources>
 
-    <dimen name="comment_layout_padding">84dp</dimen>
+    <dimen name="comment_elevation">2dp</dimen>
+    <dimen name="comment_card_margin_horiz">0dp</dimen>
     <dimen name="comment_username_text">20sp</dimen>
     <dimen name="comment_created_text">15sp</dimen>
     <dimen name="comment_body_text">18sp</dimen>
+    <dimen name="comment_list_margin_horiz">0dp</dimen>
+    <dimen name="comment_list_margin_vert">6dp</dimen>
 
     <dimen name="show_backdrop_height">235dp</dimen>
     <dimen name="show_padding">24dp</dimen>
@@ -11,4 +14,8 @@
     <dimen name="show_title_text">28sp</dimen>
     <dimen name="show_body_text">20sp</dimen>
     <dimen name="show_comment_link_text">19dp</dimen>
+
+    <dimen name="main_image_width">60dp</dimen>
+    <dimen name="main_title_text">17sp</dimen>
+    <dimen name="main_body_text">17sp</dimen>
 </resources>
