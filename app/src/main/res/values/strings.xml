@@ -47,5 +47,7 @@
     <string name="action_bookmark">保存する</string>
     <string name="action_unbookmark">削除</string>
     <string name="action_bookmarks">ブックマーク</string>
+    <string name="bookmark_deleted">Removed from bookmarks</string>
+    <string name="bookmark_created">Added to bookmarks</string>
 
 </resources>

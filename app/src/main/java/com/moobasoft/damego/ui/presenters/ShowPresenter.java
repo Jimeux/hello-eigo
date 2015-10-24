@@ -12,6 +12,7 @@ public class ShowPresenter extends RxPresenter<ShowPresenter.ShowView> {
 
     public interface ShowView extends RxPresenter.RxView {
         void onPostRetrieved(Post post);
+        void onBookmarked(boolean added);
     }
 
     private PostService postService;
@@ -21,19 +22,51 @@ public class ShowPresenter extends RxPresenter<ShowPresenter.ShowView> {
         this.postService = postService;
     }
 
-    public void getPost(int id) {
-        subscriptions.add(postService.show(id),
-                          this::handleOnNext,
+    public void createBookmark(int postId) {
+        subscriptions.add(postService.createBookmark(postId),
+                          this::onBookmarked,
                           this::handleError);
     }
 
-    public void handleOnNext(Result<Post> result) {
-        Response<Post> response = result.response();
+    public void deleteBookmark(int postId) {
+        subscriptions.add(postService.deleteBookmark(postId),
+                          this::onUnbookmarked,
+                          this::handleError);
+    }
 
+    public void getPost(int id) {
+        subscriptions.add(postService.show(id),
+                this::onPostReturned,
+                this::handleError);
+    }
+
+    public void onBookmarked(Result<Void> result) {
+        Response response = result.response();
+        if (response.code() == SUCCESS)
+            view.onBookmarked(true);
+        else
+            handleResponse(result, response);
+    }
+
+    public void onUnbookmarked(Result<Void> result) {
+        Response response = result.response();
+        if (response.code() == SUCCESS)
+            view.onBookmarked(false);
+        else
+            handleResponse(result, response);
+    }
+
+    public void onPostReturned(Result<Post> result) {
+        Response<Post> response = result.response();
+        if (response.code() == SUCCESS)
+            view.onPostRetrieved(response.body());
+        else
+            handleResponse(result, response);
+    }
+
+    private void handleResponse(Result result, Response response) {
         if (result.isError())
             handleError(result.error());
-        else if (response.code() == SUCCESS)
-            view.onPostRetrieved(response.body());
         else
             defaultResponses(response.code());
     }

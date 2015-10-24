@@ -23,11 +23,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activities.CommentsActivity"
-            android:label="@string/title_activity_comments"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
-        <activity
             android:name=".ui.activities.CreateCommentActivity"
             android:label="@string/title_activity_create_comment"
             android:theme="@style/AppTheme.NoActionBar" >

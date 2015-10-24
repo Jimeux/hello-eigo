@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -87,22 +88,38 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        MenuItem shareItem = menu.add(0, R.id.action_share, 1, R.string.action_share)
-                .setIcon(R.drawable.ic_share_white_24dp);
-        MenuItemCompat.setShowAsAction(shareItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-        MenuItem bookmarkItem = menu.add(0, R.id.action_bookmark, 0, R.string.action_bookmark)
-                .setIcon(R.drawable.ic_bookmark_outline_white_24dp);
-        MenuItemCompat.setShowAsAction(bookmarkItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-        super.onCreateOptionsMenu(menu, inflater);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        if (searchItem != null) searchItem.setVisible(false);
-        MenuItem bookmarksItem = menu.findItem(R.id.action_bookmarks);
-        if (bookmarksItem != null) bookmarksItem.setVisible(false);
+        if (post != null) {
+            MenuItem shareItem = menu.add(0, R.id.action_share, 1, R.string.action_share)
+                    .setIcon(R.drawable.ic_share_white_24dp);
+            MenuItemCompat.setShowAsAction(shareItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+
+            if (post.isBookmarked()) {
+                MenuItem bookmarkItem = menu.add(0, R.id.action_unbookmark, 0, R.string.action_unbookmark)
+                        .setIcon(R.drawable.ic_bookmark_white_24dp);
+                MenuItemCompat.setShowAsAction(bookmarkItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+            } else {
+                MenuItem bookmarkItem = menu.add(0, R.id.action_bookmark, 0, R.string.action_bookmark)
+                        .setIcon(R.drawable.ic_bookmark_outline_white_24dp);
+                MenuItemCompat.setShowAsAction(bookmarkItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+            }
+            super.onCreateOptionsMenu(menu, inflater);
+            MenuItem searchItem = menu.findItem(R.id.action_search);
+            if (searchItem != null) searchItem.setVisible(false);
+            MenuItem bookmarksItem = menu.findItem(R.id.action_bookmarks);
+            if (bookmarksItem != null) bookmarksItem.setVisible(false);
+        } else
+            super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.action_bookmark) {
+            presenter.createBookmark(post.getId());
+            return false;
+        } else if (item.getItemId() == R.id.action_unbookmark) {
+            presenter.deleteBookmark(post.getId());
+            return false;
+        } else return super.onOptionsItemSelected(item);
     }
 
     @Nullable @Override
@@ -152,7 +169,16 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
         loadPost(post);
     }
 
+    @Override
+    public void onBookmarked(boolean created) {
+        post.setBookmarked(created);
+        getActivity().supportInvalidateOptionsMenu();
+        int resId = created ? R.string.bookmark_created : R.string.bookmark_deleted;
+        Snackbar.make(tabLayout, getString(resId), Snackbar.LENGTH_SHORT).show();
+    }
+
     private void loadPost(Post post) {
+        getActivity().supportInvalidateOptionsMenu();
         showAdapter = new ShowAdapter(getChildFragmentManager(), post);
         viewPager.setAdapter(showAdapter);
         tabLayout.setupWithViewPager(viewPager);

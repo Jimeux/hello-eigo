@@ -17,6 +17,7 @@ public class Post {
     String imageUrl;
     String thumbnailUrl;
     int commentsCount;
+    boolean bookmarked;
 
     public int getId() {
         return id;
@@ -88,6 +89,14 @@ public class Post {
 
     public void setCommentsCount(int commentsCount) {
         this.commentsCount = commentsCount;
+    }
+
+    public boolean isBookmarked() {
+        return bookmarked;
+    }
+
+    public void setBookmarked(boolean bookmarked) {
+        this.bookmarked = bookmarked;
     }
 
     @Override

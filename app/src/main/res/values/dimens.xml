@@ -34,5 +34,7 @@
     <dimen name="main_title_text">17sp</dimen>
     <dimen name="main_list_margin_vert">6dp</dimen>
     <dimen name="main_list_margin_horiz">6dp</dimen>
+    <dimen name="main_title_spacing">10dp</dimen>
+    <dimen name="main_tag_bar_spacing">15dp</dimen>
 
 </resources>

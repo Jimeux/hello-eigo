@@ -1,7 +1,6 @@
 package com.moobasoft.damego.ui.views;
 
 import android.content.Context;
-import android.content.Intent;
 import android.text.Html;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -13,8 +12,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
-import com.moobasoft.damego.ui.activities.CommentsActivity;
-import com.moobasoft.damego.ui.fragments.ShowFragment;
 import com.moobasoft.damego.util.PostUtil;
 
 import butterknife.Bind;
@@ -72,9 +69,7 @@ public final class PostSummaryView extends LinearLayout {
 
     @OnClick(R.id.comment_strip)
     public void clickCommentStrip() {
-        Intent i = new Intent(getContext(), CommentsActivity.class);
-        i.putExtra(ShowFragment.POST_ID_KEY, postId);
-        getContext().startActivity(i);
+        //TODO: implement
     }
 
 }

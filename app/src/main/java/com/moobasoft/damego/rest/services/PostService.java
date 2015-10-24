@@ -8,6 +8,7 @@ import java.util.List;
 
 import retrofit.Result;
 import retrofit.http.Body;
+import retrofit.http.DELETE;
 import retrofit.http.GET;
 import retrofit.http.POST;
 import retrofit.http.Path;
@@ -32,4 +33,11 @@ public interface PostService {
     @POST("/api/posts/{id}/comments")
     Observable<Result<Comment>> createComment(@Path("id") int postId,
                                               @Body CommentRequest commentRequest);
+
+    @POST("/api/posts/{id}/bookmarks")
+    Observable<Result<Void>> createBookmark(@Path("id") int postId);
+
+    @DELETE("/api/bookmarks/{id}")
+    Observable<Result<Void>> deleteBookmark(@Path("id") int postId);
+
 }

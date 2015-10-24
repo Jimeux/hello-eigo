@@ -68,7 +68,7 @@ public class RestModule {
         File cacheDir = new File(context.getCacheDir(), "http");
         Cache cache = new Cache(cacheDir, DISK_CACHE_SIZE);
         //TODO: Reactivate
-        client.setCache(cache);
+        //client.setCache(cache);
     }
 
 }
