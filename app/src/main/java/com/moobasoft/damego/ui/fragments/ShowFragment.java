@@ -9,7 +9,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -20,9 +19,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 
 import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
+import com.moobasoft.damego.ui.activities.BaseActivity;
 import com.moobasoft.damego.ui.activities.CreateCommentActivity;
 import com.moobasoft.damego.ui.presenters.ShowPresenter;
 
@@ -42,11 +44,13 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
     public static final String POST_KEY    = "post_key";
     public static final String POST_ID_KEY = "post_id";
     public static final String TAG_NAME_KEY = "tag_name";
+    public static final String OPEN_COMMENTS_KEY = "open_comments";
     public static final int CONTENT_PAGE = 0;
     public static final int COMMENTS_PAGE = 1;
 
     private int postIdArg;
     private String tagNameArg;
+    private boolean openCommentsArg;
     private Post post;
     private ShowAdapter showAdapter;
 
@@ -61,17 +65,17 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
     public void clickFab() {
         Intent intent = new Intent(getActivity(), CreateCommentActivity.class);
         intent.putExtra(POST_ID_KEY, post.getId());
-        startActivity(intent);
-        //doIfLoggedIn(intent); TODO: Forward to activity?
+        ((BaseActivity)getActivity()).doIfLoggedIn(intent);
     }
 
     public ShowFragment() {}
 
-    public static ShowFragment newInstance(int postId, String tagName) {
+    public static ShowFragment newInstance(int postId, String tagName, boolean openComments) {
         ShowFragment fragment = new ShowFragment();
         Bundle args = new Bundle();
         args.putInt(POST_ID_KEY, postId);
         args.putString(TAG_NAME_KEY, tagName);
+        args.putBoolean(OPEN_COMMENTS_KEY, openComments);
         fragment.setArguments(args);
         return fragment;
     }
@@ -84,36 +88,27 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
         presenter.bindView(this);
         postIdArg = getArguments().getInt(POST_ID_KEY, 0);
         tagNameArg = getArguments().getString(TAG_NAME_KEY);
+        openCommentsArg = getArguments().getBoolean(OPEN_COMMENTS_KEY);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.removeGroup(R.id.fragment_specific_options);
         if (post != null) {
-            MenuItem shareItem = menu.add(0, R.id.action_share, 1, R.string.action_share)
-                    .setIcon(R.drawable.ic_share_white_24dp);
-            MenuItemCompat.setShowAsAction(shareItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-
-            if (post.isBookmarked()) {
-                MenuItem bookmarkItem = menu.add(0, R.id.action_unbookmark, 0, R.string.action_unbookmark)
-                        .setIcon(R.drawable.ic_bookmark_white_24dp);
-                MenuItemCompat.setShowAsAction(bookmarkItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-            } else {
-                MenuItem bookmarkItem = menu.add(0, R.id.action_bookmark, 0, R.string.action_bookmark)
-                        .setIcon(R.drawable.ic_bookmark_outline_white_24dp);
-                MenuItemCompat.setShowAsAction(bookmarkItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-            }
-            super.onCreateOptionsMenu(menu, inflater);
-            MenuItem searchItem = menu.findItem(R.id.action_search);
-            if (searchItem != null) searchItem.setVisible(false);
-            MenuItem bookmarksItem = menu.findItem(R.id.action_bookmarks);
-            if (bookmarksItem != null) bookmarksItem.setVisible(false);
+            inflater.inflate(R.menu.menu_show, menu);
+            menu.findItem(R.id.action_unbookmark).setVisible(post.isBookmarked());
+            menu.findItem(R.id.action_bookmark).setVisible(!post.isBookmarked());
         } else
             super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_bookmark) {
+        // TODO: Check user is logged in first
+        // TODO: Show some kind of loading indication
+        if (post == null)
+            return super.onOptionsItemSelected(item);
+        else if (item.getItemId() == R.id.action_bookmark) {
             presenter.createBookmark(post.getId());
             return false;
         } else if (item.getItemId() == R.id.action_unbookmark) {
@@ -194,6 +189,7 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
                 fab.setVisibility(position == COMMENTS_PAGE ? VISIBLE : GONE);
             }
         });
+        if (openCommentsArg) viewPager.setCurrentItem(COMMENTS_PAGE);
         tabLayout.setVisibility(VISIBLE);
         activateContentView();
     }
@@ -208,8 +204,9 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
     }
 
     @Override
-    public void onError(String message) {
-        activateErrorView(message);
+    public void onError(int messageId) {
+        super.onError(messageId);
+        getActivity().supportInvalidateOptionsMenu();
     }
 
     public static class ShowAdapter extends FragmentPagerAdapter {
@@ -226,9 +223,12 @@ public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView
 
         @Override
         public Fragment getItem(int position) {
-            if (position == CONTENT_PAGE)
-                return ContentFragment.newInstance(post);
-            else
+            if (position == CONTENT_PAGE) {
+                ContentFragment fragment = ContentFragment.newInstance(post);
+                Animation animation = new TranslateAnimation(0f, 0f, 0f, 1f);
+                fragment.setExitTransition(animation);
+                return fragment;
+            } else
                 return CommentsFragment.newInstance(post);
         }
     }

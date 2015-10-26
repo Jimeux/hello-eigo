@@ -40,4 +40,7 @@ public interface PostService {
     @DELETE("/api/bookmarks/{id}")
     Observable<Result<Void>> deleteBookmark(@Path("id") int postId);
 
+    @GET("/api/bookmarks")
+    Observable<Result<List<Post>>> getBookmarks(@Query("page") int page);
+
 }

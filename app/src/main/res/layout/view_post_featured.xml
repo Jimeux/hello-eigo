@@ -52,7 +52,7 @@
                     android:id="@+id/body"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="@dimen/main_title_spacing"
                     android:minLines="2"
                     android:maxLines="2"
                     android:lineSpacingMultiplier="1.2"
@@ -61,7 +61,7 @@
                     android:textSize="@dimen/main_body_text" />
 
                 <RelativeLayout
-                    android:layout_marginTop="15dp"
+                    android:layout_marginTop="@dimen/main_tag_bar_spacing"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <include layout="@layout/element_comment_count" />

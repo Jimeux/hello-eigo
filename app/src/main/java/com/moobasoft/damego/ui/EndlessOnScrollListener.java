@@ -19,19 +19,22 @@ public abstract class EndlessOnScrollListener extends RecyclerView.OnScrollListe
     // True if setFinished() has been called
     private boolean isFinished = false;
 
-    private final LinearLayoutManager layoutManager;
-
-    public EndlessOnScrollListener(LinearLayoutManager layoutManager) {
-        this.layoutManager = layoutManager;
-    }
+    private LinearLayoutManager layoutManager;
 
     /** Getters */
     public int getCurrentPage() { return currentPage; }
     public boolean isFinished() { return isFinished; }
 
+    /**
+     * Needs to be set manually because of fragment lifecycle issues
+     */
+    public void setLayoutManager(LinearLayoutManager layoutManager) {
+        this.layoutManager = layoutManager;
+    }
+
     @Override
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-        if (isRefreshing() || isFinished) return;
+        if (layoutManager == null || isRefreshing() || isFinished) return;
 
         super.onScrolled(recyclerView, dx, dy);
 

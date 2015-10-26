@@ -1,16 +1,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/action_search" android:title="@string/action_search"
-        android:icon="@drawable/ic_search_white_24dp" app:showAsAction="ifRoom" />
-    <item android:id="@+id/action_bookmarks" android:title="@string/action_bookmarks"
-        android:icon="@drawable/ic_bookmark_white_24dp" app:showAsAction="ifRoom" />
-    <item android:id="@+id/action_register" android:title="@string/register"
-        android:orderInCategory="100" app:showAsAction="never" />
-    <item android:id="@+id/action_login" android:title="@string/login"
-        android:orderInCategory="100" app:showAsAction="never" />
-    <item android:id="@+id/action_logout" android:title="@string/logout"
-        android:orderInCategory="100" app:showAsAction="never" />
+    <group android:id="@+id/connect_actions">
+        <item
+            android:id="@+id/action_register"
+            android:orderInCategory="100"
+            android:title="@string/register"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/action_login"
+            android:orderInCategory="100"
+            android:title="@string/login"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/action_logout"
+            android:orderInCategory="100"
+            android:title="@string/logout"
+            app:showAsAction="never" />
+    </group>
 
 </menu>

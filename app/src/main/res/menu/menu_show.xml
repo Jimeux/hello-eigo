@@ -1,12 +1,27 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
 
-    <item android:id="@+id/action_share" android:title="@string/action_share"
-        android:icon="@drawable/ic_search_white_24dp" android:orderInCategory="0" app:showAsAction="ifRoom" />
-    <item android:id="@+id/action_bookmark" android:title="@string/action_bookmark"
-        android:orderInCategory="100" app:showAsAction="ifRoom" />
-    <item android:id="@+id/action_unbookmark" android:title="@string/action_unbookmark"
-        android:orderInCategory="100" app:showAsAction="ifRoom" />
+    <group android:id="@+id/fragment_specific_options">
+        <item
+            android:id="@+id/action_share"
+            android:icon="@drawable/ic_share_white_24dp"
+            android:orderInCategory="0"
+            android:title="@string/action_share"
+            app:showAsAction="ifRoom" />
+        <item
+            android:id="@+id/action_bookmark"
+            android:icon="@drawable/ic_bookmark_outline_white_24dp"
+            android:orderInCategory="100"
+            android:title="@string/action_bookmark"
+            app:showAsAction="ifRoom" />
+        <item
+            android:id="@+id/action_unbookmark"
+            android:icon="@drawable/ic_bookmark_white_24dp"
+            android:orderInCategory="100"
+            android:title="@string/action_unbookmark"
+            app:showAsAction="ifRoom" />
+    </group>
 
 </menu>

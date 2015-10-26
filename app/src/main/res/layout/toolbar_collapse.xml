@@ -13,11 +13,6 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:layout_collapseMode="pin"
-        app:tabMode="scrollable"
-        app:tabBackground="@color/colorPrimary"
-        app:tabIndicatorColor="@color/white"
-        app:tabPaddingEnd="25dp"
-        app:tabGravity="fill" />
+        app:layout_scrollFlags="scroll|enterAlways" />
 
 </android.support.design.widget.AppBarLayout>

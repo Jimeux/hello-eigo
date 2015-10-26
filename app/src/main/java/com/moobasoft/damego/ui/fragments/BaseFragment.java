@@ -35,6 +35,13 @@ public abstract class BaseFragment extends Fragment {
     @Bind({R.id.loading_view, R.id.error_view, R.id.empty_view, R.id.content})
     List<ViewGroup> stateViews;
 
+    public void onError(int messageId) {
+        String message = getString(messageId);
+        if (message == null)
+            message = getString(R.string.error_default);
+        activateErrorView(message);
+    }
+
     protected static void toggleVisibility(View... views) {
         for (View view : views) {
             if (view == null) return;

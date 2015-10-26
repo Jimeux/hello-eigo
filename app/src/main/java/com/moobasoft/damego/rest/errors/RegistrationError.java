@@ -7,7 +7,7 @@ import java.util.List;
 import retrofit.Converter;
 import retrofit.GsonConverterFactory;
 
-public class RegistrationError {
+public class RegistrationError extends ErrorBase {
 
     private List<String> username;
     private List<String> email;
@@ -17,15 +17,6 @@ public class RegistrationError {
     public static final Converter<ResponseBody, RegistrationError> CONVERTER =
             (Converter< ResponseBody, RegistrationError>) GsonConverterFactory
                     .create().fromResponseBody(RegistrationError.class, null);
-
-    // TODO: Make a static util method
-    private String composeErrors(List<String> errors) {
-        if (errors == null || errors.isEmpty()) return null;
-        String errorString = "";
-        for (String s : errors)
-            errorString += s + "\n";
-        return errorString.trim();
-    }
 
     public String getUsername() {
         return composeErrors(username);

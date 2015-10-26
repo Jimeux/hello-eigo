@@ -19,8 +19,6 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-import static android.support.design.widget.Snackbar.LENGTH_INDEFINITE;
-
 public class BaseActivity extends AppCompatActivity {
 
     @Inject CredentialStore credentialStore;
@@ -57,7 +55,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     public void promptForLogin() {
-        Snackbar.make(findViewById(android.R.id.content), getString(R.string.unauthorized), LENGTH_INDEFINITE)
+        Snackbar.make(findViewById(android.R.id.content), getString(R.string.error_unauthorized), Snackbar.LENGTH_LONG)
                 .setActionTextColor(getResources().getColor(R.color.green400))
                 .setAction(getString(R.string.login), v -> {
                     Intent intent = new Intent(getApplicationContext(), ConnectActivity.class);

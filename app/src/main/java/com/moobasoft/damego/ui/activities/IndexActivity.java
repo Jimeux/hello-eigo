@@ -12,14 +12,15 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.PostsAdapter;
 import com.moobasoft.damego.ui.fragments.BaseFragment;
+import com.moobasoft.damego.ui.fragments.BookmarksFragment;
 import com.moobasoft.damego.ui.fragments.IndexFragment;
-import com.moobasoft.damego.ui.fragments.SearchFragment;
 import com.moobasoft.damego.ui.fragments.ShowFragment;
 import com.moobasoft.damego.ui.fragments.TagFragment;
 
@@ -31,6 +32,7 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
     public static final String CHANGED_FROM_2PANE_KEY = "switch_from_two_pane";
     public static final String INDEX_TAG       = "index";
     public static final String SHOW_TAG        = "show";
+    public static final String BOOKMARKS_TAG   = "bookmarks";
     public static final String SEARCH_TAG      = "search";
 
     private FragmentManager manager;
@@ -68,10 +70,10 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
                 restoreSingleLayout(showFragment);
             //else if (isSinglePaneLayout()) // Restore single pane layout
         } else {
-            loadFragment(indexContainer.getId(), IndexFragment.newInstance(), INDEX_TAG, false, true);
+            loadFragment(indexContainer.getId(), IndexFragment.newInstance(), INDEX_TAG, false);
             if (showContainer != null) {
-                ShowFragment showFragment = ShowFragment.newInstance(0, TagFragment.SHOW_ALL_TAG);
-                loadFragment(showContainer.getId(), showFragment, SHOW_TAG, false, true);
+                ShowFragment showFragment = ShowFragment.newInstance(0, TagFragment.SHOW_ALL_TAG, false);
+                loadFragment(showContainer.getId(), showFragment, SHOW_TAG, false);
             }
         }
     }
@@ -82,31 +84,26 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
         state.putBoolean(CHANGED_FROM_2PANE_KEY, isTwoPaneLayout());
     }
 
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-    }
-
     private void restoreSingleLayout(Fragment showFragment) {
         if (showFragment != null) {
             manager.beginTransaction().remove(showFragment).commit();
             manager.executePendingTransactions();
-            loadFragment(indexContainer.getId(), showFragment, SHOW_TAG, true, true);
+            loadFragment(indexContainer.getId(), showFragment, SHOW_TAG, true);
         }
     }
 
     private void restoreTwoPaneLayout(Fragment showFragment) {
         if (showFragment == null)
-            showFragment = ShowFragment.newInstance(0, TagFragment.SHOW_ALL_TAG); // Default
+            showFragment = ShowFragment.newInstance(0, TagFragment.SHOW_ALL_TAG, false); // Default
         else {
-            if (indexFragmentIsOnTop())
+            if (isOnTopOfBackstack(INDEX_TAG))
                 manager.popBackStackImmediate(SHOW_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             else
                 manager.popBackStackImmediate();
             manager.beginTransaction().remove(showFragment).commit();
             manager.executePendingTransactions();
         }
-        loadFragment(showContainer.getId(), showFragment, SHOW_TAG, false, false);
+        loadFragment(showContainer.getId(), showFragment, SHOW_TAG, false);
     }
 
     @Override
@@ -121,46 +118,56 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
     }
 
     @Override
-    public void onSummaryClicked(Post post) {
+    public void onSummaryClicked(Post post, boolean openComments) {
+
+        // FIXME: Prevent two posts opening at once when jamming the screen
+
         int containerId = (isSinglePaneLayout()) ? indexContainer.getId() : showContainer.getId();
         IndexFragment indexFragment = (IndexFragment) manager.findFragmentByTag(INDEX_TAG);
-        if (isSinglePaneLayout()) indexFragment.savePagerPosition();
-        CharSequence currentTitle = indexFragment.getCurrentTitle();
-        ShowFragment showFragment = ShowFragment.newInstance(post.getId(), currentTitle.toString());
-        loadFragment(containerId, showFragment, SHOW_TAG, isSinglePaneLayout(), true);
+
+        CharSequence currentTitle = "";
+        if (isOnTopOfBackstack(INDEX_TAG)) {
+            indexFragment.savePagerPosition();
+            currentTitle = indexFragment.getCurrentTitle();
+        } else if (isOnTopOfBackstack(BOOKMARKS_TAG))
+            currentTitle = getString(R.string.bookmarks_title);
+
+        ShowFragment showFragment = ShowFragment.newInstance(
+                post.getId(), currentTitle.toString(), openComments);
+        loadFragment(containerId, showFragment, SHOW_TAG, isSinglePaneLayout());
     }
 
-    private void loadFragment(int containerId, Fragment fragment, String tag, boolean addToBackstack, boolean add) {
+    private void loadFragment(int containerId, Fragment fragment, String tag, boolean addToBackstack) {
         FragmentTransaction transaction = manager
                 .beginTransaction()
-                .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right,
-                                     android.R.anim.slide_in_left, R.anim.slide_y);
+                //.setCustomAnimations(R.anim.slide_up_in, R.anim.slide_up_out, 0, 0);
+                .replace(containerId, fragment, tag);
         if (addToBackstack) transaction.addToBackStack(tag);
-        if (add && showContainer == null)
-            transaction.add(containerId, fragment, tag);
-        else
-            transaction.replace(containerId, fragment, tag);
         transaction.commit();
+    }
+
+    private boolean isOnTopOfBackstack(String tag) {
+        int count = manager.getBackStackEntryCount();
+        if (count == 0 && tag.equals(INDEX_TAG))
+            return true;
+        return count > 0 && manager.getBackStackEntryAt(count-1).getName().equals(tag);
     }
 
     @Override
     public void onTagClicked(String tag) {
         IndexFragment indexFragment = (IndexFragment) manager.findFragmentByTag(INDEX_TAG);
-        ShowFragment showFragment   = (ShowFragment)  manager.findFragmentByTag(SHOW_TAG);
 
-        boolean clickedInShowFragment =
-                manager.getBackStackEntryCount() > 0 && (showFragment != null && showFragment.isVisible());
-
-        if (clickedInShowFragment)
-            loadFragment(indexContainer.getId(), indexFragment, INDEX_TAG, true, false);
-
+        if (!isOnTopOfBackstack(INDEX_TAG)) {
+            loadFragment(indexContainer.getId(), indexFragment, INDEX_TAG, true);
+            manager.executePendingTransactions();
+        }
         indexFragment.setCurrentTag(tag);
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if (isSinglePaneLayout() && indexFragmentIsOnTop()) {
+        if (isSinglePaneLayout() && isOnTopOfBackstack(INDEX_TAG)) {
             IndexFragment indexFragment = (IndexFragment) manager.findFragmentByTag(INDEX_TAG);
             indexFragment.restorePagerPosition();
         }
@@ -172,15 +179,14 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
                 ShowFragment showFragment = (ShowFragment) manager.findFragmentByTag(SHOW_TAG);
                 manager.popBackStack();
                 manager.executePendingTransactions();
-                loadFragment(showContainer.getId(), showFragment, SHOW_TAG, false, false);
+                loadFragment(showContainer.getId(), showFragment, SHOW_TAG, false);
                 ((IndexFragment) manager.findFragmentByTag(INDEX_TAG)).restorePagerPosition();
             }
         }
     }
 
-    private boolean indexFragmentIsOnTop() {
-        int entryCount = manager.getBackStackEntryCount();
-        return entryCount <= 0 || manager.getBackStackEntryAt(entryCount-1).getName().equals(INDEX_TAG);
+    public void openBookmarks() {
+        loadFragment(indexContainer.getId(), new BookmarksFragment(), BOOKMARKS_TAG, true);
     }
 
     @Override
@@ -201,10 +207,6 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_search:
-                loadFragment(indexContainer.getId(), new SearchFragment(), SEARCH_TAG, true, true);
-                return false;
-
             case R.id.action_login:
                 Intent loginIntent = new Intent(this, ConnectActivity.class);
                 loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -226,6 +228,67 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
         }
         supportInvalidateOptionsMenu();
         return false;
+    }
+
+}
+
+class MainManager {
+
+    public static final String CHANGED_FROM_2PANE_KEY = "switch_from_two_pane";
+    public static final String INDEX_TAG       = "index";
+    public static final String SHOW_TAG        = "show";
+    public static final String BOOKMARKS_TAG   = "bookmarks";
+    public static final String SEARCH_TAG      = "search";
+
+    private final View showContainer;
+    private final View indexContainer;
+    private final FragmentManager manager;
+
+    public MainManager(View showContainer, View indexContainer, FragmentManager manager) {
+        this.showContainer = showContainer;
+        this.indexContainer = indexContainer;
+        this.manager = manager;
+    }
+
+    public boolean isTwoPaneLayout()    { return showContainer != null; }
+    public boolean isSinglePaneLayout() { return showContainer == null; }
+
+    public void restoreSingleLayout(Fragment showFragment) {
+        if (showFragment != null) {
+            manager.beginTransaction().remove(showFragment).commit();
+            manager.executePendingTransactions();
+            loadFragment(indexContainer.getId(), showFragment, SHOW_TAG, true);
+        }
+    }
+
+    public void restoreTwoPaneLayout(Fragment showFragment) {
+        if (showFragment == null)
+            showFragment = ShowFragment.newInstance(0, TagFragment.SHOW_ALL_TAG, false); // Default
+        else {
+            if (isOnTopOfBackstack(INDEX_TAG))
+                manager.popBackStackImmediate(SHOW_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            else
+                manager.popBackStackImmediate();
+            manager.beginTransaction().remove(showFragment).commit();
+            manager.executePendingTransactions();
+        }
+        loadFragment(showContainer.getId(), showFragment, SHOW_TAG, false);
+    }
+
+    public void loadFragment(int containerId, Fragment fragment, String tag, boolean addToBackstack) {
+        FragmentTransaction transaction = manager
+                .beginTransaction()
+                        //.setCustomAnimations(R.anim.slide_up_in, R.anim.slide_up_out, 0, 0);
+                .replace(containerId, fragment, tag);
+        if (addToBackstack) transaction.addToBackStack(tag);
+        transaction.commit();
+    }
+
+    public boolean isOnTopOfBackstack(String tag) {
+        int count = manager.getBackStackEntryCount();
+        if (count == 0 && tag.equals(INDEX_TAG))
+            return true;
+        return count > 0 && manager.getBackStackEntryAt(count-1).getName().equals(tag);
     }
 
 }

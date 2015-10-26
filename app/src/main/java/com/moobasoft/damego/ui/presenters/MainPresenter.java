@@ -32,7 +32,7 @@ public class MainPresenter extends RxPresenter<MainPresenter.View> {
         Response<List<String>> response = result.response();
 
         if (result.isError())
-            handleError(result.error()); // TODO: Tag error messages?
+            handleError(result.error());
         else if (response.code() == SUCCESS)
             view.onTagsRetrieved(response.body());
         else

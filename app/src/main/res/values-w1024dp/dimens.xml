@@ -18,6 +18,5 @@
     <dimen name="main_image_width">60dp</dimen>
     <dimen name="main_title_text">17sp</dimen>
     <dimen name="main_body_text">15sp</dimen>
-    <dimen name="main_title_spacing">4dp</dimen>
-    <dimen name="main_tag_bar_spacing">7dp</dimen>
+
 </resources>

@@ -1,5 +1,6 @@
 package com.moobasoft.damego.ui.presenters;
 
+import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.rest.services.PostService;
 import com.moobasoft.damego.ui.RxSubscriber;
@@ -40,9 +41,12 @@ public class ShowPresenter extends RxPresenter<ShowPresenter.ShowView> {
                 this::handleError);
     }
 
+    // TODO: Tidy these three methods up
     public void onBookmarked(Result<Void> result) {
         Response response = result.response();
-        if (response.code() == SUCCESS)
+        if (response == null)
+            view.onError(R.string.error_server);
+        else  if (response.code() == SUCCESS)
             view.onBookmarked(true);
         else
             handleResponse(result, response);
@@ -50,7 +54,9 @@ public class ShowPresenter extends RxPresenter<ShowPresenter.ShowView> {
 
     public void onUnbookmarked(Result<Void> result) {
         Response response = result.response();
-        if (response.code() == SUCCESS)
+        if (response == null)
+            view.onError(R.string.error_server);
+        else if (response.code() == SUCCESS)
             view.onBookmarked(false);
         else
             handleResponse(result, response);
@@ -58,7 +64,10 @@ public class ShowPresenter extends RxPresenter<ShowPresenter.ShowView> {
 
     public void onPostReturned(Result<Post> result) {
         Response<Post> response = result.response();
-        if (response.code() == SUCCESS)
+
+        if (response == null)
+            view.onError(R.string.error_server);
+        else if (response.code() == SUCCESS)
             view.onPostRetrieved(response.body());
         else
             handleResponse(result, response);

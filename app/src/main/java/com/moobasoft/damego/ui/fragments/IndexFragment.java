@@ -14,6 +14,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.transition.TransitionManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -81,10 +84,34 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onCreate(@Nullable Bundle state) {
+        super.onCreate(state);
         adapter = new Adapter(getChildFragmentManager());
         positionStack = new ArrayDeque<>();
+        tags = new ArrayList<>();
+        setHasOptionsMenu(true);
+        if (state != null) {
+            ArrayList<Integer> savedStack = state.getIntegerArrayList(POSITION_STACK_KEY);
+            if (savedStack != null) positionStack.addAll(savedStack);
+            //adapter.restoreState(state.getParcelable(ADAPTER_KEY), getActivity().getClassLoader());
+            tags = state.getStringArrayList(TAGS_KEY);
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.removeGroup(R.id.fragment_specific_options);
+        inflater.inflate(R.menu.menu_index, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_bookmarks)
+            // TODO: This should really be called through an interface
+            ((IndexActivity)getActivity()).openBookmarks();
+        /*else if (item.getId() == R.id.action_search)
+                loadFragment(indexContainer.getId(), new SearchFragment(), SEARCH_TAG, true, true);*/
+        return super.onOptionsItemSelected(item);
     }
 
     @Nullable @Override
@@ -93,14 +120,6 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
         getComponent().inject(this);
         presenter.bindView(this);
         ButterKnife.bind(this, view);
-
-        if (state != null) {
-            ArrayList<Integer> savedStack = state.getIntegerArrayList(POSITION_STACK_KEY);
-            if (savedStack != null) positionStack.addAll(savedStack);
-            adapter.restoreState(state.getParcelable(ADAPTER_KEY), getActivity().getClassLoader());
-            tags = state.getStringArrayList(TAGS_KEY);
-        }
-
         return view;
     }
 
@@ -115,7 +134,7 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
         }
         if (tabLayout != null) tabLayout.setVisibility(View.GONE);
 
-        if (tags == null)
+        if (tags.isEmpty())
             onRefresh();
         else
             loadTagFragments();
@@ -148,7 +167,7 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
 
     private void loadTagFragments() {
         for (String tag : tags)
-             adapter.addFragment(TagFragment.newInstance(tag), tag);
+             adapter.addFragment(TagFragment.newInstance(TagFragment.MODE_TAG, tag), tag);
 
         viewPager.setAdapter(adapter);
         if (Build.VERSION.SDK_INT >= 11)
@@ -160,11 +179,6 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
                 TransitionManager.beginDelayedTransition(appBarLayout, new Slide());
             tabLayout.setVisibility(View.VISIBLE);
         }
-    }
-
-    @Override
-    public void onError(String message) {
-        activateErrorView(message);
     }
 
     @Override

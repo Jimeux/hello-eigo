@@ -35,6 +35,12 @@ public class IndexPresenter extends RxPresenter<IndexPresenter.View> {
                           this::handleError);
     }
 
+    public void getBookmarks(int page) {
+        subscriptions.add(postService.getBookmarks(page),
+                          this::handleOnNext,
+                          this::handleError);
+    }
+
     public void handleOnNext(Result<List<Post>> result) {
         Response<List<Post>> response = result.response();
 

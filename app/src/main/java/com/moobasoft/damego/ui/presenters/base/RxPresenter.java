@@ -2,6 +2,7 @@ package com.moobasoft.damego.ui.presenters.base;
 
 import android.util.Log;
 
+import com.moobasoft.damego.R;
 import com.moobasoft.damego.ui.RxSubscriber;
 
 import java.net.SocketTimeoutException;
@@ -10,7 +11,7 @@ public abstract class RxPresenter<V extends RxPresenter.RxView> extends BasePres
 
     public interface RxView {
         void promptForLogin();
-        void onError(String message);
+        void onError(int messageId);
     }
 
     protected final RxSubscriber subscriptions;
@@ -37,10 +38,10 @@ public abstract class RxPresenter<V extends RxPresenter.RxView> extends BasePres
                 view.promptForLogin();
                 break;
             case GATEWAY_TIMEOUT:
-                view.onError("Not connected to the Internet.");
+                view.onError(R.string.error_offline);
                 break;
             default:
-                view.onError("An unexpected error occurred");
+                view.onError(R.string.error_default);
         }
     }
 
@@ -51,14 +52,14 @@ public abstract class RxPresenter<V extends RxPresenter.RxView> extends BasePres
         String message = throwable.getMessage();
 
         if (throwable instanceof SocketTimeoutException)
-            view.onError("Request timed out.");
+            view.onError(R.string.error_timeout);
         else if (message.contains(OFFLINE_CODE))
-            view.onError("Not connected to the Internet.");
+            view.onError(R.string.error_offline);
         else if (message.contains(SERVER_DOWN_CODE))
-            view.onError("Couldn't connect to server.");
+            view.onError(R.string.error_server);
         else {
-            Log.d("TAGGART", throwable.getMessage());
-            view.onError("An unexpected error occurred.");
+            Log.d("Taggart", throwable.getMessage());
+            view.onError(R.string.error_default);
         }
     }
 

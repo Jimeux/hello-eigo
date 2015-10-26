@@ -1,6 +1,7 @@
 package com.moobasoft.damego.ui.presenters;
 
 import com.moobasoft.damego.CredentialStore;
+import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.errors.RegistrationError;
 import com.moobasoft.damego.rest.models.AccessToken;
 import com.moobasoft.damego.rest.models.User;
@@ -72,7 +73,7 @@ public class ConnectPresenter extends RxPresenter<ConnectPresenter.View> {
                                      error.getEmail(),
                                      error.getPassword());
         } catch (IOException e) {
-            view.onError("An unexpected error occurred");
+            view.onError(R.string.error_default);
         }
     }
 

@@ -1,7 +1,8 @@
 package com.moobasoft.damego.ui.presenters;
 
-import com.moobasoft.damego.rest.models.Comment;
+import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.errors.CommentError;
+import com.moobasoft.damego.rest.models.Comment;
 import com.moobasoft.damego.rest.requests.CommentRequest;
 import com.moobasoft.damego.rest.services.PostService;
 import com.moobasoft.damego.ui.RxSubscriber;
@@ -41,7 +42,7 @@ public class CommentPresenter extends RxPresenter<CommentPresenter.View> {
         else if (response.isSuccess())
             view.onCommentSubmitted(response.body());
         else if (response.code() == UNPROCESSABLE_ENTITY)
-            view.onError(getInputError(response.errorBody()));
+            view.onError(R.string.comment_length_error);
         else
             defaultResponses(response.code());
     }

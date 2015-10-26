@@ -31,19 +31,25 @@ import butterknife.ButterKnife;
 
 import static android.view.View.VISIBLE;
 
-public class TagFragment extends BaseFragment
-        implements IndexPresenter.View, SwipeRefreshLayout.OnRefreshListener, AppBarLayout.OnOffsetChangedListener {
+public class TagFragment extends BaseFragment implements IndexPresenter.View,
+        SwipeRefreshLayout.OnRefreshListener, AppBarLayout.OnOffsetChangedListener {
 
     public static final String POSTS_KEY    = "posts";
     public static final String LAYOUT_KEY   = "layout";
     public static final String SCROLL_KEY   = "scroll_key";
     public static final String TAG_NAME     = "tag_name";
+    public static final String MODE         = "mode";
     public static final String SHOW_ALL_TAG = "すべて";
+
+    public static final int MODE_TAG       = 1;
+    public static final int MODE_BOOKMARKS = 2;
 
     private PostsAdapter postsAdapter;
     private LinearLayoutManager layoutManager;
     /** The tag name of the posts to be loaded. */
     private String tagName;
+    /** Determine if this is for tags, bookmarks or everything. */
+    private int mode;
     /** OnScrollListener for {@code postsRecyclerView} */
     private EndlessOnScrollListener scrollListener;
     /** A reference to the Activity's AppBarLayout. */
@@ -61,9 +67,10 @@ public class TagFragment extends BaseFragment
 
     public TagFragment() {}
 
-    public static TagFragment newInstance(String tagName) {
+    public static TagFragment newInstance(int mode, String tagName) {
         TagFragment fragment = new TagFragment();
         Bundle args = new Bundle();
+        args.putInt(MODE, mode);
         args.putString(TAG_NAME, tagName);
         fragment.setArguments(args);
         return fragment;
@@ -73,12 +80,11 @@ public class TagFragment extends BaseFragment
     public void onCreate(@Nullable Bundle state) {
         super.onCreate(state);
         tagName = getArguments().getString(TAG_NAME);
+        mode = getArguments().getInt(MODE);
         int columns = getResources().getInteger(R.integer.main_list_columns);
-
-        layoutManager = new GridLayoutManager(getActivity(), columns);
         postsAdapter = new PostsAdapter((IndexActivity)getActivity(), columns,
                 getResources().getBoolean(R.bool.show_feature_views));
-        scrollListener = new EndlessOnScrollListener(layoutManager) {
+        scrollListener = new EndlessOnScrollListener() {
             @Override public void onLoadMore(int currentPage) {
                 loadPosts(currentPage);
             }
@@ -87,6 +93,16 @@ public class TagFragment extends BaseFragment
                 return refreshLayout.isRefreshing();
             }
         };
+        // Created only for saving state
+        layoutManager = new GridLayoutManager(getActivity(), columns);
+
+        if (state != null) {
+            List<Post> posts = Parcels.unwrap(state.getParcelable(POSTS_KEY));
+            layoutManager.onRestoreInstanceState(state.getParcelable(LAYOUT_KEY));
+            scrollListener.restoreState(Parcels.unwrap(state.getParcelable(SCROLL_KEY)));
+            if (scrollListener.isFinished()) postsAdapter.setFinished();
+            postsAdapter.loadPosts(posts);
+        }
     }
 
     @Nullable @Override
@@ -100,24 +116,20 @@ public class TagFragment extends BaseFragment
         return view;
     }
 
+    private boolean viewsUninitialised = true;
+
     @Override
     public void onViewStateRestored(@Nullable Bundle state) {
         super.onViewStateRestored(state);
 
-        if (state == null)
+        if (state == null && viewsUninitialised) {
+            viewsUninitialised = false;
             onRefresh();
-        else {
-            List<Post> posts = Parcels.unwrap(state.getParcelable(POSTS_KEY));
-            layoutManager.onRestoreInstanceState(state.getParcelable(LAYOUT_KEY));
-            scrollListener.restoreState(Parcels.unwrap(state.getParcelable(SCROLL_KEY)));
-            if (scrollListener.isFinished()) postsAdapter.setFinished();
-
-            if (posts.isEmpty())
+        } else if (state != null) {
+            if (postsAdapter.getPostList().isEmpty())
                 activateEmptyView(getString(R.string.no_posts_found));
-            else {
-                postsAdapter.loadPosts(posts);
+            else
                 activateContentView();
-            }
         }
     }
 
@@ -142,12 +154,13 @@ public class TagFragment extends BaseFragment
             state.putParcelable(POSTS_KEY, Parcels.wrap(postsAdapter.getPostList()));
             state.putParcelable(SCROLL_KEY, Parcels.wrap(scrollListener.getOutState()));
         }
+        super.onSaveInstanceState(state);
     }
 
     @Override
     public void onDestroyView() {
         presenter.releaseView();
-        ButterKnife.unbind(this);
+        //ButterKnife.unbind(this);
         super.onDestroyView();
     }
 
@@ -155,9 +168,21 @@ public class TagFragment extends BaseFragment
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
 
-        postsRecyclerView.setLayoutManager(layoutManager);
+        //  postsRecyclerView.setLayoutManager(layoutManager);
         postsRecyclerView.setAdapter(postsAdapter);
         postsRecyclerView.addOnScrollListener(scrollListener);
+
+
+        int scrollPosition = (layoutManager == null) ? 0 :
+            layoutManager.findFirstCompletelyVisibleItemPosition();
+
+        int columns = getResources().getInteger(R.integer.main_list_columns);
+        layoutManager = new GridLayoutManager(getActivity(), columns);
+
+        postsRecyclerView.setLayoutManager(layoutManager);
+        postsRecyclerView.scrollToPosition(scrollPosition);
+
+        scrollListener.setLayoutManager(layoutManager);
     }
 
     private void setRefreshLayoutEnabled() {
@@ -171,10 +196,15 @@ public class TagFragment extends BaseFragment
         if (page == 1) activateLoadingView();
         refreshLayout.setRefreshing(true);
 
-        if (tagName.equals(SHOW_ALL_TAG) || TextUtils.isEmpty(tagName))
-            presenter.postsIndex(page);
+        if (mode == MODE_TAG) {
+            if (TextUtils.isEmpty(tagName) || tagName.equals(SHOW_ALL_TAG))
+                presenter.postsIndex(page);
+            else
+                presenter.filterByTag(tagName, page);
+        } else if (mode == MODE_BOOKMARKS)
+            presenter.getBookmarks(page);
         else
-            presenter.filterByTag(tagName, page);
+            onError(R.string.error_default);
     }
 
     @Override
@@ -194,10 +224,17 @@ public class TagFragment extends BaseFragment
         }
     }
 
+    // FIXME: Current page is incremented even on error, which may result in skipped pages
     @Override
-    public void onError(String message) {
+    public void onError(int messageId) {
+        super.onError(messageId);
         refreshLayout.setRefreshing(false);
-        activateErrorView(message);
+    }
+
+    @Override
+    public void promptForLogin() {
+        super.promptForLogin();
+        activateErrorView(getString(R.string.error_unauthorized));
     }
 
     @Override

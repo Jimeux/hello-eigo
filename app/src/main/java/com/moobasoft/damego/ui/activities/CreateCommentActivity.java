@@ -84,10 +84,9 @@ public class CreateCommentActivity extends BaseActivity implements CommentPresen
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save_comment:
-
                 String query = input.getText().toString();
-                if (query.length() < 0) { // TODO: Use sensible number
-                    input.setError(getString(R.string.comment_error_too_short));
+                if (query.length() < 2) {
+                    input.setError(getString(R.string.comment_length_error));
                     input.requestFocus();
                     return false;
                 }
@@ -119,10 +118,10 @@ public class CreateCommentActivity extends BaseActivity implements CommentPresen
     }
 
     @Override
-    public void onError(String message) {
+    public void onError(int messageId) {
         progress.dismiss();
         input.setEnabled(true);
-        Snackbar.make(toolbar, message, Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(toolbar, getString(messageId), Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
@@ -137,7 +136,7 @@ public class CreateCommentActivity extends BaseActivity implements CommentPresen
         @NonNull
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             return new AlertDialog.Builder(getActivity())
-                    .setTitle(getString(R.string.destroy_comment_dialog))
+                    .setTitle(getString(R.string.discard_comment_dialog))
                     .setPositiveButton("Yes", (dialog, id) -> {
                         ConfirmCancelDialog.this.getDialog().cancel();
                         getActivity().finish();
@@ -152,10 +151,12 @@ public class CreateCommentActivity extends BaseActivity implements CommentPresen
         @Override
         @NonNull
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            return new AlertDialog.Builder(getActivity())
+            AlertDialog loading = new AlertDialog.Builder(getActivity())
                     .setTitle(getString(R.string.comment_submitting))
                     .setView(R.layout.loading_view)
                     .create();
+            loading.setCanceledOnTouchOutside(false);
+            return loading;
         }
     }
 
@@ -163,13 +164,15 @@ public class CreateCommentActivity extends BaseActivity implements CommentPresen
         @Override
         @NonNull
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            return new AlertDialog.Builder(getActivity()) //TODO: finish() when touched outside
+            AlertDialog ok = new AlertDialog.Builder(getActivity())
                     .setTitle(getString(R.string.comment_success))
                     .setPositiveButton("OK", (dialog, id) -> {
                         getActivity().finish();
                         ConfirmSubmitDialog.this.getDialog().dismiss();
                     })
                     .create();
+            ok.setCanceledOnTouchOutside(false);
+            return ok;
         }
     }
 

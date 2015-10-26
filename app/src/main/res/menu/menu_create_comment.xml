@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
 
     <item android:id="@+id/action_destroy_comment"
-        android:title="@string/action_destroy_comment"
+        android:title="@string/action_discard_comment"
         android:orderInCategory="100"
         android:icon="@drawable/ic_close_white_24dp"
         app:showAsAction="always" />

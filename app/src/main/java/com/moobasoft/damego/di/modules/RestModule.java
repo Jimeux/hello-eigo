@@ -6,6 +6,7 @@ import com.facebook.stetho.okhttp.StethoInterceptor;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.moobasoft.damego.BuildConfig;
 import com.moobasoft.damego.CredentialStore;
 import com.moobasoft.damego.di.scopes.Endpoint;
 import com.moobasoft.damego.rest.ApiAuthenticator;
@@ -29,18 +30,17 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 @Module
 public class RestModule {
 
-    private static final int DISK_CACHE_SIZE = 5 * 1024 * 1024; //5MB
+    private static final int DISK_CACHE_SIZE = 7 * 1024 * 1024; //7MB
 
     @Provides
     @Singleton
-    Retrofit provideRetrofit(@Endpoint String baseUrl, Gson gson, Context context,
-                             CredentialStore credentialStore) {
+    Retrofit provideRetrofit(@Endpoint String baseUrl, Gson gson, Context context, CredentialStore store) {
         final Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
-        configureHttpClient(retrofit.client(), context, credentialStore);
+        configureHttpClient(retrofit.client(), context, store);
         return retrofit;
     }
 
@@ -52,23 +52,20 @@ public class RestModule {
         return gson.create();
     }
 
-    private static void configureHttpClient(OkHttpClient client, Context context,
-                                            CredentialStore credentialStore) {
-        client.interceptors().add(new ApiHeaders(context, credentialStore));
-        client.setAuthenticator(new ApiAuthenticator(context, credentialStore));
+    private static void configureHttpClient(OkHttpClient client, Context context, CredentialStore store) {
+        client.interceptors().add(new ApiHeaders(context, store));
+        client.setAuthenticator(new ApiAuthenticator(context, store));
 
-        // TODO: Debug build only
-        client.networkInterceptors().add(new StethoInterceptor());
+        if (BuildConfig.DEBUG)
+            client.networkInterceptors().add(new StethoInterceptor());
 
         client.setConnectTimeout(10, SECONDS);
         client.setReadTimeout(10, SECONDS);
         client.setWriteTimeout(10, SECONDS);
 
-        // Install an HTTP cache in the application cache directory.
         File cacheDir = new File(context.getCacheDir(), "http");
         Cache cache = new Cache(cacheDir, DISK_CACHE_SIZE);
-        //TODO: Reactivate
-        //client.setCache(cache);
+        client.setCache(cache);
     }
 
 }

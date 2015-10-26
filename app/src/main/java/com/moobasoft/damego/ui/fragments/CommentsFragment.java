@@ -68,6 +68,7 @@ public class CommentsFragment extends BaseFragment implements OnRefreshListener 
 
     @Override
     public void onRefresh() {
+        //TODO: Handle refreshing comments!
         //commentsAdapter.clear();
     }
 

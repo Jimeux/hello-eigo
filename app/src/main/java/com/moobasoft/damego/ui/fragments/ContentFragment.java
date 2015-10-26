@@ -77,12 +77,6 @@ public class ContentFragment extends Fragment {
         toggleVisibility(title, body, tags);
     }*/
 
-    /*@Override
-    public void onSaveInstanceState(Bundle state) {
-        super.onSaveInstanceState(state);
-        state.putParcelable(POST_KEY, Parcels.wrap(post));
-    }*/
-
     @Override
     public void onDestroyView() {
         ButterKnife.unbind(this);

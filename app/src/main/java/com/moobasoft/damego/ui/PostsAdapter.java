@@ -35,7 +35,7 @@ public class PostsAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     public ArrayList<Post> getPostList() {
-        return postList; // TODO: Protective copy?
+        return postList;
     }
 
     public void loadPosts(List<Post> posts) {
@@ -98,7 +98,7 @@ public class PostsAdapter extends RecyclerView.Adapter<ViewHolder> {
     public boolean isEmpty() { return postList.isEmpty(); }
 
     public interface PostClickListener {
-        void onSummaryClicked(Post post);
+        void onSummaryClicked(Post post, boolean openComments);
         void onTagClicked(String tag);
     }
 

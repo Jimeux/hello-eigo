@@ -6,7 +6,7 @@
     app:fabSize="mini"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_margin="25dp"
+    android:layout_margin="15dp"
     app:backgroundTint="@color/white"
     android:clickable="true"
     android:src="@drawable/ic_refresh_red_300_18dp"

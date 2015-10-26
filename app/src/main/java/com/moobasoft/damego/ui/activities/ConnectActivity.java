@@ -146,7 +146,7 @@ public class ConnectActivity extends BaseActivity implements ConnectPresenter.Vi
     }
 
     @Override
-    public void onError(String error) {
+    public void onError(int error) {
         setProcessing(false);
         Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
     }

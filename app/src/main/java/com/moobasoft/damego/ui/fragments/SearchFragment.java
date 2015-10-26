@@ -34,7 +34,7 @@ public class SearchFragment extends BaseFragment implements IndexPresenter.View 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        menu.findItem(R.id.action_search).setVisible(false);
+        /*menu.findItem(R.id.action_search).setVisible(false);*/
         MenuItem bookmarksItem = menu.findItem(R.id.action_bookmarks);
         if (bookmarksItem != null) bookmarksItem.setVisible(false);
     }
@@ -76,9 +76,9 @@ public class SearchFragment extends BaseFragment implements IndexPresenter.View 
     }
 
     @Override
-    public void onError(String message) {
-        activateErrorView(message);
-        Snackbar.make(getView().getRootView(), message, Snackbar.LENGTH_SHORT).show();
+    public void onError(int messageId) {
+        super.onError(messageId);
+        Snackbar.make(getView().getRootView(), messageId, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
