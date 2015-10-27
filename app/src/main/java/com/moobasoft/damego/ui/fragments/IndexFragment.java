@@ -166,8 +166,9 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
     }
 
     private void loadTagFragments() {
-        for (String tag : tags)
-             adapter.addFragment(TagFragment.newInstance(TagFragment.MODE_TAG, tag), tag);
+        if (adapter.getCount() == 0)
+            for (String tag : tags)
+                 adapter.addFragment(TagFragment.newInstance(TagFragment.MODE_TAG, tag), tag);
 
         viewPager.setAdapter(adapter);
         if (Build.VERSION.SDK_INT >= 11)
