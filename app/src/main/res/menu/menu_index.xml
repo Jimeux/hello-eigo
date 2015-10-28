@@ -3,8 +3,11 @@
 
     <group android:id="@+id/fragment_specific_options">
 
-        <!--<item android:id="@+id/action_search" android:title="@string/action_search"
-                android:icon="@drawable/ic_search_white_24dp" app:showAsAction="ifRoom" />-->
+        <item
+            android:id="@+id/action_search"
+            android:icon="@drawable/ic_search_white_24dp"
+            android:title="@string/action_search"
+            app:showAsAction="ifRoom" />
         <item
             android:id="@+id/action_bookmarks"
             android:icon="@drawable/ic_bookmark_white_24dp"

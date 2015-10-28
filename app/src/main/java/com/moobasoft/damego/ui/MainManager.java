@@ -5,11 +5,12 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 
+import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.fragments.BookmarksFragment;
 import com.moobasoft.damego.ui.fragments.IndexFragment;
+import com.moobasoft.damego.ui.fragments.SearchFragment;
 import com.moobasoft.damego.ui.fragments.ShowFragment;
-import com.moobasoft.damego.ui.fragments.TagFragment;
 
 public class MainManager {
 
@@ -52,7 +53,7 @@ public class MainManager {
     public void restoreTwoPaneLayout() {
         ShowFragment showFragment = getShowFragment();
         if (showFragment == null)
-            showFragment = ShowFragment.newInstance(0, TagFragment.SHOW_ALL_TAG, false); // Default
+            showFragment = ShowFragment.newInstance(0, IndexFragment.SHOW_ALL_TAG, false); // Default
         else {
             if (isOnTopOfBackstack(INDEX_TAG))
                 manager.popBackStackImmediate(SHOW_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -64,11 +65,12 @@ public class MainManager {
         loadFragment(showContainer.getId(), showFragment, SHOW_TAG, false);
     }
 
-    public void loadFragment(int containerId, Fragment fragment, String tag, boolean addToBackstack) {
+    public void loadFragment(int containerId, Fragment fragment, String tag, boolean addToBackStack) {
         FragmentTransaction transaction = manager.beginTransaction()
-                        //.setCustomAnimations(R.anim.slide_up_in, R.anim.slide_up_out, 0, 0);
+                .setCustomAnimations(R.anim.slide_in_left,  R.anim.slide_out_right)
+                                     //R.anim.slide_in_right, R.anim.slide_out_left)
                 .replace(containerId, fragment, tag);
-        if (addToBackstack) transaction.addToBackStack(tag);
+        if (addToBackStack) transaction.addToBackStack(tag);
         transaction.commit();
     }
 
@@ -136,12 +138,17 @@ public class MainManager {
     public void initialiseFragments() {
         loadFragment(indexContainer.getId(), IndexFragment.newInstance(), INDEX_TAG, false);
         if (showContainer != null) {
-            ShowFragment showFragment = ShowFragment.newInstance(0, TagFragment.SHOW_ALL_TAG, false);
+            ShowFragment showFragment = ShowFragment.newInstance(0, IndexFragment.SHOW_ALL_TAG, false);
             loadFragment(showContainer.getId(), showFragment, SHOW_TAG, false);
         }
+        manager.executePendingTransactions();
     }
 
     public void openBookmarksFragment() {
         loadFragment(indexContainer.getId(), new BookmarksFragment(), BOOKMARKS_TAG, true);
+    }
+
+    public void openSearchFragment() {
+        loadFragment(indexContainer.getId(), new SearchFragment(), SEARCH_TAG, true);
     }
 }

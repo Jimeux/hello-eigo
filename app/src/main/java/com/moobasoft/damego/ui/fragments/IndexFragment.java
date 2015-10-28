@@ -16,7 +16,6 @@ import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -35,13 +34,14 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class IndexFragment extends BaseFragment implements MainPresenter.View  {
+public class IndexFragment extends RxFragment implements MainPresenter.View  {
     @Inject MainPresenter presenter;
 
     @Nullable @Bind(R.id.app_bar) AppBarLayout appBarLayout;
     @Nullable @Bind(R.id.tab_layout) TabLayout tabLayout;
     @Bind(R.id.view_pager)           ViewPager viewPager;
 
+    public static final String SHOW_ALL_TAG = "すべて";
     public static final String POSITION_STACK_KEY = "position_stack_key";
     public static final String TAGS_KEY = "tags_tag";
     public static final String ADAPTER_KEY = "adapter_tag";
@@ -104,16 +104,6 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
         inflater.inflate(R.menu.menu_index, menu);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_bookmarks)
-            // TODO: This should really be called through an interface
-            ((IndexActivity)getActivity()).openBookmarks();
-        /*else if (item.getId() == R.id.action_search)
-                loadFragment(indexContainer.getId(), new SearchFragment(), SEARCH_TAG, true, true);*/
-        return super.onOptionsItemSelected(item);
-    }
-
     @Nullable @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state) {
         View view = inflater.inflate(R.layout.fragment_index, container, false);
@@ -137,7 +127,7 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
         if (tags.isEmpty())
             onRefresh();
         else
-            loadTagFragments();
+            setUpViewPager();
     }
 
     @Override
@@ -162,13 +152,19 @@ public class IndexFragment extends BaseFragment implements MainPresenter.View  {
     public void onTagsRetrieved(List<String> tags) {
         this.tags = new ArrayList<>(tags);
         activateContentView();
-        loadTagFragments();
+        setUpViewPager();
     }
 
     private void loadTagFragments() {
-        if (adapter.getCount() == 0)
-            for (String tag : tags)
-                 adapter.addFragment(TagFragment.newInstance(TagFragment.MODE_TAG, tag), tag);
+        if (adapter.getCount() > 0) return;
+        for (String tag : tags) {
+            int mode =  (tag.equals(SHOW_ALL_TAG)) ? TagFragment.MODE_ALL : TagFragment.MODE_TAG;
+            adapter.addFragment(TagFragment.newInstance(mode, tag), tag);
+        }
+    }
+
+    private void setUpViewPager() {
+        loadTagFragments();
 
         viewPager.setAdapter(adapter);
         if (Build.VERSION.SDK_INT >= 11)

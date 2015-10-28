@@ -41,6 +41,12 @@ public class IndexPresenter extends RxPresenter<IndexPresenter.View> {
                           this::handleError);
     }
 
+    public void search(String query, int page) {
+        subscriptions.add(postService.search(query, page),
+                this::handleOnNext,
+                this::handleError);
+    }
+
     public void handleOnNext(Result<List<Post>> result) {
         Response<List<Post>> response = result.response();
 

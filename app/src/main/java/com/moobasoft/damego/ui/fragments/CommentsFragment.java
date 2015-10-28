@@ -19,7 +19,7 @@ import butterknife.ButterKnife;
 
 import static android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 
-public class CommentsFragment extends BaseFragment implements OnRefreshListener {
+public class CommentsFragment extends RxFragment implements OnRefreshListener {
 
     @Bind(R.id.comment_list)  RecyclerView commentList;
     @Bind(R.id.swipe_refresh) SwipeRefreshLayout refreshLayout;
@@ -57,11 +57,10 @@ public class CommentsFragment extends BaseFragment implements OnRefreshListener 
 
     private void initialiseRecyclerView() {
         refreshLayout.setOnRefreshListener(this);
-        refreshLayout.setColorSchemeResources(R.color.colorPrimary,
-                R.color.colorAccent);
+        refreshLayout.setEnabled(false);
+        refreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
         commentsAdapter  = new CommentsAdapter();
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-
         commentList.setLayoutManager(layoutManager);
         commentList.setAdapter(commentsAdapter);
     }

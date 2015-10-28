@@ -14,7 +14,7 @@ import com.moobasoft.damego.R;
 
 import butterknife.ButterKnife;
 
-public class BookmarksFragment extends BaseFragment  {
+public class BookmarksFragment extends RxFragment  {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

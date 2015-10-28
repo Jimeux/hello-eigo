@@ -89,10 +89,6 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
         manager.handleBackPress();
     }
 
-    public void openBookmarks() {
-        manager.openBookmarksFragment();
-    }
-
     @Override
     public void onBackStackChanged() {
         setMainToolbar();
@@ -111,6 +107,16 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+
+            /** IndexFragment items */
+            case R.id.action_bookmarks:
+                manager.openBookmarksFragment();
+                break;
+            case R.id.action_search:
+                manager.openSearchFragment();
+                break;
+
+            /** IndexActivity items */
             case R.id.action_login:
                 Intent loginIntent = new Intent(this, ConnectActivity.class);
                 loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

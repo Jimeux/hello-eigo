@@ -43,4 +43,7 @@ public interface PostService {
     @GET("/api/bookmarks")
     Observable<Result<List<Post>>> getBookmarks(@Query("page") int page);
 
+    @GET("/api/search")
+    Observable<Result<List<Post>>> search(@Query("query") String query,
+                                          @Query("page")  int page);
 }

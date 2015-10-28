@@ -8,7 +8,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +30,7 @@ import butterknife.ButterKnife;
 
 import static android.view.View.VISIBLE;
 
-public class TagFragment extends BaseFragment implements IndexPresenter.View,
+public class TagFragment extends RxFragment implements IndexPresenter.View,
         SwipeRefreshLayout.OnRefreshListener, AppBarLayout.OnOffsetChangedListener {
 
     public static final String POSTS_KEY    = "posts";
@@ -39,10 +38,11 @@ public class TagFragment extends BaseFragment implements IndexPresenter.View,
     public static final String SCROLL_KEY   = "scroll_key";
     public static final String TAG_NAME     = "tag_name";
     public static final String MODE         = "mode";
-    public static final String SHOW_ALL_TAG = "すべて";
 
-    public static final int MODE_TAG       = 1;
-    public static final int MODE_BOOKMARKS = 2;
+    public static final int MODE_ALL       = 1;
+    public static final int MODE_TAG       = 2;
+    public static final int MODE_BOOKMARKS = 3;
+    public static final int MODE_SEARCH    = 4;
 
     private PostsAdapter postsAdapter;
     private LinearLayoutManager layoutManager;
@@ -196,15 +196,22 @@ public class TagFragment extends BaseFragment implements IndexPresenter.View,
         if (page == 1) activateLoadingView();
         refreshLayout.setRefreshing(true);
 
-        if (mode == MODE_TAG) {
-            if (TextUtils.isEmpty(tagName) || tagName.equals(SHOW_ALL_TAG))
+        switch (mode) {
+            case MODE_ALL:
                 presenter.postsIndex(page);
-            else
+                break;
+            case MODE_TAG:
                 presenter.filterByTag(tagName, page);
-        } else if (mode == MODE_BOOKMARKS)
-            presenter.getBookmarks(page);
-        else
-            onError(R.string.error_default);
+                break;
+            case MODE_BOOKMARKS:
+                presenter.getBookmarks(page);
+                break;
+            case MODE_SEARCH:
+                presenter.search(tagName, page);
+                break;
+            default:
+                onError(R.string.error_default);
+        }
     }
 
     @Override

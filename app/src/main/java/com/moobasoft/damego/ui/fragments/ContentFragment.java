@@ -2,7 +2,6 @@ package com.moobasoft.damego.ui.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +20,7 @@ import org.parceler.Parcels;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class ContentFragment extends Fragment {
+public class ContentFragment extends BaseFragment {
 
     public static final String POST_KEY = "post_key";
     private Post post;

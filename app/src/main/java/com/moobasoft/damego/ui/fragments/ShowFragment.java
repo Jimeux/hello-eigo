@@ -39,7 +39,7 @@ import butterknife.OnClick;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-public class ShowFragment extends BaseFragment implements ShowPresenter.ShowView {
+public class ShowFragment extends RxFragment implements ShowPresenter.ShowView {
 
     public static final String POST_KEY    = "post_key";
     public static final String POST_ID_KEY = "post_id";

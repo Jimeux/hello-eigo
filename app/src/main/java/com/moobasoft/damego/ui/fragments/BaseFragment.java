@@ -1,46 +1,30 @@
 package com.moobasoft.damego.ui.fragments;
 
+import android.content.res.Resources;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
-import com.moobasoft.damego.App;
 import com.moobasoft.damego.R;
-import com.moobasoft.damego.di.components.DaggerMainComponent;
-import com.moobasoft.damego.di.components.MainComponent;
-import com.moobasoft.damego.di.modules.MainModule;
-import com.moobasoft.damego.ui.activities.BaseActivity;
 
-import java.util.List;
+import java.lang.reflect.Field;
 
 import butterknife.Bind;
-import butterknife.OnClick;
 
-import static android.view.View.VISIBLE;
-
-public abstract class BaseFragment extends Fragment {
+public class BaseFragment extends Fragment {
 
     @Nullable @Bind(R.id.toolbar) Toolbar toolbar;
 
-    @Bind(R.id.content)       ViewGroup contentView;
-    @Bind(R.id.loading_view)  ViewGroup loadingView;
-    @Bind(R.id.empty_view)    ViewGroup emptyView;
-    @Bind(R.id.error_view)    ViewGroup errorView;
-    @Bind(R.id.error_msg)     TextView errorMessage;
-    @Bind(R.id.empty_msg)     TextView emptyMessage;
-    @Bind({R.id.loading_view, R.id.error_view, R.id.empty_view, R.id.content})
-    List<ViewGroup> stateViews;
-
-    public void onError(int messageId) {
-        String message = getString(messageId);
-        if (message == null)
-            message = getString(R.string.error_default);
-        activateErrorView(message);
+    @Nullable
+    public Toolbar getToolbar() {
+        return toolbar;
     }
+
+    public void setToolbar() {}
 
     protected static void toggleVisibility(View... views) {
         for (View view : views) {
@@ -50,59 +34,45 @@ public abstract class BaseFragment extends Fragment {
         }
     }
 
-    public void promptForLogin() {
-        ((BaseActivity) getActivity()).promptForLogin();
+    /**
+     * Hackish code from StackOverflow to stop child fragments disappearing on transition
+     */
+
+    // Arbitrary value; set it to some reasonable default
+    private static final int DEFAULT_CHILD_ANIMATION_DURATION = 250;
+
+    @Override
+    public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
+        final Fragment parent = getParentFragment();
+
+        // Apply the workaround only if this is a child fragment, and the parent
+        // is being removed.
+        if (!enter && parent != null && parent.isRemoving()) {
+            // This is a workaround for the bug where child fragments disappear when
+            // the parent is removed (as all children are first removed from the parent)
+            // See https://code.google.com/p/android/issues/detail?id=55228
+            Animation doNothingAnim = new AlphaAnimation(1, 1);
+            doNothingAnim.setDuration(getNextAnimationDuration(parent, DEFAULT_CHILD_ANIMATION_DURATION));
+            return doNothingAnim;
+        } else {
+            return super.onCreateAnimation(transit, enter, nextAnim);
+        }
     }
 
-    @Nullable
-    public Toolbar getToolbar() {
-        return toolbar;
+    private static long getNextAnimationDuration(Fragment fragment, long defValue) {
+        try {
+            // Attempt to get the resource ID of the next animation that
+            // will be applied to the given fragment.
+            Field nextAnimField = Fragment.class.getDeclaredField("mNextAnim");
+            nextAnimField.setAccessible(true);
+            int nextAnimResource = nextAnimField.getInt(fragment);
+            Animation nextAnim = AnimationUtils.loadAnimation(fragment.getActivity(), nextAnimResource);
+
+            // ...and if it can be loaded, return that animation's duration
+            return (nextAnim == null) ? defValue : nextAnim.getDuration();
+        } catch (NoSuchFieldException|IllegalAccessException|Resources.NotFoundException ex) {
+            return defValue;
+        }
     }
 
-    public void setToolbar() {}
-
-    protected MainComponent getComponent() {
-        return DaggerMainComponent.builder()
-                .mainModule(new MainModule())
-                .appComponent(((App) getActivity().getApplication()).getAppComponent())
-                .build();
-    }
-
-    protected void activateView(View view) {
-        for (ViewGroup vg : stateViews)
-            vg.setVisibility(android.view.View.GONE);
-
-        if (view == null)
-            activateErrorView(getString(R.string.error_default));
-        else
-            view.setVisibility(VISIBLE);
-    }
-
-    protected void activateEmptyView(String message) {
-        activateView(emptyView);
-        emptyMessage.setText(message);
-    }
-
-    protected void activateErrorView(String message) {
-        if (loadingView.getVisibility() == VISIBLE || errorView.getVisibility() == VISIBLE) {
-            errorMessage.setText(message);
-            activateView(errorView);
-        } else
-           Snackbar.make(getActivity().findViewById(android.R.id.content), message, Snackbar.LENGTH_SHORT).show();
-    }
-
-    protected void activateContentView() {
-        activateView(contentView);
-    }
-    
-    protected void activateLoadingView() {
-        activateView(loadingView);
-    }
-    
-    public abstract void onRefresh();
-
-    @OnClick({R.id.empty_refresh_btn, R.id.error_refresh_btn})
-    public void clickRefresh() {
-        onRefresh();
-    }
 }

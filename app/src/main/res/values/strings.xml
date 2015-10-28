@@ -57,5 +57,7 @@
     <string name="loading_list">Loading…</string>
     <string name="empty_list">コメントはまだありません。</string>
     <string name="bookmarks_title">Bookmarks</string>
+    <string name="search_hint">Enter a search term...</string>
+    <string name="search_error_length">\"Search term is too short!\"</string>
 
 </resources>
