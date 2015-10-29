@@ -26,8 +26,6 @@ public class BaseFragment extends Fragment {
 
     public void setToolbar() {}
 
-    public void setToolbar(Toolbar toolbar) {}
-
     protected static void toggleVisibility(View... views) {
         for (View view : views) {
             if (view == null) return;

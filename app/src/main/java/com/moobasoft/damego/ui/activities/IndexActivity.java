@@ -2,16 +2,11 @@ package com.moobasoft.damego.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.moobasoft.damego.R;
@@ -25,31 +20,10 @@ import butterknife.ButterKnife;
 
 public class IndexActivity extends BaseActivity implements PostsAdapter.PostClickListener, FragmentManager.OnBackStackChangedListener {
 
-    public static final String WAS_TWO_PANE_KEY = "switch_from_two_pane";
-
     private FragmentManager fragmentManager;
     private MainManager manager;
 
-    @Nullable @Bind(R.id.app_bar)    AppBarLayout appBar;
-    @Nullable @Bind(R.id.toolbar)    Toolbar toolbar;
-    @Nullable @Bind(R.id.tab_layout) TabLayout tabLayout;
-
-    @Nullable @Bind(R.id.toolbar_container) ViewGroup toolbarContainer;
-    @Nullable @Bind(R.id.show_container)    ViewGroup showContainer;
-    @Bind(R.id.index_container)             ViewGroup indexContainer;
-
-    @Nullable public AppBarLayout getAppBar() { return appBar;    }
-    @Nullable public Toolbar getToolbar()     { return toolbar;   }
-    @Nullable public TabLayout getTabLayout() { return tabLayout; }
-
-    public static final String INDEX_TOOLBAR = "index_toolbar";
-    public static final String SEARCH_TOOLBAR = "index_toolbar";
-    public static final String BOOKMARKS_TOOLBAR = "index_toolbar";
-
-    @Nullable
-    public Fragment getToolbarFragment(String tag) {
-        return fragmentManager.findFragmentByTag(tag);
-    }
+    @Bind(R.id.container) ViewGroup container;
 
     @Override
     protected void onCreate(Bundle state) {
@@ -60,18 +34,9 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
 
         fragmentManager = getSupportFragmentManager();
         fragmentManager.addOnBackStackChangedListener(this);
-        manager = new MainManager(toolbarContainer, showContainer, indexContainer, fragmentManager);
+        manager = new MainManager(container, fragmentManager);
 
-        if (state != null)
-            manager.restoreFromInstanceState(state.getBoolean(WAS_TWO_PANE_KEY));
-        else
-            manager.initialiseFragments();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle state) {
-        super.onSaveInstanceState(state);
-        state.putBoolean(WAS_TWO_PANE_KEY, manager.isTwoPaneLayout());
+        if (state == null) manager.initialiseFragments();
     }
 
     @Override
@@ -81,7 +46,7 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
     }
 
     public void setMainToolbar() {
-        Fragment mainFrag = fragmentManager.findFragmentById(indexContainer.getId());
+        Fragment mainFrag = fragmentManager.findFragmentById(container.getId());
         if (mainFrag != null) ((BaseFragment) mainFrag).setToolbar();
     }
 
@@ -145,36 +110,11 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
 
             case R.id.action_logout:
                 credentialStore.delete();
-                Snackbar.make(indexContainer, getString(R.string.logout_success), Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(container, getString(R.string.logout_success), Snackbar.LENGTH_SHORT).show();
                 break;
         }
         supportInvalidateOptionsMenu();
         return false;
     }
 
-}
-
-class ViewGroupUtils {
-
-    public static ViewGroup getParent(View view) {
-        return (ViewGroup)view.getParent();
-    }
-
-    public static void removeView(View view) {
-        ViewGroup parent = getParent(view);
-        if(parent != null) {
-            parent.removeView(view);
-        }
-    }
-
-    public static void replaceView(View currentView, View newView) {
-        ViewGroup parent = getParent(currentView);
-        if(parent == null) {
-            return;
-        }
-        final int index = parent.indexOfChild(currentView);
-        removeView(currentView);
-        removeView(newView);
-        parent.addView(newView, index);
-    }
 }

@@ -20,7 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.moobasoft.damego.R;
-import com.moobasoft.damego.ui.activities.IndexActivity;
 import com.moobasoft.damego.ui.presenters.MainPresenter;
 import com.moobasoft.damego.util.DepthPageTransformer;
 
@@ -37,14 +36,15 @@ import butterknife.ButterKnife;
 public class IndexFragment extends RxFragment implements MainPresenter.View  {
     @Inject MainPresenter presenter;
 
-    @Nullable @Bind(R.id.app_bar) AppBarLayout appBarLayout;
-    @Nullable @Bind(R.id.tab_layout) TabLayout tabLayout;
-    @Bind(R.id.view_pager)           ViewPager viewPager;
+    @Bind(R.id.app_bar)    AppBarLayout appBarLayout;
+    @Bind(R.id.tab_layout) TabLayout tabLayout;
+    @Bind(R.id.view_pager) ViewPager viewPager;
 
     public static final String SHOW_ALL_TAG = "すべて";
     public static final String POSITION_STACK_KEY = "position_stack_key";
     public static final String TAGS_KEY = "tags_tag";
     public static final String ADAPTER_KEY = "adapter_tag";
+
     private ArrayList<String> tags;
     private Deque<Integer> positionStack;
     private Adapter adapter;
@@ -110,19 +110,13 @@ public class IndexFragment extends RxFragment implements MainPresenter.View  {
         getComponent().inject(this);
         presenter.bindView(this);
         ButterKnife.bind(this, view);
+        tabLayout.setVisibility(View.GONE);
         return view;
     }
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-
-        if (tabLayout == null) {
-            appBarLayout = ((IndexActivity)getActivity()).getAppBar(); //TODO: Use interface?
-            toolbar = ((IndexActivity)getActivity()).getToolbar();
-            tabLayout = ((IndexActivity)getActivity()).getTabLayout();
-        }
-        if (tabLayout != null) tabLayout.setVisibility(View.GONE);
 
         if (tags.isEmpty())
             onRefresh();
@@ -142,10 +136,8 @@ public class IndexFragment extends RxFragment implements MainPresenter.View  {
 
     @Override
     public void setToolbar() {
-        if (toolbar != null) {
-            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-            setDisplayHomeAsUpEnabled();
-        }
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        setDisplayHomeAsUpEnabled();
     }
 
     @Override

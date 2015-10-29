@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--<android.support.design.widget.AppBarLayout xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/app_bar"
     fontPath="fonts/Roboto-Light.ttf"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/colorPrimary"
     android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-    app:elevation="2dp">-->
+    app:elevation="2dp">
 
-<android.support.v7.widget.Toolbar
-    android:id="@+id/toolbar"
-    android:layout_width="match_parent"
-    android:layout_height="?attr/actionBarSize"
-    android:background="@color/colorPrimary"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-    app:layout_scrollFlags="scroll|enterAlways"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <android.support.v7.widget.Toolbar
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:layout_scrollFlags="scroll|enterAlways">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:gravity="center"
+            android:layout_height="match_parent"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:layout_height="match_parent"
+            android:gravity="center"
             android:orientation="horizontal">
 
             <ImageView
@@ -34,10 +34,10 @@
                 android:src="@drawable/ic_search_white_24dp" />
 
             <EditText
-                android:layout_weight="1"
                 android:id="@+id/search_input"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:background="@null"
                 android:hint="@string/search_hint"
                 android:imeOptions="actionDone"
@@ -50,16 +50,15 @@
 
             <ImageView
                 android:id="@+id/clear_btn"
-                android:visibility="invisible"
-                android:layout_marginRight="16dp"
-                android:layout_gravity="right|center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="right|center"
+                android:layout_marginRight="16dp"
                 android:clickable="true"
-                android:src="@drawable/ic_close_white_24dp" />
+                android:src="@drawable/ic_close_white_24dp"
+                android:visibility="invisible" />
 
         </LinearLayout>
     </android.support.v7.widget.Toolbar>
 
-<!--
-</android.support.design.widget.AppBarLayout>-->
+</android.support.design.widget.AppBarLayout>

@@ -4,15 +4,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
-import android.view.ViewGroup;
 
-import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.fragments.BookmarksFragment;
 import com.moobasoft.damego.ui.fragments.IndexFragment;
 import com.moobasoft.damego.ui.fragments.SearchFragment;
 import com.moobasoft.damego.ui.fragments.ShowFragment;
-import com.moobasoft.damego.ui.fragments.ToolbarFragment;
 
 public class MainManager {
 
@@ -21,21 +18,13 @@ public class MainManager {
     public static final String BOOKMARKS_TAG    = "bookmarks";
     public static final String SEARCH_TAG       = "search";
 
-    private final ViewGroup toolbarContainer;
-    private final View showContainer;
     private final View indexContainer;
     private final FragmentManager manager;
 
-    public MainManager(ViewGroup toolbarContainer, View showContainer, View indexContainer, FragmentManager manager) {
-        this.toolbarContainer = toolbarContainer;
-        this.showContainer = showContainer;
+    public MainManager(View indexContainer, FragmentManager manager) {
         this.indexContainer = indexContainer;
         this.manager = manager;
     }
-
-    public boolean isTwoPaneLayout()    { return showContainer != null; }
-
-    public boolean isSinglePaneLayout() { return showContainer == null; }
 
     public ShowFragment getShowFragment() {
         return (ShowFragment) manager.findFragmentByTag(SHOW_TAG);
@@ -45,33 +34,17 @@ public class MainManager {
         return (IndexFragment) manager.findFragmentByTag(INDEX_TAG);
     }
 
-    public void restoreSingleLayout() {
-        ShowFragment showFragment = getShowFragment();
-        if (showFragment != null) {
-            manager.beginTransaction().remove(showFragment).commit();
-            manager.executePendingTransactions();
-            loadFragment(indexContainer.getId(), showFragment, SHOW_TAG, true);
-        }
-    }
+    public void loadFragment(Fragment fragment, boolean addToBackStack) {
+        String tag = null;
+        if      (fragment instanceof ShowFragment)      tag = SHOW_TAG;
+        else if (fragment instanceof IndexFragment)     tag = INDEX_TAG;
+        else if (fragment instanceof SearchFragment)    tag = SEARCH_TAG;
+        else if (fragment instanceof BookmarksFragment) tag = BOOKMARKS_TAG;
 
-    public void restoreTwoPaneLayout() {
-        ShowFragment showFragment = getShowFragment();
-        if (showFragment == null)
-            showFragment = ShowFragment.newInstance(0, IndexFragment.SHOW_ALL_TAG, false); // Default
-        else {
-            if (isOnTopOfBackstack(INDEX_TAG))
-                manager.popBackStackImmediate(SHOW_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-            else
-                manager.popBackStackImmediate();
-            manager.beginTransaction().remove(showFragment).commit();
-            manager.executePendingTransactions();
-        }
-        loadFragment(showContainer.getId(), showFragment, SHOW_TAG, false);
-    }
+        int containerId = indexContainer.getId();
 
-    public void loadFragment(int containerId, Fragment fragment, String tag, boolean addToBackStack) {
         FragmentTransaction transaction = manager.beginTransaction()
-                .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right)
+                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
                 .replace(containerId, fragment, tag);
         if (addToBackStack) transaction.addToBackStack(tag);
         transaction.commit();
@@ -85,30 +58,15 @@ public class MainManager {
     }
 
     public void handleBackPress() {
-        if (isSinglePaneLayout() && isOnTopOfBackstack(INDEX_TAG)) {
+        if (isOnTopOfBackstack(INDEX_TAG)) {
             IndexFragment indexFragment = getIndexFragment();
             indexFragment.restorePagerPosition();
-        }
-
-        int backStackEntryCount = manager.getBackStackEntryCount();
-
-        if (isTwoPaneLayout() && backStackEntryCount > 0) {
-            String name = manager.getBackStackEntryAt(backStackEntryCount - 1).getName();
-
-            if (name != null && name.equals(SHOW_TAG)) {
-                ShowFragment showFragment = getShowFragment();
-                manager.popBackStack();
-                manager.executePendingTransactions();
-                loadFragment(showContainer.getId(), showFragment, SHOW_TAG, false);
-                getIndexFragment().restorePagerPosition();
-            }
         }
     }
 
     public void openShowFragment(Post post, String title, boolean openComments) {
         // FIXME: Prevent two posts opening at once when jamming the screen
 
-        int containerId = (isSinglePaneLayout()) ? indexContainer.getId() : showContainer.getId();
         IndexFragment indexFragment = getIndexFragment();
 
         if (isOnTopOfBackstack(INDEX_TAG)) {
@@ -117,70 +75,27 @@ public class MainManager {
         }
 
         ShowFragment showFragment = ShowFragment.newInstance(post.getId(), title, openComments);
-        loadFragment(containerId, showFragment, SHOW_TAG, isSinglePaneLayout());
+        loadFragment(showFragment, true);
     }
 
     public void handleTagClick(String tag) {
         IndexFragment indexFragment = getIndexFragment();
         if (!isOnTopOfBackstack(INDEX_TAG)) {
-            loadFragment(indexContainer.getId(), indexFragment, INDEX_TAG, true);
+            loadFragment(indexFragment, true);
             manager.executePendingTransactions();
         }
         indexFragment.setCurrentTag(tag); // Has to be called after state is restored
     }
 
-    public void restoreFromInstanceState(boolean wasTwoPaneLayout) {
-        boolean changedFromTwoPaneLayout = (isSinglePaneLayout() && wasTwoPaneLayout);
-        if (isTwoPaneLayout())
-            restoreTwoPaneLayout();
-        else if (isSinglePaneLayout() && changedFromTwoPaneLayout)
-            restoreSingleLayout();
-        //else if (isSinglePaneLayout()) // Restore single pane layout
-    }
-
     public void initialiseFragments() {
-        loadFragment(indexContainer.getId(), IndexFragment.newInstance(), INDEX_TAG, false);
-        if (showContainer != null) {
-            ShowFragment showFragment = ShowFragment.newInstance(0, IndexFragment.SHOW_ALL_TAG, false);
-            loadFragment(showContainer.getId(), showFragment, SHOW_TAG, false);
-        }
-        //manager.executePendingTransactions();
+        loadFragment(IndexFragment.newInstance(), false);
     }
 
     public void openBookmarksFragment() {
-        loadFragment(indexContainer.getId(), new BookmarksFragment(), BOOKMARKS_TAG, true);
+        loadFragment(new BookmarksFragment(), true);
     }
 
     public void openSearchFragment() {
-        if (isSinglePaneLayout())
-            loadFragment(indexContainer.getId(), new SearchFragment(), SEARCH_TAG, true);
-        else {
-            ToolbarFragment toolbarFragment = ToolbarFragment.newInstance(R.layout.toolbar_search);
-            SearchFragment searchFragment = new SearchFragment();
-
-            manager.beginTransaction()
-                    .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right)
-                    .replace(R.id.toolbar_container, toolbarFragment, "toolbar")
-                    .replace(indexContainer.getId(), searchFragment, SEARCH_TAG)
-                    .addToBackStack(SEARCH_TAG)
-                    .commit();
-
-            manager.executePendingTransactions();
-
-            searchFragment.setToolbar(toolbarFragment.getToolbar());
-        }
-
-
-
-        if (toolbarContainer != null) {
-
-
-            //Fragment mainFrag = fragmentManager.findFragmentById(indexContainer.getId());
-
-/*            if (mainFrag != null) ((BaseFragment) mainFrag).setToolbar(fragment.getToolbar());
-
-            setSupportActionBar(fragment.getToolbar());
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);*/
-        }
+        loadFragment(new SearchFragment(), true);
     }
 }
