@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.moobasoft.damego.R;
@@ -32,12 +33,23 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
     @Nullable @Bind(R.id.app_bar)    AppBarLayout appBar;
     @Nullable @Bind(R.id.toolbar)    Toolbar toolbar;
     @Nullable @Bind(R.id.tab_layout) TabLayout tabLayout;
-    @Nullable @Bind(R.id.show_container)  ViewGroup showContainer;
-    @Bind(R.id.index_container) ViewGroup indexContainer;
+
+    @Nullable @Bind(R.id.toolbar_container) ViewGroup toolbarContainer;
+    @Nullable @Bind(R.id.show_container)    ViewGroup showContainer;
+    @Bind(R.id.index_container)             ViewGroup indexContainer;
 
     @Nullable public AppBarLayout getAppBar() { return appBar;    }
     @Nullable public Toolbar getToolbar()     { return toolbar;   }
     @Nullable public TabLayout getTabLayout() { return tabLayout; }
+
+    public static final String INDEX_TOOLBAR = "index_toolbar";
+    public static final String SEARCH_TOOLBAR = "index_toolbar";
+    public static final String BOOKMARKS_TOOLBAR = "index_toolbar";
+
+    @Nullable
+    public Fragment getToolbarFragment(String tag) {
+        return fragmentManager.findFragmentByTag(tag);
+    }
 
     @Override
     protected void onCreate(Bundle state) {
@@ -48,7 +60,7 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
 
         fragmentManager = getSupportFragmentManager();
         fragmentManager.addOnBackStackChangedListener(this);
-        manager = new MainManager(showContainer, indexContainer, fragmentManager);
+        manager = new MainManager(toolbarContainer, showContainer, indexContainer, fragmentManager);
 
         if (state != null)
             manager.restoreFromInstanceState(state.getBoolean(WAS_TWO_PANE_KEY));
@@ -70,7 +82,7 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
 
     public void setMainToolbar() {
         Fragment mainFrag = fragmentManager.findFragmentById(indexContainer.getId());
-        if (mainFrag != null) ((BaseFragment)mainFrag).setToolbar();
+        if (mainFrag != null) ((BaseFragment) mainFrag).setToolbar();
     }
 
     @Override
@@ -140,4 +152,29 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
         return false;
     }
 
+}
+
+class ViewGroupUtils {
+
+    public static ViewGroup getParent(View view) {
+        return (ViewGroup)view.getParent();
+    }
+
+    public static void removeView(View view) {
+        ViewGroup parent = getParent(view);
+        if(parent != null) {
+            parent.removeView(view);
+        }
+    }
+
+    public static void replaceView(View currentView, View newView) {
+        ViewGroup parent = getParent(currentView);
+        if(parent == null) {
+            return;
+        }
+        final int index = parent.indexOfChild(currentView);
+        removeView(currentView);
+        removeView(newView);
+        parent.addView(newView, index);
+    }
 }

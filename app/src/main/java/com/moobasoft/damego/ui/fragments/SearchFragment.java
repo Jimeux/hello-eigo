@@ -3,6 +3,7 @@ package com.moobasoft.damego.ui.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -19,13 +20,12 @@ import com.moobasoft.damego.util.Util;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class SearchFragment extends BaseFragment {
 
-    @Bind(R.id.search_input) EditText  searchInput;
-    @Bind(R.id.clear_btn)    View      clearBtn;
-    @Bind(R.id.content)      ViewGroup contentView;
+    @Nullable @Bind(R.id.search_input) EditText  searchInput;
+    @Nullable @Bind(R.id.clear_btn)    View      clearBtn;
+    @Nullable @Bind(R.id.content)      ViewGroup contentView;
 
     private final TextView.OnEditorActionListener onEditListener = (v, actionId, event) -> {
         String query = searchInput.getText().toString();
@@ -74,6 +74,14 @@ public class SearchFragment extends BaseFragment {
         }
     }
 
+    public void setToolbar(Toolbar t) {
+        this.toolbar = t;
+        this.searchInput = (EditText) t.findViewById(R.id.search_input);
+        this.clearBtn = t.findViewById(R.id.clear_btn);
+        initialiseSearchInput();
+        setToolbar();
+    }
+
     @Nullable @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
@@ -83,26 +91,27 @@ public class SearchFragment extends BaseFragment {
     }
 
     private void initialiseSearchInput() {
+        if (searchInput == null || clearBtn == null) return;
+
         searchInput.setOnEditorActionListener(onEditListener);
         searchInput.addTextChangedListener(textWatcher);
         searchInput.setOnFocusChangeListener((v, hasFocus) -> {
             if (searchInput != null) Util.setImeVisibility(hasFocus, searchInput);
         });
         searchInput.requestFocus();
+
+        clearBtn.setOnClickListener(v -> {
+            searchInput.setError(null);
+            searchInput.setText("");
+            searchInput.requestFocus();
+        });
     }
 
     @Override
     public void onDestroyView() {
-        searchInput.clearFocus();
+        if (searchInput != null) searchInput.clearFocus();
         ButterKnife.unbind(this);
         super.onDestroyView();
-    }
-
-    @OnClick(R.id.clear_btn)
-    public void clickClearButton() {
-        searchInput.setError(null);
-        searchInput.setText("");
-        searchInput.requestFocus();
     }
 
     private void loadResults(String query) {

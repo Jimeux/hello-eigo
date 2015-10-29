@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
@@ -11,6 +12,7 @@ import com.moobasoft.damego.ui.fragments.BookmarksFragment;
 import com.moobasoft.damego.ui.fragments.IndexFragment;
 import com.moobasoft.damego.ui.fragments.SearchFragment;
 import com.moobasoft.damego.ui.fragments.ShowFragment;
+import com.moobasoft.damego.ui.fragments.ToolbarFragment;
 
 public class MainManager {
 
@@ -19,11 +21,13 @@ public class MainManager {
     public static final String BOOKMARKS_TAG    = "bookmarks";
     public static final String SEARCH_TAG       = "search";
 
+    private final ViewGroup toolbarContainer;
     private final View showContainer;
     private final View indexContainer;
     private final FragmentManager manager;
 
-    public MainManager(View showContainer, View indexContainer, FragmentManager manager) {
+    public MainManager(ViewGroup toolbarContainer, View showContainer, View indexContainer, FragmentManager manager) {
+        this.toolbarContainer = toolbarContainer;
         this.showContainer = showContainer;
         this.indexContainer = indexContainer;
         this.manager = manager;
@@ -67,8 +71,7 @@ public class MainManager {
 
     public void loadFragment(int containerId, Fragment fragment, String tag, boolean addToBackStack) {
         FragmentTransaction transaction = manager.beginTransaction()
-                .setCustomAnimations(R.anim.slide_in_left,  R.anim.slide_out_right)
-                                     //R.anim.slide_in_right, R.anim.slide_out_left)
+                .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right)
                 .replace(containerId, fragment, tag);
         if (addToBackStack) transaction.addToBackStack(tag);
         transaction.commit();
@@ -141,7 +144,7 @@ public class MainManager {
             ShowFragment showFragment = ShowFragment.newInstance(0, IndexFragment.SHOW_ALL_TAG, false);
             loadFragment(showContainer.getId(), showFragment, SHOW_TAG, false);
         }
-        manager.executePendingTransactions();
+        //manager.executePendingTransactions();
     }
 
     public void openBookmarksFragment() {
@@ -149,6 +152,35 @@ public class MainManager {
     }
 
     public void openSearchFragment() {
-        loadFragment(indexContainer.getId(), new SearchFragment(), SEARCH_TAG, true);
+        if (isSinglePaneLayout())
+            loadFragment(indexContainer.getId(), new SearchFragment(), SEARCH_TAG, true);
+        else {
+            ToolbarFragment toolbarFragment = ToolbarFragment.newInstance(R.layout.toolbar_search);
+            SearchFragment searchFragment = new SearchFragment();
+
+            manager.beginTransaction()
+                    .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right)
+                    .replace(R.id.toolbar_container, toolbarFragment, "toolbar")
+                    .replace(indexContainer.getId(), searchFragment, SEARCH_TAG)
+                    .addToBackStack(SEARCH_TAG)
+                    .commit();
+
+            manager.executePendingTransactions();
+
+            searchFragment.setToolbar(toolbarFragment.getToolbar());
+        }
+
+
+
+        if (toolbarContainer != null) {
+
+
+            //Fragment mainFrag = fragmentManager.findFragmentById(indexContainer.getId());
+
+/*            if (mainFrag != null) ((BaseFragment) mainFrag).setToolbar(fragment.getToolbar());
+
+            setSupportActionBar(fragment.getToolbar());
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);*/
+        }
     }
 }

@@ -1,25 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
-<android.support.design.widget.AppBarLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+<!--<android.support.design.widget.AppBarLayout xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/app_bar"
     fontPath="fonts/Roboto-Light.ttf"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/colorPrimary"
     android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-    app:elevation="2dp"
-    tools:showIn="@layout/fragment_search">
+    app:elevation="2dp">-->
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:layout_scrollFlags="scroll|enterAlways">
+<android.support.v7.widget.Toolbar
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@color/colorPrimary"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+    app:layout_scrollFlags="scroll|enterAlways"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -63,4 +61,5 @@
         </LinearLayout>
     </android.support.v7.widget.Toolbar>
 
-</android.support.design.widget.AppBarLayout>
+<!--
+</android.support.design.widget.AppBarLayout>-->

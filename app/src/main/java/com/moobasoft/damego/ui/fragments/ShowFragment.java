@@ -13,6 +13,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -93,7 +94,7 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.removeGroup(R.id.fragment_specific_options);
+        //menu.removeGroup(R.id.fragment_specific_options);
         if (post != null) {
             inflater.inflate(R.menu.menu_show, menu);
             menu.findItem(R.id.action_unbookmark).setVisible(post.isBookmarked());
@@ -176,6 +177,7 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView {
         getActivity().supportInvalidateOptionsMenu();
         showAdapter = new ShowAdapter(getChildFragmentManager(), post);
         viewPager.setAdapter(showAdapter);
+        viewPager.setPageMargin(16);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.getTabAt(CONTENT_PAGE).setIcon(R.drawable.ic_subject_white_24dp);
         tabLayout.getTabAt(COMMENTS_PAGE).setIcon(R.drawable.ic_comment_white_24dp);
@@ -201,6 +203,11 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView {
             ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
             ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    public void setToolbar(Toolbar toolbar) {
+        this.toolbar = toolbar;
+        setToolbar();
     }
 
     @Override
