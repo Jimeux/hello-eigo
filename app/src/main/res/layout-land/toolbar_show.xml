@@ -4,7 +4,7 @@
     android:id="@+id/app_bar"
     fontPath="fonts/Roboto-Light.ttf"
     android:layout_width="match_parent"
-    android:layout_height="200dp"
+    android:layout_height="130dp"
     android:background="@color/colorPrimary"
     android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
     app:elevation="3dp">
@@ -28,12 +28,13 @@
             <!--app:layout_scrollFlags="scroll|enterAlways">-->
 
             <TextView
+                android:id="@+id/title_view"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginRight="30dp"
                 android:gravity="center"
                 android:text="@string/app_name"
-                android:textSize="20sp" />
+                android:textSize="@dimen/land_title_size" />
 
             <android.support.design.widget.TabLayout
                 android:id="@+id/tab_layout"

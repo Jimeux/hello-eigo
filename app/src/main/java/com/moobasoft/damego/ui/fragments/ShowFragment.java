@@ -9,10 +9,8 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.widget.TextView;
 
 import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
@@ -56,10 +55,12 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView {
 
     @Inject ShowPresenter presenter;
 
-    @Nullable @Bind(R.id.card_view) CardView cardView;
-    @Bind(R.id.tab_layout)          TabLayout tabLayout;
-    @Bind(R.id.view_pager)          ViewPager viewPager;
-    @Bind(R.id.fab)                 FloatingActionButton fab;
+    /** w1024p views */
+    @Nullable @Bind(R.id.title_view) TextView titleView;
+
+    @Bind(R.id.tab_layout)           TabLayout tabLayout;
+    @Bind(R.id.view_pager)           ViewPager viewPager;
+    @Bind(R.id.fab)                  FloatingActionButton fab;
 
     @OnClick(R.id.fab)
     public void clickFab() {
@@ -122,7 +123,6 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView {
         View view = inflater.inflate(R.layout.fragment_show, container, false);
         ButterKnife.bind(this, view);
         tabLayout.setVisibility(GONE);
-        if (cardView != null) ViewCompat.setTranslationZ(tabLayout, 2F); // For tablet layout
         return view;
     }
 
@@ -183,10 +183,6 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView {
         viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(final int position) {
-                if (cardView != null) {
-                    float elevation = (position == CONTENT_PAGE) ? 2F : 0F;
-                    ViewCompat.setElevation(cardView, elevation);
-                }
                 fab.setVisibility(position == COMMENTS_PAGE ? VISIBLE : GONE);
             }
         });
@@ -197,7 +193,10 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView {
 
     @Override
     public void setToolbar() {
-        toolbar.setTitle(tagNameArg);
+        if (titleView != null)
+            titleView.setText(tagNameArg);
+        else if (toolbar != null)
+            toolbar.setTitle(tagNameArg);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }

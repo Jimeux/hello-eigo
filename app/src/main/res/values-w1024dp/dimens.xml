@@ -2,11 +2,16 @@
 
     <dimen name="comment_elevation">2dp</dimen>
     <dimen name="comment_card_margin_horiz">0dp</dimen>
+    <dimen name="comment_list_margin_vert">0dp</dimen>
     <dimen name="comment_username_text">20sp</dimen>
     <dimen name="comment_created_text">15sp</dimen>
     <dimen name="comment_body_text">18sp</dimen>
 
-    <dimen name="show_backdrop_height">300dp</dimen>
+    <dimen name="land_title_size">20sp</dimen>
+    <dimen name="show_land_overlap_top">60dp</dimen>
+    <dimen name="show_land_margin">110dp</dimen>
+
+    <dimen name="show_backdrop_height">310dp</dimen>
     <dimen name="show_title_text">36sp</dimen>
     <!--<dimen name="show_padding">24dp</dimen>
     <dimen name="show_tag_text">18dp</dimen>

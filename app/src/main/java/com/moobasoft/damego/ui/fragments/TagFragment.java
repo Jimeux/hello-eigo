@@ -178,6 +178,21 @@ public class TagFragment extends RxFragment implements IndexPresenter.View,
 
         int columns = getResources().getInteger(R.integer.main_list_columns);
         layoutManager = new GridLayoutManager(getActivity(), columns);
+        ((GridLayoutManager)layoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                switch(postsAdapter.getItemViewType(position)){
+                    case PostsAdapter.TYPE_FEATURED:
+                        return (columns == 3 && (position % 8 == 0)) ? 2 : 1;
+                    case PostsAdapter.TYPE_NORMAL:
+                        return 1;
+                    case PostsAdapter.TYPE_FOOTER:
+                        return 1;
+                    default:
+                        return -1;
+                }
+            }
+        });
 
         postsRecyclerView.setLayoutManager(layoutManager);
         postsRecyclerView.scrollToPosition(scrollPosition);

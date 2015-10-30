@@ -19,6 +19,11 @@
     <dimen name="comment_list_margin_vert">6dp</dimen>
     <dimen name="comment_list_margin_horiz">6dp</dimen>
 
+    <dimen name="land_title_size">18sp</dimen>
+    <dimen name="show_land_overlap_top">75dp</dimen>
+    <dimen name="show_land_margin">16dp</dimen>
+
+    <dimen name="show_backdrop_negative_margin">250dp</dimen>
     <dimen name="show_backdrop_height">250dp</dimen>
     <dimen name="show_padding">22dp</dimen>
     <dimen name="show_tag_text">17dp</dimen>
@@ -31,7 +36,7 @@
     <dimen name="main_card_margin">2dp</dimen>
     <dimen name="main_image_width">60dp</dimen>
     <dimen name="main_body_text">15sp</dimen>
-    <dimen name="main_title_text">17sp</dimen>
+    <dimen name="main_title_text">15sp</dimen>
     <dimen name="main_list_margin_vert">6dp</dimen>
     <dimen name="main_list_margin_horiz">6dp</dimen>
     <dimen name="main_title_spacing">4dp</dimen>

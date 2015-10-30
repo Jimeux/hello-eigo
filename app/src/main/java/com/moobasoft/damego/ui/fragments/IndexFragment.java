@@ -34,6 +34,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class IndexFragment extends RxFragment implements MainPresenter.View  {
+
     @Inject MainPresenter presenter;
 
     @Bind(R.id.app_bar)    AppBarLayout appBarLayout;
@@ -161,13 +162,12 @@ public class IndexFragment extends RxFragment implements MainPresenter.View  {
         viewPager.setAdapter(adapter);
         if (Build.VERSION.SDK_INT >= 11)
             viewPager.setPageTransformer(true, new DepthPageTransformer());
-        if (tabLayout != null) {
-            tabLayout.setupWithViewPager(viewPager);
-            tabLayout.setVisibility(View.GONE);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && getView() != null)
-                TransitionManager.beginDelayedTransition(appBarLayout, new Slide());
-            tabLayout.setVisibility(View.VISIBLE);
-        }
+
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setVisibility(View.GONE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && getView() != null)
+            TransitionManager.beginDelayedTransition(appBarLayout, new Slide());
+        tabLayout.setVisibility(View.VISIBLE);
     }
 
     @Override

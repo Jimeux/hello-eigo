@@ -93,6 +93,10 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
                 manager.openSearchFragment();
                 break;
 
+            /** ShowFragment items */
+            case R.id.action_share:
+                break;
+
             /** IndexActivity items */
             case R.id.action_login:
                 Intent loginIntent = new Intent(this, ConnectActivity.class);

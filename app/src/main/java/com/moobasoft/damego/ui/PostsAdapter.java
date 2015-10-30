@@ -73,7 +73,9 @@ public class PostsAdapter extends RecyclerView.Adapter<ViewHolder> {
     public int getItemViewType(int position) {
         if (position == postList.size())
             return TYPE_FOOTER;
-        else if ((position % 10 == 0 || (columns == 2 && (position-1) % 10 == 0)))
+        else if (columns == 3 && (position % 8 == 0 || (position - 1) % 8 == 0))
+            return TYPE_FEATURED;
+        else if (columns != 3 && (position % 10 == 0 || (columns == 2 && (position-1) % 10 == 0)))
             return TYPE_FEATURED;
         else
             return TYPE_NORMAL;
