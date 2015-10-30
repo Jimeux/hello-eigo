@@ -13,10 +13,8 @@
         android:id="@+id/main.collapsing"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
         app:contentScrim="?attr/colorPrimary"
-        app:expandedTitleMarginEnd="64dp"
-        app:expandedTitleMarginStart="48dp"
+        app:titleEnabled="false"
         app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
         <android.support.v7.widget.Toolbar
@@ -33,7 +31,6 @@
                 android:layout_height="match_parent"
                 android:layout_marginRight="30dp"
                 android:gravity="center"
-                android:text="@string/app_name"
                 android:textSize="@dimen/land_title_size" />
 
             <android.support.design.widget.TabLayout

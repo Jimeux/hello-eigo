@@ -9,8 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
 import android.transition.TransitionManager;
 import android.view.LayoutInflater;
@@ -20,13 +19,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.moobasoft.damego.R;
-import com.moobasoft.damego.ui.fragments.TagFragment.Mode;
+import com.moobasoft.damego.ui.activities.IndexActivity;
+import com.moobasoft.damego.ui.fragments.PostsFragment.Mode;
+import com.moobasoft.damego.ui.fragments.base.RxFragment;
 import com.moobasoft.damego.ui.presenters.MainPresenter;
 import com.moobasoft.damego.util.DepthPageTransformer;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -34,21 +33,20 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class IndexFragment extends RxFragment implements MainPresenter.View  {
+public class IndexFragment extends RxFragment implements MainPresenter.View, IndexActivity.ToolbarFragment {
 
     @Inject MainPresenter presenter;
 
+    @Bind(R.id.toolbar)    Toolbar toolbar;
     @Bind(R.id.app_bar)    AppBarLayout appBarLayout;
     @Bind(R.id.tab_layout) TabLayout tabLayout;
     @Bind(R.id.view_pager) ViewPager viewPager;
 
     public static final String SHOW_ALL_TAG = "すべて";
-    public static final String POSITION_STACK_KEY = "position_stack_key";
-    public static final String TAGS_KEY = "tags_tag";
-    public static final String ADAPTER_KEY = "adapter_tag";
+    public static final String TAGS_KEY     = "tags_tag";
+    public static final String ADAPTER_KEY  = "adapter_tag";
 
     private ArrayList<String> tags;
-    private Deque<Integer> positionStack;
     private Adapter adapter;
 
     public IndexFragment() {}
@@ -60,40 +58,19 @@ public class IndexFragment extends RxFragment implements MainPresenter.View  {
         return fragment;
     }
 
-    public void setCurrentTag(String tag) {
-        viewPager.setCurrentItem(adapter.indexOf(tag));
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    }
-
-    public void savePagerPosition() {
-        positionStack.push(viewPager.getCurrentItem());
-    }
-
-    public void restorePagerPosition() {
-        if (!positionStack.isEmpty())
-            viewPager.setCurrentItem(positionStack.pop());
-        setDisplayHomeAsUpEnabled();
-    }
-
-    private void setDisplayHomeAsUpEnabled() {
-        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        if (actionBar != null) actionBar.setDisplayHomeAsUpEnabled(positionStack.size() > 0);
+    @Override
+    public Toolbar getToolbar() {
+        return toolbar;
     }
 
     @Override
     public void onCreate(@Nullable Bundle state) {
         super.onCreate(state);
         adapter = new Adapter(getChildFragmentManager());
-        positionStack = new ArrayDeque<>();
         tags = new ArrayList<>();
         setHasOptionsMenu(true);
-        if (state != null) {
-            ArrayList<Integer> savedStack = state.getIntegerArrayList(POSITION_STACK_KEY);
-            if (savedStack != null) positionStack.addAll(savedStack);
-            //adapter.restoreState(state.getParcelable(ADAPTER_KEY), getActivity().getClassLoader());
+        if (state != null)
             tags = state.getStringArrayList(TAGS_KEY);
-        }
     }
 
     @Override
@@ -128,14 +105,7 @@ public class IndexFragment extends RxFragment implements MainPresenter.View  {
         if (adapter != null && tags != null) {
             state.putParcelable(ADAPTER_KEY, adapter.saveState());
             state.putStringArrayList(TAGS_KEY, tags);
-            state.putIntegerArrayList(POSITION_STACK_KEY, new ArrayList<>(positionStack));
         }
-    }
-
-    @Override
-    public void setToolbar() {
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        setDisplayHomeAsUpEnabled();
     }
 
     @Override
@@ -149,7 +119,7 @@ public class IndexFragment extends RxFragment implements MainPresenter.View  {
         if (adapter.getCount() > 0) return;
         for (String tag : tags) {
             Mode mode =  (tag.equals(SHOW_ALL_TAG)) ? Mode.ALL : Mode.TAG;
-            adapter.addFragment(TagFragment.newInstance(mode, tag), tag);
+            adapter.addFragment(PostsFragment.newInstance(mode, tag), tag);
         }
     }
 
@@ -206,10 +176,6 @@ public class IndexFragment extends RxFragment implements MainPresenter.View  {
         @Override
         public CharSequence getPageTitle(int position) {
             return fragmentTitles.get(position);
-        }
-
-        public int indexOf(String tag) {
-            return fragmentTitles.indexOf(tag);
         }
     }
 

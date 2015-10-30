@@ -5,14 +5,15 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
 import com.moobasoft.damego.rest.models.Post;
-import com.moobasoft.damego.ui.fragments.BookmarksFragment;
+import com.moobasoft.damego.ui.fragments.TagFragment;
 import com.moobasoft.damego.ui.fragments.IndexFragment;
+import com.moobasoft.damego.ui.fragments.PostsFragment.Mode;
 import com.moobasoft.damego.ui.fragments.SearchFragment;
 import com.moobasoft.damego.ui.fragments.ShowFragment;
 
 public class MainManager {
 
-    enum Tag { INDEX, SHOW, BOOKMARKS, SEARCH }
+    public enum Tag { INDEX, SHOW, TAG, BOOKMARKS, SEARCH }
 
     private final int containerId;
     private final FragmentManager manager;
@@ -20,19 +21,6 @@ public class MainManager {
     public MainManager(FragmentManager manager, int containerId) {
         this.manager     = manager;
         this.containerId = containerId;
-    }
-
-    public void handleBackPress() {
-        if (isOnTopOfBackstack(Tag.INDEX)) getIndexFragment().restorePagerPosition();
-    }
-
-    public void handleTagClick(String tag) {
-        IndexFragment indexFragment = getIndexFragment();
-        if (!isOnTopOfBackstack(Tag.INDEX)) {
-            loadFragment(indexFragment, Tag.INDEX, true);
-            manager.executePendingTransactions();
-        }
-        indexFragment.setCurrentTag(tag); // Has to be called after state is restored
     }
 
     public void initialiseFragments() {
@@ -45,8 +33,14 @@ public class MainManager {
         loadFragment(showFragment, Tag.SHOW, true);
     }
 
-    public void openBookmarksFragment() {
-        loadFragment(new BookmarksFragment(), Tag.BOOKMARKS, true);
+    public void openTagFragment(String tagNameArg) {
+        TagFragment fragment = TagFragment.newInstance(Mode.TAG, tagNameArg);
+        loadFragment(fragment, Tag.TAG, true);
+    }
+
+    public void openBookmarksFragment(String tagNameArg) {
+        TagFragment fragment = TagFragment.newInstance(Mode.BOOKMARKS, tagNameArg);
+        loadFragment(fragment, Tag.BOOKMARKS, true);
     }
 
     public void openSearchFragment() {
@@ -54,23 +48,12 @@ public class MainManager {
     }
 
     public void loadFragment(Fragment fragment, Tag tag, boolean addToBackStack) {
-        if (!tag.equals(Tag.INDEX) && isOnTopOfBackstack(Tag.INDEX))
-            getIndexFragment().savePagerPosition();
-
-        FragmentTransaction transaction = manager.beginTransaction()
+        FragmentTransaction transaction = manager
+                .beginTransaction()
                 .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-                .replace(containerId, fragment, tag.name());
+                .add(containerId, fragment, tag.name());
         if (addToBackStack) transaction.addToBackStack(tag.name());
         transaction.commit();
     }
 
-    private IndexFragment getIndexFragment() {
-        return (IndexFragment) manager.findFragmentByTag(Tag.INDEX.name());
-    }
-
-    private boolean isOnTopOfBackstack(Tag tag) {
-        int count = manager.getBackStackEntryCount();
-        return (count == 0 && tag.equals(Tag.INDEX)) || // Empty back stack means Index is visible
-               (count > 0 && manager.getBackStackEntryAt(count - 1).getName().equals(tag.name()));
-    }
 }

@@ -10,7 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,8 +21,10 @@ import android.widget.TextView;
 
 import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
-import com.moobasoft.damego.ui.activities.BaseActivity;
 import com.moobasoft.damego.ui.activities.CreateCommentActivity;
+import com.moobasoft.damego.ui.activities.IndexActivity;
+import com.moobasoft.damego.ui.activities.base.BaseActivity;
+import com.moobasoft.damego.ui.fragments.base.RxFragment;
 import com.moobasoft.damego.ui.presenters.ShowPresenter;
 
 import org.parceler.Parcels;
@@ -36,7 +38,7 @@ import butterknife.OnClick;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-public class ShowFragment extends RxFragment implements ShowPresenter.ShowView {
+public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, IndexActivity.ToolbarFragment {
 
     public static final String POST_KEY          = "post_key";
     public static final String POST_ID_KEY       = "post_id";
@@ -55,9 +57,10 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView {
     /** w1024p view */
     @Nullable @Bind(R.id.title_view) TextView titleView;
 
-    @Bind(R.id.tab_layout)           TabLayout tabLayout;
-    @Bind(R.id.view_pager)           ViewPager viewPager;
-    @Bind(R.id.fab)                  FloatingActionButton fab;
+    @Bind(R.id.toolbar)    Toolbar toolbar;
+    @Bind(R.id.tab_layout) TabLayout tabLayout;
+    @Bind(R.id.view_pager) ViewPager viewPager;
+    @Bind(R.id.fab)        FloatingActionButton fab;
 
     @OnClick(R.id.fab)
     public void clickFab() {
@@ -91,7 +94,7 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        //menu.removeGroup(R.id.fragment_specific_options);
+        menu.removeGroup(R.id.fragment_specific_options);
         if (post != null) {
             inflater.inflate(R.menu.menu_show, menu);
             menu.findItem(R.id.action_unbookmark).setVisible(post.isBookmarked());
@@ -189,13 +192,13 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView {
     }
 
     @Override
-    public void setToolbar() {
-        if (titleView != null)
+    public Toolbar getToolbar() {
+        toolbar.setTitle(tagNameArg);
+        if (titleView != null) {
+            toolbar.setTitle(""); //TODO: Clean this up
             titleView.setText(tagNameArg);
-        else if (toolbar != null)
-            toolbar.setTitle(tagNameArg);
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        return toolbar;
     }
 
     @Override

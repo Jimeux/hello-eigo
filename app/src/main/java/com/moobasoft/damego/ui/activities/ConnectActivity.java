@@ -15,6 +15,7 @@ import com.moobasoft.damego.App;
 import com.moobasoft.damego.R;
 import com.moobasoft.damego.di.components.DaggerMainComponent;
 import com.moobasoft.damego.di.modules.MainModule;
+import com.moobasoft.damego.ui.activities.base.BaseActivity;
 import com.moobasoft.damego.ui.presenters.ConnectPresenter;
 
 import java.util.List;

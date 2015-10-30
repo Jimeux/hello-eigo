@@ -1,6 +1,7 @@
-package com.moobasoft.damego.ui.fragments;
+package com.moobasoft.damego.ui.fragments.base;
 
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -10,7 +11,7 @@ import com.moobasoft.damego.R;
 import com.moobasoft.damego.di.components.DaggerMainComponent;
 import com.moobasoft.damego.di.components.MainComponent;
 import com.moobasoft.damego.di.modules.MainModule;
-import com.moobasoft.damego.ui.activities.BaseActivity;
+import com.moobasoft.damego.ui.activities.base.BaseActivity;
 
 import java.util.List;
 
@@ -19,16 +20,16 @@ import butterknife.OnClick;
 
 import static android.view.View.VISIBLE;
 
-public abstract class RxFragment extends BaseFragment {
+public abstract class RxFragment extends Fragment {
 
-    @Bind(R.id.content)       ViewGroup contentView;
-    @Bind(R.id.loading_view)  ViewGroup loadingView;
-    @Bind(R.id.empty_view)    ViewGroup emptyView;
-    @Bind(R.id.error_view)    ViewGroup errorView;
-    @Bind(R.id.error_msg)     TextView errorMessage;
-    @Bind(R.id.empty_msg)     TextView emptyMessage;
+    @Bind(R.id.content)      protected ViewGroup contentView;
+    @Bind(R.id.loading_view) protected ViewGroup loadingView;
+    @Bind(R.id.empty_view)   protected ViewGroup emptyView;
+    @Bind(R.id.error_view)   protected ViewGroup errorView;
+    @Bind(R.id.error_msg)    protected TextView errorMessage;
+    @Bind(R.id.empty_msg)    protected TextView emptyMessage;
     @Bind({R.id.loading_view, R.id.error_view, R.id.empty_view, R.id.content})
-    List<ViewGroup> stateViews;
+    protected List<ViewGroup> stateViews;
 
     public void onError(int messageId) {
         String message = getString(messageId);

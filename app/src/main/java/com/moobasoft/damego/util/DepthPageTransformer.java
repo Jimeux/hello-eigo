@@ -3,6 +3,8 @@ package com.moobasoft.damego.util;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 
+import com.moobasoft.damego.BuildConfig;
+
 public class DepthPageTransformer implements ViewPager.PageTransformer {
     private static final float MIN_SCALE = 0.8f;
 

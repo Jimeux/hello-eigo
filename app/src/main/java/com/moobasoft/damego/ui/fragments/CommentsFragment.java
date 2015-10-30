@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.CommentsAdapter;
+import com.moobasoft.damego.ui.fragments.base.RxFragment;
 
 import org.parceler.Parcels;
 

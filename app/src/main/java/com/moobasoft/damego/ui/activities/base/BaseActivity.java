@@ -1,11 +1,9 @@
-package com.moobasoft.damego.ui.activities;
+package com.moobasoft.damego.ui.activities.base;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 
 import com.moobasoft.damego.App;
 import com.moobasoft.damego.CredentialStore;
@@ -13,17 +11,16 @@ import com.moobasoft.damego.R;
 import com.moobasoft.damego.di.components.DaggerMainComponent;
 import com.moobasoft.damego.di.components.MainComponent;
 import com.moobasoft.damego.di.modules.MainModule;
+import com.moobasoft.damego.ui.activities.ConnectActivity;
 
 import javax.inject.Inject;
 
-import butterknife.Bind;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class BaseActivity extends AppCompatActivity {
 
-    @Inject CredentialStore credentialStore;
-
-    @Nullable @Bind(R.id.toolbar) Toolbar toolbar;
+    @Inject
+    protected CredentialStore credentialStore;
 
     @Override
     protected void attachBaseContext(Context newBase) {

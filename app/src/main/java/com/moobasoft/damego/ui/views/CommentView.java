@@ -7,7 +7,7 @@ import android.widget.TextView;
 
 import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Comment;
-import com.moobasoft.damego.util.DateTimeUtil;
+import com.moobasoft.damego.util.Util;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -30,7 +30,7 @@ public final class CommentView extends LinearLayout {
     public void bindTo(Comment comment) {
         username.setText(comment.getUser().getUsername());
         body.setText(comment.getBody());
-        createdAt.setText(DateTimeUtil.formatShortDate(comment.getCreatedAt()));
+        createdAt.setText(Util.formatShortDate(comment.getCreatedAt()));
     }
 
 }

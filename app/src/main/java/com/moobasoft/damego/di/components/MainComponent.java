@@ -8,7 +8,7 @@ import com.moobasoft.damego.ui.activities.IndexActivity;
 import com.moobasoft.damego.ui.fragments.IndexFragment;
 import com.moobasoft.damego.ui.fragments.SearchFragment;
 import com.moobasoft.damego.ui.fragments.ShowFragment;
-import com.moobasoft.damego.ui.fragments.TagFragment;
+import com.moobasoft.damego.ui.fragments.PostsFragment;
 
 import dagger.Component;
 
@@ -28,7 +28,7 @@ public interface MainComponent {
     void inject(SearchFragment searchFragment);
     void inject(CreateCommentActivity createCommentActivity);
     void inject(ConnectActivity connectActivity);
-    void inject(TagFragment tagFragment);
+    void inject(PostsFragment postsFragment);
     void inject(IndexFragment indexFragment);
 
 }

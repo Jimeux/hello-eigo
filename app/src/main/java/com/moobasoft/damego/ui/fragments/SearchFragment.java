@@ -2,7 +2,7 @@ package com.moobasoft.damego.ui.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -16,17 +16,19 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.moobasoft.damego.R;
-import com.moobasoft.damego.ui.fragments.TagFragment.Mode;
+import com.moobasoft.damego.ui.activities.IndexActivity;
+import com.moobasoft.damego.ui.fragments.PostsFragment.Mode;
 import com.moobasoft.damego.util.Util;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class SearchFragment extends BaseFragment {
+public class SearchFragment extends Fragment implements IndexActivity.ToolbarFragment {
 
-    @Nullable @Bind(R.id.search_input) EditText  searchInput;
-    @Nullable @Bind(R.id.clear_btn)    View      clearBtn;
-    @Nullable @Bind(R.id.content)      ViewGroup contentView;
+    @Bind(R.id.toolbar)      Toolbar toolbar;
+    @Bind(R.id.search_input) EditText  searchInput;
+    @Bind(R.id.clear_btn)    View      clearBtn;
+    @Bind(R.id.content)      ViewGroup contentView;
 
     private final TextView.OnEditorActionListener onEditListener = (v, actionId, event) -> {
         String query = searchInput.getText().toString();
@@ -67,20 +69,9 @@ public class SearchFragment extends BaseFragment {
     }
 
     @Override
-    public void setToolbar() {
-        if (toolbar != null) {
-            toolbar.setTitle("");
-            ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-    }
-
-    public void setToolbar(Toolbar t) {
-        this.toolbar = t;
-        this.searchInput = (EditText) t.findViewById(R.id.search_input);
-        this.clearBtn = t.findViewById(R.id.clear_btn);
-        initialiseSearchInput();
-        setToolbar();
+    public Toolbar getToolbar() {
+        toolbar.setTitle("");
+        return toolbar;
     }
 
     @Nullable @Override
@@ -92,8 +83,6 @@ public class SearchFragment extends BaseFragment {
     }
 
     private void initialiseSearchInput() {
-        if (searchInput == null || clearBtn == null) return;
-
         searchInput.setOnEditorActionListener(onEditListener);
         searchInput.addTextChangedListener(textWatcher);
         searchInput.setOnFocusChangeListener((v, hasFocus) -> {
@@ -110,15 +99,15 @@ public class SearchFragment extends BaseFragment {
 
     @Override
     public void onDestroyView() {
-        if (searchInput != null) searchInput.clearFocus();
+        searchInput.clearFocus();
         ButterKnife.unbind(this);
         super.onDestroyView();
     }
 
     private void loadResults(String query) {
-        TagFragment tagFragment = TagFragment.newInstance(Mode.SEARCH, query);
+        PostsFragment postsFragment = PostsFragment.newInstance(Mode.SEARCH, query);
         getChildFragmentManager().beginTransaction()
-                .replace(contentView.getId(), tagFragment)
+                .replace(contentView.getId(), postsFragment)
                 .commit();
     }
 

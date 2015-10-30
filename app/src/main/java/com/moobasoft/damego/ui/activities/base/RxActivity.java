@@ -1,4 +1,4 @@
-package com.moobasoft.damego.ui.activities;
+package com.moobasoft.damego.ui.activities.base;
 
 import android.view.ViewGroup;
 import android.widget.TextView;

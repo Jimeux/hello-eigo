@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -17,6 +18,7 @@ import com.moobasoft.damego.R;
 import com.moobasoft.damego.di.components.DaggerMainComponent;
 import com.moobasoft.damego.di.modules.MainModule;
 import com.moobasoft.damego.rest.models.Comment;
+import com.moobasoft.damego.ui.activities.base.BaseActivity;
 import com.moobasoft.damego.ui.fragments.ShowFragment;
 import com.moobasoft.damego.ui.presenters.CommentPresenter;
 import com.moobasoft.damego.util.Util;
@@ -30,7 +32,8 @@ public class CreateCommentActivity extends BaseActivity implements CommentPresen
 
     @Inject CommentPresenter presenter;
 
-    @Bind(R.id.input) EditText input;
+    @Bind(R.id.input)   EditText input;
+    @Bind(R.id.toolbar) Toolbar toolbar;
 
     private int postId;
     private LoadingDialog progress;

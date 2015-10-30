@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
-import com.moobasoft.damego.util.PostUtil;
+import com.moobasoft.damego.util.Util;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -43,17 +43,10 @@ public final class PostSummaryView extends LinearLayout {
         body.setText(Html.fromHtml(post.getBody()));
         commentsCount.setText(String.valueOf(post.getCommentsCount()));
         commentStrip.setOnClickListener(v -> postClickListener.onSummaryClicked(post, true, tagName));
+        setOnClickListener(v -> postClickListener.onSummaryClicked(post, false, tagName));
 
         loadImage(post, itemViewType);
-        LayoutInflater inflater = (LayoutInflater) tags.getContext()
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        PostUtil.insertTags(post, inflater, tags, false);
-
-        setOnClickListener(v -> postClickListener.onSummaryClicked(post, false, tagName));
-        for (int i = 0; i < tags.getChildCount(); i++) {
-            TextView tag = (TextView) tags.getChildAt(i);
-            tag.setOnClickListener(v -> postClickListener.onTagClicked(tag.getText().toString()));
-        }
+        loadTags(post, postClickListener);
     }
 
     private void loadImage(Post post, int itemViewType) {
@@ -62,6 +55,17 @@ public final class PostSummaryView extends LinearLayout {
         Glide.with(getContext())
                 .load(imageUrl)
                 .into(image);
+    }
+
+    private void loadTags(Post post, PostClickListener postClickListener) {
+        LayoutInflater inflater = (LayoutInflater) tags.getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        Util.insertTags(post, inflater, tags, false);
+
+        for (int i = 0; i < tags.getChildCount(); i++) {
+            TextView tag = (TextView) tags.getChildAt(i);
+            tag.setOnClickListener(v -> postClickListener.onTagClicked(tag.getText().toString()));
+        }
     }
 
 }

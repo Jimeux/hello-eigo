@@ -2,6 +2,7 @@ package com.moobasoft.damego.ui.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,14 +14,14 @@ import com.bumptech.glide.Glide;
 import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.activities.IndexActivity;
-import com.moobasoft.damego.util.PostUtil;
+import com.moobasoft.damego.util.Util;
 
 import org.parceler.Parcels;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class ContentFragment extends BaseFragment {
+public class ContentFragment extends Fragment {
 
     public static final String POST_KEY = "post_key";
     private Post post;
@@ -62,19 +63,13 @@ public class ContentFragment extends BaseFragment {
     }
 
     private void loadTags() {
-        PostUtil.insertTags(post, getActivity().getLayoutInflater(), tags, true);
+        Util.insertTags(post, getActivity().getLayoutInflater(), tags, true);
         for (int i = 0; i < tags.getChildCount(); i++) {
             TextView tag = (TextView) tags.getChildAt(i);
             tag.setOnClickListener(v ->
                     ((IndexActivity) getActivity()).onTagClicked(tag.getText().toString()));
         }
     }
-
-    /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && getView() != null) {
-        toggleVisibility(title, body, tags);
-        TransitionManager.beginDelayedTransition((ViewGroup) getView().getRootView(), new Slide());
-        toggleVisibility(title, body, tags);
-    }*/
 
     @Override
     public void onDestroyView() {

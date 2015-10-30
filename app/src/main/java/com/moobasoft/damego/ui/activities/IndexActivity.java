@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
@@ -13,12 +14,18 @@ import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.MainManager;
 import com.moobasoft.damego.ui.PostsAdapter;
-import com.moobasoft.damego.ui.fragments.BaseFragment;
+import com.moobasoft.damego.ui.activities.base.BaseActivity;
+import com.moobasoft.damego.ui.fragments.IndexFragment;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class IndexActivity extends BaseActivity implements PostsAdapter.PostClickListener, FragmentManager.OnBackStackChangedListener {
+public class IndexActivity extends BaseActivity
+        implements PostsAdapter.PostClickListener, FragmentManager.OnBackStackChangedListener {
+
+    public interface ToolbarFragment {
+        Toolbar getToolbar();
+    }
 
     private FragmentManager fragmentManager;
     private MainManager manager;
@@ -47,7 +54,11 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
 
     public void setMainToolbar() {
         Fragment mainFrag = fragmentManager.findFragmentById(container.getId());
-        if (mainFrag != null) ((BaseFragment) mainFrag).setToolbar();
+        if (mainFrag != null) {
+            setSupportActionBar(((ToolbarFragment) mainFrag).getToolbar());
+            boolean notOnHomePage = !(mainFrag instanceof IndexFragment);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(notOnHomePage);
+        }
     }
 
     @Override
@@ -57,13 +68,7 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
 
     @Override
     public void onTagClicked(String tag) {
-        manager.handleTagClick(tag);
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        manager.handleBackPress();
+        manager.openTagFragment(tag);
     }
 
     @Override
@@ -87,7 +92,7 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
 
             /** IndexFragment items */
             case R.id.action_bookmarks:
-                manager.openBookmarksFragment();
+                manager.openBookmarksFragment(getString(R.string.bookmarks_title));
                 break;
             case R.id.action_search:
                 manager.openSearchFragment();
@@ -120,5 +125,4 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
         supportInvalidateOptionsMenu();
         return false;
     }
-
 }

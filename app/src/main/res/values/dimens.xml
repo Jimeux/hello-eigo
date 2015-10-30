@@ -1,5 +1,4 @@
 <resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="app_bar_height">180dp</dimen>
@@ -32,11 +31,11 @@
     <dimen name="show_comment_link_text">18dp</dimen>
     <dimen name="show_comment_link_padding">8dp</dimen>
 
-    <dimen name="main_footer_text">14dp</dimen>
     <dimen name="main_card_margin">2dp</dimen>
     <dimen name="main_image_width">60dp</dimen>
-    <dimen name="main_body_text">15sp</dimen>
-    <dimen name="main_title_text">15sp</dimen>
+    <dimen name="main_footer_text">16sp</dimen>
+    <dimen name="main_body_text">16sp</dimen>
+    <dimen name="main_title_text">16sp</dimen>
     <dimen name="main_list_margin_vert">6dp</dimen>
     <dimen name="main_list_margin_horiz">6dp</dimen>
     <dimen name="main_title_spacing">4dp</dimen>
