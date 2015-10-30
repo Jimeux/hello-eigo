@@ -3,7 +3,6 @@ package com.moobasoft.damego.ui;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.view.View;
 
 import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.fragments.BookmarksFragment;
@@ -13,89 +12,65 @@ import com.moobasoft.damego.ui.fragments.ShowFragment;
 
 public class MainManager {
 
-    public static final String INDEX_TAG        = "index";
-    public static final String SHOW_TAG         = "show";
-    public static final String BOOKMARKS_TAG    = "bookmarks";
-    public static final String SEARCH_TAG       = "search";
+    enum Tag { INDEX, SHOW, BOOKMARKS, SEARCH }
 
-    private final View indexContainer;
+    private final int containerId;
     private final FragmentManager manager;
 
-    public MainManager(View indexContainer, FragmentManager manager) {
-        this.indexContainer = indexContainer;
-        this.manager = manager;
-    }
-
-    public ShowFragment getShowFragment() {
-        return (ShowFragment) manager.findFragmentByTag(SHOW_TAG);
-    }
-
-    public IndexFragment getIndexFragment() {
-        return (IndexFragment) manager.findFragmentByTag(INDEX_TAG);
-    }
-
-    public void loadFragment(Fragment fragment, boolean addToBackStack) {
-        String tag = null;
-        if      (fragment instanceof ShowFragment)      tag = SHOW_TAG;
-        else if (fragment instanceof IndexFragment)     tag = INDEX_TAG;
-        else if (fragment instanceof SearchFragment)    tag = SEARCH_TAG;
-        else if (fragment instanceof BookmarksFragment) tag = BOOKMARKS_TAG;
-
-        int containerId = indexContainer.getId();
-
-        FragmentTransaction transaction = manager.beginTransaction()
-                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-                .replace(containerId, fragment, tag);
-        if (addToBackStack) transaction.addToBackStack(tag);
-        transaction.commit();
-    }
-
-    public boolean isOnTopOfBackstack(String tag) {
-        int count = manager.getBackStackEntryCount();
-        if (count == 0 && tag.equals(INDEX_TAG))
-            return true;
-        return count > 0 && manager.getBackStackEntryAt(count-1).getName().equals(tag);
+    public MainManager(FragmentManager manager, int containerId) {
+        this.manager     = manager;
+        this.containerId = containerId;
     }
 
     public void handleBackPress() {
-        if (isOnTopOfBackstack(INDEX_TAG)) {
-            IndexFragment indexFragment = getIndexFragment();
-            indexFragment.restorePagerPosition();
-        }
-    }
-
-    public void openShowFragment(Post post, String title, boolean openComments) {
-        // FIXME: Prevent two posts opening at once when jamming the screen
-
-        IndexFragment indexFragment = getIndexFragment();
-
-        if (isOnTopOfBackstack(INDEX_TAG)) {
-            indexFragment.savePagerPosition();
-            title = indexFragment.getCurrentTitle().toString();
-        }
-
-        ShowFragment showFragment = ShowFragment.newInstance(post.getId(), title, openComments);
-        loadFragment(showFragment, true);
+        if (isOnTopOfBackstack(Tag.INDEX)) getIndexFragment().restorePagerPosition();
     }
 
     public void handleTagClick(String tag) {
         IndexFragment indexFragment = getIndexFragment();
-        if (!isOnTopOfBackstack(INDEX_TAG)) {
-            loadFragment(indexFragment, true);
+        if (!isOnTopOfBackstack(Tag.INDEX)) {
+            loadFragment(indexFragment, Tag.INDEX, true);
             manager.executePendingTransactions();
         }
         indexFragment.setCurrentTag(tag); // Has to be called after state is restored
     }
 
     public void initialiseFragments() {
-        loadFragment(IndexFragment.newInstance(), false);
+        loadFragment(IndexFragment.newInstance(), Tag.INDEX, false);
+    }
+
+    // FIXME: Prevent two posts opening at once when jamming the screen
+    public void openShowFragment(Post post, String title, boolean openComments) {
+        ShowFragment showFragment = ShowFragment.newInstance(post.getId(), title, openComments);
+        loadFragment(showFragment, Tag.SHOW, true);
     }
 
     public void openBookmarksFragment() {
-        loadFragment(new BookmarksFragment(), true);
+        loadFragment(new BookmarksFragment(), Tag.BOOKMARKS, true);
     }
 
     public void openSearchFragment() {
-        loadFragment(new SearchFragment(), true);
+        loadFragment(new SearchFragment(), Tag.SEARCH, true);
+    }
+
+    public void loadFragment(Fragment fragment, Tag tag, boolean addToBackStack) {
+        if (!tag.equals(Tag.INDEX) && isOnTopOfBackstack(Tag.INDEX))
+            getIndexFragment().savePagerPosition();
+
+        FragmentTransaction transaction = manager.beginTransaction()
+                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                .replace(containerId, fragment, tag.name());
+        if (addToBackStack) transaction.addToBackStack(tag.name());
+        transaction.commit();
+    }
+
+    private IndexFragment getIndexFragment() {
+        return (IndexFragment) manager.findFragmentByTag(Tag.INDEX.name());
+    }
+
+    private boolean isOnTopOfBackstack(Tag tag) {
+        int count = manager.getBackStackEntryCount();
+        return (count == 0 && tag.equals(Tag.INDEX)) || // Empty back stack means Index is visible
+               (count > 0 && manager.getBackStackEntryAt(count - 1).getName().equals(tag.name()));
     }
 }

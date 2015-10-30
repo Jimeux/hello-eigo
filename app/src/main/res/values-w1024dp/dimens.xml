@@ -19,7 +19,7 @@
     <dimen name="show_comment_link_text">19dp</dimen>-->
 
     <dimen name="main_image_width">60dp</dimen>
-    <dimen name="main_title_text">17sp</dimen>
-    <dimen name="main_body_text">15sp</dimen>
+    <!--<dimen name="main_title_text">17sp</dimen>
+    <dimen name="main_body_text">15sp</dimen>-->
 
 </resources>

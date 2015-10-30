@@ -32,8 +32,8 @@
             app:tabGravity="fill"
             app:tabIndicatorColor="@color/white"
             app:tabMode="scrollable"
-            app:tabPaddingEnd="5dp"
-            app:tabPaddingStart="5dp" />
+            app:tabPaddingEnd="20dp"
+            app:tabPaddingStart="20dp" />
 
     </android.support.v7.widget.Toolbar>
 

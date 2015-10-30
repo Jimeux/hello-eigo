@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.moobasoft.damego.R;
+import com.moobasoft.damego.ui.fragments.TagFragment.Mode;
 import com.moobasoft.damego.util.Util;
 
 import butterknife.Bind;
@@ -115,7 +116,7 @@ public class SearchFragment extends BaseFragment {
     }
 
     private void loadResults(String query) {
-        TagFragment tagFragment = TagFragment.newInstance(TagFragment.MODE_SEARCH, query);
+        TagFragment tagFragment = TagFragment.newInstance(Mode.SEARCH, query);
         getChildFragmentManager().beginTransaction()
                 .replace(contentView.getId(), tagFragment)
                 .commit();

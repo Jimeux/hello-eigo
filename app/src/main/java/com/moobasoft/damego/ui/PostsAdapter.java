@@ -1,6 +1,7 @@
 package com.moobasoft.damego.ui;
 
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,22 +17,22 @@ import static android.support.v7.widget.RecyclerView.ViewHolder;
 
 public class PostsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
-    public static final int ID_PREFIX = 12345678;
+    public static final int ID_PREFIX     = 12345678;
     public static final int TYPE_FEATURED = 0;
     public static final int TYPE_NORMAL   = 1;
     public static final int TYPE_FOOTER   = 2;
-    private final boolean showFeatures;
+    private final String tagName;
     private boolean hideFooter = true;
 
     private PostClickListener summaryClickListener;
     private ArrayList<Post> postList;
     private final int columns;
 
-    public PostsAdapter(PostClickListener summaryClickListener, int columns, boolean showFeatures) {
+    public PostsAdapter(PostClickListener summaryClickListener, int columns, String tagName) {
         this.summaryClickListener = summaryClickListener;
         this.postList = new ArrayList<>();
         this.columns = columns;
-        this.showFeatures = showFeatures;
+        this.tagName = tagName;
     }
 
     public ArrayList<Post> getPostList() {
@@ -66,16 +67,25 @@ public class PostsAdapter extends RecyclerView.Adapter<ViewHolder> {
     public void onBindViewHolder(ViewHolder holder, int position) {
         if (holder instanceof SummaryViewHolder )
             ((SummaryViewHolder)holder)
-                    .bindTo(postList.get(position), getItemViewType(position), summaryClickListener);
+                    .bindTo(postList.get(position), getItemViewType(position), summaryClickListener, tagName);
+        else if (holder instanceof FooterHolder) {
+            ((StaggeredGridLayoutManager.LayoutParams) holder.itemView.getLayoutParams())
+                    .setFullSpan(true);
+        }
     }
 
     @Override
     public int getItemViewType(int position) {
         if (position == postList.size())
             return TYPE_FOOTER;
-        else if (columns == 3 && (position % 8 == 0 || (position - 1) % 8 == 0))
+        else if (columns == 3 && (position == 0 || position == 2 || position == 3 ||
+                (position >= 7  && (position - 7)  % 6 == 0) ||
+                (position >= 9  && (position - 9)  % 6 == 0) ||
+                (position >= 10 && (position - 10) % 6 == 0)))
             return TYPE_FEATURED;
-        else if (columns != 3 && (position % 10 == 0 || (columns == 2 && (position-1) % 10 == 0)))
+        else if (columns == 2 && (position % 6 == 0 || (position >= 4 && (position + 2) % 6 == 0)))
+            return TYPE_FEATURED;
+        else if (columns == 1 && (position % 10 == 0))
             return TYPE_FEATURED;
         else
             return TYPE_NORMAL;
@@ -100,7 +110,7 @@ public class PostsAdapter extends RecyclerView.Adapter<ViewHolder> {
     public boolean isEmpty() { return postList.isEmpty(); }
 
     public interface PostClickListener {
-        void onSummaryClicked(Post post, boolean openComments);
+        void onSummaryClicked(Post post, boolean openComments, String tagName);
         void onTagClicked(String tag);
     }
 
@@ -113,9 +123,9 @@ public class PostsAdapter extends RecyclerView.Adapter<ViewHolder> {
             this.itemView = itemView;
         }
 
-        public void bindTo(Post post, int itemViewType, PostClickListener postClickListener) {
+        public void bindTo(Post post, int itemViewType, PostClickListener listener, String tagName) {
             itemView.setId(ID_PREFIX + post.getId());
-            itemView.bindTo(post, itemViewType, postClickListener);
+            itemView.bindTo(post, itemViewType, listener, tagName);
         }
     }
 

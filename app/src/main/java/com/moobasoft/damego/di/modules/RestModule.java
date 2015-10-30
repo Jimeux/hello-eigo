@@ -54,7 +54,7 @@ public class RestModule {
 
     private static void configureHttpClient(OkHttpClient client, Context context, CredentialStore store) {
         client.interceptors().add(new ApiHeaders(context, store));
-        client.setAuthenticator(new ApiAuthenticator(context, store));
+        client.setAuthenticator(new ApiAuthenticator(store));
 
         if (BuildConfig.DEBUG)
             client.networkInterceptors().add(new StethoInterceptor());

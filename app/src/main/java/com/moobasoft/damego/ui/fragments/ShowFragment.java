@@ -17,8 +17,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
 import android.widget.TextView;
 
 import com.moobasoft.damego.R;
@@ -40,22 +38,21 @@ import static android.view.View.VISIBLE;
 
 public class ShowFragment extends RxFragment implements ShowPresenter.ShowView {
 
-    public static final String POST_KEY    = "post_key";
-    public static final String POST_ID_KEY = "post_id";
-    public static final String TAG_NAME_KEY = "tag_name";
+    public static final String POST_KEY          = "post_key";
+    public static final String POST_ID_KEY       = "post_id";
+    public static final String TAG_NAME_KEY      = "tag_name";
     public static final String OPEN_COMMENTS_KEY = "open_comments";
-    public static final int CONTENT_PAGE = 0;
+    public static final int CONTENT_PAGE  = 0;
     public static final int COMMENTS_PAGE = 1;
 
     private int postIdArg;
     private String tagNameArg;
     private boolean openCommentsArg;
     private Post post;
-    private ShowAdapter showAdapter;
 
     @Inject ShowPresenter presenter;
 
-    /** w1024p views */
+    /** w1024p view */
     @Nullable @Bind(R.id.title_view) TextView titleView;
 
     @Bind(R.id.tab_layout)           TabLayout tabLayout;
@@ -87,8 +84,8 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView {
         setHasOptionsMenu(true);
         getComponent().inject(this);
         presenter.bindView(this);
-        postIdArg = getArguments().getInt(POST_ID_KEY, 0);
-        tagNameArg = getArguments().getString(TAG_NAME_KEY);
+        postIdArg       = getArguments().getInt(POST_ID_KEY, 0);
+        tagNameArg      = getArguments().getString(TAG_NAME_KEY);
         openCommentsArg = getArguments().getBoolean(OPEN_COMMENTS_KEY);
     }
 
@@ -174,7 +171,7 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView {
 
     private void loadPost(Post post) {
         getActivity().supportInvalidateOptionsMenu();
-        showAdapter = new ShowAdapter(getChildFragmentManager(), post);
+        ShowAdapter showAdapter = new ShowAdapter(getChildFragmentManager(), post);
         viewPager.setAdapter(showAdapter);
         viewPager.setPageMargin(16);
         tabLayout.setupWithViewPager(viewPager);
@@ -221,12 +218,9 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView {
 
         @Override
         public Fragment getItem(int position) {
-            if (position == CONTENT_PAGE) {
-                ContentFragment fragment = ContentFragment.newInstance(post);
-                Animation animation = new TranslateAnimation(0f, 0f, 0f, 1f);
-                fragment.setExitTransition(animation);
-                return fragment;
-            } else
+            if (position == CONTENT_PAGE)
+                return ContentFragment.newInstance(post);
+            else
                 return CommentsFragment.newInstance(post);
         }
     }

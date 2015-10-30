@@ -38,18 +38,18 @@ public final class PostSummaryView extends LinearLayout {
         ButterKnife.bind(this);
     }
 
-    public void bindTo(Post post, int itemViewType, PostClickListener postClickListener) {
+    public void bindTo(Post post, int itemViewType, PostClickListener postClickListener, String tagName) {
         title.setText(post.getTitle());
         body.setText(Html.fromHtml(post.getBody()));
         commentsCount.setText(String.valueOf(post.getCommentsCount()));
-        commentStrip.setOnClickListener(v -> postClickListener.onSummaryClicked(post, true));
+        commentStrip.setOnClickListener(v -> postClickListener.onSummaryClicked(post, true, tagName));
 
         loadImage(post, itemViewType);
         LayoutInflater inflater = (LayoutInflater) tags.getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         PostUtil.insertTags(post, inflater, tags, false);
 
-        setOnClickListener(v -> postClickListener.onSummaryClicked(post, false));
+        setOnClickListener(v -> postClickListener.onSummaryClicked(post, false, tagName));
         for (int i = 0; i < tags.getChildCount(); i++) {
             TextView tag = (TextView) tags.getChildAt(i);
             tag.setOnClickListener(v -> postClickListener.onTagClicked(tag.getText().toString()));

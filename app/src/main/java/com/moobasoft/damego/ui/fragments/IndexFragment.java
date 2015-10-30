@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.moobasoft.damego.R;
+import com.moobasoft.damego.ui.fragments.TagFragment.Mode;
 import com.moobasoft.damego.ui.presenters.MainPresenter;
 import com.moobasoft.damego.util.DepthPageTransformer;
 
@@ -78,10 +79,6 @@ public class IndexFragment extends RxFragment implements MainPresenter.View  {
     private void setDisplayHomeAsUpEnabled() {
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) actionBar.setDisplayHomeAsUpEnabled(positionStack.size() > 0);
-    }
-
-    public CharSequence getCurrentTitle() {
-        return adapter.getPageTitle(viewPager.getCurrentItem());
     }
 
     @Override
@@ -151,7 +148,7 @@ public class IndexFragment extends RxFragment implements MainPresenter.View  {
     private void loadTagFragments() {
         if (adapter.getCount() > 0) return;
         for (String tag : tags) {
-            int mode =  (tag.equals(SHOW_ALL_TAG)) ? TagFragment.MODE_ALL : TagFragment.MODE_TAG;
+            Mode mode =  (tag.equals(SHOW_ALL_TAG)) ? Mode.ALL : Mode.TAG;
             adapter.addFragment(TagFragment.newInstance(mode, tag), tag);
         }
     }

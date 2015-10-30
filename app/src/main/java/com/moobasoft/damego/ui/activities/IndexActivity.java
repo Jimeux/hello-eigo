@@ -34,7 +34,7 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
 
         fragmentManager = getSupportFragmentManager();
         fragmentManager.addOnBackStackChangedListener(this);
-        manager = new MainManager(container, fragmentManager);
+        manager = new MainManager(fragmentManager, container.getId());
 
         if (state == null) manager.initialiseFragments();
     }
@@ -51,8 +51,8 @@ public class IndexActivity extends BaseActivity implements PostsAdapter.PostClic
     }
 
     @Override
-    public void onSummaryClicked(Post post, boolean openComments) {
-        manager.openShowFragment(post, getString(R.string.bookmarks_title), openComments);
+    public void onSummaryClicked(Post post, boolean openComments, String tagName) {
+        manager.openShowFragment(post, tagName, openComments);
     }
 
     @Override

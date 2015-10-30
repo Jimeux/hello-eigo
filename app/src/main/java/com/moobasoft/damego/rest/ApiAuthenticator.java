@@ -1,6 +1,5 @@
 package com.moobasoft.damego.rest;
 
-import android.content.Context;
 import android.support.annotation.Nullable;
 
 import com.moobasoft.damego.CredentialStore;
@@ -13,11 +12,9 @@ import java.net.Proxy;
 
 public class ApiAuthenticator implements Authenticator {
 
-    private final Context context;
     private final CredentialStore credentialStore;
 
-    public ApiAuthenticator(Context context, CredentialStore credentialStore) {
-        this.context = context;
+    public ApiAuthenticator(CredentialStore credentialStore) {
         this.credentialStore = credentialStore;
     }
 
@@ -43,7 +40,6 @@ public class ApiAuthenticator implements Authenticator {
                     .build();
         } else {
             credentialStore.delete(); // All tokens are invalid
-            launchLoginActivity();
             return null;
         }
     }
@@ -58,13 +54,6 @@ public class ApiAuthenticator implements Authenticator {
             return null;
         }*/
         return null;
-    }
-
-    private void launchLoginActivity() {
-        /*Intent intent = new Intent(context, ConnectActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra(ConnectActivity.REGISTER, false);
-        context.startActivity(intent);*/
     }
 
     @Override

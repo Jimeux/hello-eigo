@@ -5,17 +5,16 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
-import com.moobasoft.damego.ui.EndlessOnScrollListener;
 import com.moobasoft.damego.ui.PostsAdapter;
+import com.moobasoft.damego.ui.StaggeredScrollListener;
 import com.moobasoft.damego.ui.activities.IndexActivity;
 import com.moobasoft.damego.ui.presenters.IndexPresenter;
 
@@ -33,25 +32,23 @@ import static android.view.View.VISIBLE;
 public class TagFragment extends RxFragment implements IndexPresenter.View,
         SwipeRefreshLayout.OnRefreshListener, AppBarLayout.OnOffsetChangedListener {
 
-    public static final String POSTS_KEY    = "posts";
-    public static final String LAYOUT_KEY   = "layout";
-    public static final String SCROLL_KEY   = "scroll_key";
-    public static final String TAG_NAME     = "tag_name";
-    public static final String MODE         = "mode";
+    public static final String POSTS_KEY      = "posts";
+    public static final String LAYOUT_KEY     = "layout";
+    public static final String SCROLL_KEY     = "scroll_key";
+    public static final String VIEWS_INIT_KEY = "views_uninitialised";
+    public static final String TAG_NAME_ARG   = "tag_name";
+    public static final String MODE_ARG       = "mode";
 
-    public static final int MODE_ALL       = 1;
-    public static final int MODE_TAG       = 2;
-    public static final int MODE_BOOKMARKS = 3;
-    public static final int MODE_SEARCH    = 4;
+    public enum Mode { ALL, TAG, BOOKMARKS, SEARCH }
 
     private PostsAdapter postsAdapter;
-    private LinearLayoutManager layoutManager;
+    private StaggeredGridLayoutManager layoutManager;
     /** The tag name of the posts to be loaded. */
     private String tagName;
-    /** Determine if this is for tags, bookmarks or everything. */
-    private int mode;
+    /** Determine if this is for tags, bookmarks, search or everything. */
+    private Mode mode;
     /** OnScrollListener for {@code postsRecyclerView} */
-    private EndlessOnScrollListener scrollListener;
+    private StaggeredScrollListener scrollListener;
     /** A reference to the Activity's AppBarLayout. */
     private AppBarLayout appBarLayout;
     /**
@@ -59,6 +56,10 @@ public class TagFragment extends RxFragment implements IndexPresenter.View,
      *  Makes use of {@code AppBarLayout.OnOffsetChangedListener}.
      */
     private boolean appBarIsExpanded = true;
+    /**
+     * Track whether any views have been set up //TODO: Complete this
+     */
+    private boolean viewsUninitialised = true;
 
     @Inject IndexPresenter presenter;
 
@@ -67,11 +68,11 @@ public class TagFragment extends RxFragment implements IndexPresenter.View,
 
     public TagFragment() {}
 
-    public static TagFragment newInstance(int mode, String tagName) {
+    public static TagFragment newInstance(Mode mode, String tagName) {
         TagFragment fragment = new TagFragment();
         Bundle args = new Bundle();
-        args.putInt(MODE, mode);
-        args.putString(TAG_NAME, tagName);
+        args.putSerializable(MODE_ARG, mode);
+        args.putString(TAG_NAME_ARG, tagName);
         fragment.setArguments(args);
         return fragment;
     }
@@ -79,12 +80,11 @@ public class TagFragment extends RxFragment implements IndexPresenter.View,
     @Override
     public void onCreate(@Nullable Bundle state) {
         super.onCreate(state);
-        tagName = getArguments().getString(TAG_NAME);
-        mode = getArguments().getInt(MODE);
+        tagName = getArguments().getString(TAG_NAME_ARG);
+        mode = (Mode) getArguments().getSerializable(MODE_ARG);
         int columns = getResources().getInteger(R.integer.main_list_columns);
-        postsAdapter = new PostsAdapter((IndexActivity)getActivity(), columns,
-                getResources().getBoolean(R.bool.show_feature_views));
-        scrollListener = new EndlessOnScrollListener() {
+        postsAdapter = new PostsAdapter((IndexActivity)getActivity(), columns, tagName);
+        scrollListener = new StaggeredScrollListener() {
             @Override public void onLoadMore(int currentPage) {
                 loadPosts(currentPage);
             }
@@ -94,9 +94,10 @@ public class TagFragment extends RxFragment implements IndexPresenter.View,
             }
         };
         // Created only for saving state
-        layoutManager = new GridLayoutManager(getActivity(), columns);
+        layoutManager = new StaggeredGridLayoutManager(columns, StaggeredGridLayoutManager.VERTICAL);
 
         if (state != null) {
+            viewsUninitialised = state.getBoolean(VIEWS_INIT_KEY);
             List<Post> posts = Parcels.unwrap(state.getParcelable(POSTS_KEY));
             layoutManager.onRestoreInstanceState(state.getParcelable(LAYOUT_KEY));
             scrollListener.restoreState(Parcels.unwrap(state.getParcelable(SCROLL_KEY)));
@@ -115,8 +116,6 @@ public class TagFragment extends RxFragment implements IndexPresenter.View,
         initialiseRecyclerView();
         return view;
     }
-
-    private boolean viewsUninitialised = true;
 
     @Override
     public void onViewStateRestored(@Nullable Bundle state) {
@@ -150,6 +149,7 @@ public class TagFragment extends RxFragment implements IndexPresenter.View,
         super.onSaveInstanceState(state);
         if (layoutManager != null && scrollListener != null &&
             postsAdapter != null  && postsAdapter.getPostList() != null ) {
+            state.putBoolean(VIEWS_INIT_KEY, viewsUninitialised);
             state.putParcelable(LAYOUT_KEY, layoutManager.onSaveInstanceState());
             state.putParcelable(POSTS_KEY, Parcels.wrap(postsAdapter.getPostList()));
             state.putParcelable(SCROLL_KEY, Parcels.wrap(scrollListener.getOutState()));
@@ -160,43 +160,25 @@ public class TagFragment extends RxFragment implements IndexPresenter.View,
     @Override
     public void onDestroyView() {
         presenter.releaseView();
-        //ButterKnife.unbind(this);
+        ButterKnife.unbind(this);
         super.onDestroyView();
     }
 
     private void initialiseRecyclerView() {
+/*        int scrollPosition = (viewsUninitialised) ? 0 :
+            layoutManager.findFirstCompletelyVisibleItemPositions(null)[0];*/
+
+        int columns = getResources().getInteger(R.integer.main_list_columns);
+        layoutManager = new StaggeredGridLayoutManager(columns, StaggeredGridLayoutManager.VERTICAL);
+
+        postsRecyclerView.setLayoutManager(layoutManager);
+
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
 
-        //  postsRecyclerView.setLayoutManager(layoutManager);
-        postsRecyclerView.setAdapter(postsAdapter);
         postsRecyclerView.addOnScrollListener(scrollListener);
-
-
-        int scrollPosition = (layoutManager == null) ? 0 :
-            layoutManager.findFirstCompletelyVisibleItemPosition();
-
-        int columns = getResources().getInteger(R.integer.main_list_columns);
-        layoutManager = new GridLayoutManager(getActivity(), columns);
-        ((GridLayoutManager)layoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-            @Override
-            public int getSpanSize(int position) {
-                switch(postsAdapter.getItemViewType(position)){
-                    case PostsAdapter.TYPE_FEATURED:
-                        return (columns == 3 && (position % 8 == 0)) ? 2 : 1;
-                    case PostsAdapter.TYPE_NORMAL:
-                        return 1;
-                    case PostsAdapter.TYPE_FOOTER:
-                        return 1;
-                    default:
-                        return -1;
-                }
-            }
-        });
-
-        postsRecyclerView.setLayoutManager(layoutManager);
-        postsRecyclerView.scrollToPosition(scrollPosition);
-
+        postsRecyclerView.setAdapter(postsAdapter);
+        /*postsRecyclerView.scrollToPosition(scrollPosition);*/
         scrollListener.setLayoutManager(layoutManager);
     }
 
@@ -212,20 +194,11 @@ public class TagFragment extends RxFragment implements IndexPresenter.View,
         refreshLayout.setRefreshing(true);
 
         switch (mode) {
-            case MODE_ALL:
-                presenter.postsIndex(page);
-                break;
-            case MODE_TAG:
-                presenter.filterByTag(tagName, page);
-                break;
-            case MODE_BOOKMARKS:
-                presenter.getBookmarks(page);
-                break;
-            case MODE_SEARCH:
-                presenter.search(tagName, page);
-                break;
-            default:
-                onError(R.string.error_default);
+            case ALL:       presenter.postsIndex(page);           break;
+            case TAG:       presenter.filterByTag(tagName, page); break;
+            case BOOKMARKS: presenter.getBookmarks(page);         break;
+            case SEARCH:    presenter.search(tagName, page);      break;
+            default:        onError(R.string.error_default);
         }
     }
 

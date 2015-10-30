@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.moobasoft.damego.R;
+import com.moobasoft.damego.ui.fragments.TagFragment.Mode;
 
 import butterknife.ButterKnife;
 
@@ -53,7 +54,8 @@ public class BookmarksFragment extends RxFragment  {
     public void onRefresh() {
         Fragment content = getChildFragmentManager().findFragmentById(contentView.getId());
         if (content == null) {
-            TagFragment tagFragment = TagFragment.newInstance(TagFragment.MODE_BOOKMARKS, null);
+            TagFragment tagFragment = TagFragment
+                    .newInstance(Mode.BOOKMARKS, getString(R.string.bookmarks_title));
             getChildFragmentManager().beginTransaction()
                     .add(contentView.getId(), tagFragment)
                     .commit();
