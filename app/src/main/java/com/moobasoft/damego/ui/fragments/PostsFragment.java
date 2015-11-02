@@ -83,7 +83,7 @@ public class PostsFragment extends RxFragment implements IndexPresenter.View,
         postsAdapter = new PostsAdapter((IndexActivity)getActivity(), columns, tagName);
         scrollListener = new StaggeredScrollListener() {
             @Override public void onLoadMore(int currentPage) {
-                loadPosts(currentPage);
+                loadPosts(currentPage, false);
             }
             @Override public boolean isRefreshing() {
                 setRefreshLayoutEnabled();
@@ -117,7 +117,7 @@ public class PostsFragment extends RxFragment implements IndexPresenter.View,
 
         if (state == null && viewsUninitialised) {
             viewsUninitialised = false;
-            onRefresh();
+            loadPosts(1, false);
         } else if (state != null) {
             if (postsAdapter.getPostList().isEmpty())
                 activateEmptyView(getString(R.string.no_posts_found));
@@ -178,17 +178,13 @@ public class PostsFragment extends RxFragment implements IndexPresenter.View,
         refreshLayout.setEnabled(canRefresh);
     }
 
-    private void loadPosts(int page) {
-        if (page == 1) activateLoadingView();
-        refreshLayout.setRefreshing(true);
+    private void loadPosts(int page, boolean refresh) {
+        if (page == 1 || errorView.getVisibility() == VISIBLE || emptyView.getVisibility() == VISIBLE)
+            activateLoadingView();
+        else
+            refreshLayout.setRefreshing(true);
 
-        switch (mode) {
-        case ALL:       presenter.postsIndex(page);           break;
-        case TAG:       presenter.filterByTag(tagName, page); break;
-        case BOOKMARKS: presenter.getBookmarks(page);         break;
-        case SEARCH:    presenter.search(tagName, page);      break;
-        default:        onError(R.string.error_default);
-        }
+        presenter.loadPosts(mode, tagName, refresh, page);
     }
 
     @Override
@@ -223,13 +219,8 @@ public class PostsFragment extends RxFragment implements IndexPresenter.View,
 
     @Override
     public void onRefresh() {
-        if (errorView.getVisibility() == VISIBLE || emptyView.getVisibility() == VISIBLE)
-            activateLoadingView();
-        else
-            refreshLayout.setRefreshing(true);
-
         scrollListener.reset();
-        loadPosts(1);
+        loadPosts(1, true);
     }
 
     @Override

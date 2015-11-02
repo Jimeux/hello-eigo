@@ -8,8 +8,6 @@ import com.moobasoft.damego.ui.presenters.base.RxPresenter;
 
 import retrofit.Response;
 import retrofit.Result;
-import rx.Observable;
-import rx.Subscription;
 
 public class ShowPresenter extends RxPresenter<ShowPresenter.ShowView> {
 
@@ -37,22 +35,10 @@ public class ShowPresenter extends RxPresenter<ShowPresenter.ShowView> {
                 this::handleError);
     }
 
-    private Observable<Result<Post>> request;
-    private Subscription sub;
-
-    @Override
-    public void releaseView() {
-        super.releaseView();
-        sub.unsubscribe();
-    }
-
-    public void getPost(int id) {
-        if (request == null)
-            request = postService.show(id).cache();
-        sub = request
-                .compose(subscriptions.applySchedulers())
-                .subscribe(this::onPostReturned,
-                           this::handleError);
+    public void getPost(boolean forceRefresh, int id) {
+        subscriptions.add(postService.show(getCacheHeader(forceRefresh), id),
+                this::onPostReturned,
+                this::handleError);
     }
 
     // TODO: Tidy these three methods up
@@ -77,9 +63,6 @@ public class ShowPresenter extends RxPresenter<ShowPresenter.ShowView> {
     }
 
     public void onPostReturned(Result<Post> result) {
-        if (view == null) return;
-
-        request = null; // Clear cache
         Response<Post> response = result.response();
 
         if (response == null)

@@ -30,6 +30,8 @@ import com.moobasoft.damego.ui.presenters.ShowPresenter;
 
 import org.parceler.Parcels;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import butterknife.Bind;
@@ -47,11 +49,12 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
     public static final String OPEN_COMMENTS_KEY = "open_comments";
     public static final int CONTENT_PAGE  = 0;
     public static final int COMMENTS_PAGE = 1;
-    private static final int BOOKMARK_ID = 444;
+    public static final int BOOKMARK_ID = 444;
 
     private int postIdArg;
     private String tagNameArg;
     private boolean openCommentsArg;
+    private boolean bookmarkRequestOngoing = false;
     private Post post;
 
     @Inject ShowPresenter presenter;
@@ -87,7 +90,6 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        setRetainInstance(true);
         getComponent().inject(this);
         postIdArg       = getArguments().getInt(POST_ID_KEY, 0);
         tagNameArg      = getArguments().getString(TAG_NAME_KEY);
@@ -120,22 +122,23 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.removeGroup(R.id.fragment_specific_options);
-
         if (post != null) {
-            // TODO: ID won't work when same post is open twice
-            MenuItem bookmark = menu.add(
-                    R.id.fragment_specific_options, postIdArg + BOOKMARK_ID, 0, R.string.action_bookmark);
-            bookmark.setIcon(post.isBookmarked() ?
-                            R.drawable.ic_bookmark_white_24dp :
-                            R.drawable.ic_bookmark_outline_white_24dp);
-            MenuItemCompat.setShowAsAction(bookmark, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+            MenuItem item = menu.add( // TODO: ID won't work when same post is open twice
+                R.id.fragment_specific_options, postIdArg + BOOKMARK_ID, 0, R.string.action_bookmark);
+            MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+
+            if (bookmarkRequestOngoing)
+                item.setIcon(R.drawable.ic_refresh_white_24dp); // TODO: Animate
+            else
+                item.setIcon(post.isBookmarked() ?
+                        R.drawable.ic_bookmark_white_24dp :
+                        R.drawable.ic_bookmark_outline_white_24dp);
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // TODO: Check user is logged in first
-        // TODO: Show some kind of loading indication
         if (post == null)
             return super.onOptionsItemSelected(item);
         else if (item.getItemId() == postIdArg + BOOKMARK_ID) {
@@ -143,6 +146,8 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
                 presenter.deleteBookmark(post.getId());
             else
                 presenter.createBookmark(post.getId());
+            bookmarkRequestOngoing = true;
+            getActivity().supportInvalidateOptionsMenu();
             return true;
         } else
             return super.onOptionsItemSelected(item);
@@ -163,10 +168,14 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
 
     @Override
     public void onRefresh() {
-        if (post != null)
+        boolean refreshing = (post != null);
+        if (refreshing)
             openCommentsArg = (viewPager.getCurrentItem() == COMMENTS_PAGE);
+
         activateLoadingView();
-        presenter.getPost(postIdArg);
+        List<Fragment> fragments = getChildFragmentManager().getFragments();
+        if (fragments != null) fragments.clear();
+        presenter.getPost(refreshing, postIdArg);
     }
 
     @Override
@@ -177,6 +186,7 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
 
     @Override
     public void onBookmarked(boolean created) {
+        bookmarkRequestOngoing = false;
         post.setBookmarked(created);
         getActivity().supportInvalidateOptionsMenu();
         int resId = created ? R.string.bookmark_created : R.string.bookmark_deleted;
@@ -216,6 +226,7 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
     @Override
     public void onError(int messageId) {
         super.onError(messageId);
+        bookmarkRequestOngoing = false;
         getActivity().supportInvalidateOptionsMenu();
     }
 

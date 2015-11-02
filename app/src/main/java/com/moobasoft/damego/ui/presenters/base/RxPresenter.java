@@ -3,6 +3,7 @@ package com.moobasoft.damego.ui.presenters.base;
 import android.util.Log;
 
 import com.moobasoft.damego.R;
+import com.moobasoft.damego.Rest;
 import com.moobasoft.damego.ui.RxSubscriber;
 
 import java.net.SocketTimeoutException;
@@ -24,6 +25,10 @@ public abstract class RxPresenter<V extends RxPresenter.RxView> extends BasePres
     public void releaseView() {
         super.releaseView();
         subscriptions.clear();
+    }
+
+    protected String getCacheHeader(boolean forceRefresh) {
+        return (forceRefresh) ? Rest.CACHE_NO_CACHE : Rest.CACHE_DEFAULT;
     }
 
     public static final int SUCCESS              = 200;
