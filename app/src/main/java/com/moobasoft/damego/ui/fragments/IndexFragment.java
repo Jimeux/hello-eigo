@@ -58,6 +58,10 @@ public class IndexFragment extends RxFragment implements MainPresenter.View, Ind
         return fragment;
     }
 
+    public void setCurrentTag(String tag) {
+        viewPager.setCurrentItem(adapter.indexOf(tag));
+    }
+
     @Override
     public Toolbar getToolbar() {
         return toolbar;
@@ -176,6 +180,10 @@ public class IndexFragment extends RxFragment implements MainPresenter.View, Ind
         @Override
         public CharSequence getPageTitle(int position) {
             return fragmentTitles.get(position);
+        }
+
+        public int indexOf(String tag) {
+            return fragmentTitles.indexOf(tag);
         }
     }
 

@@ -18,7 +18,7 @@ public class RxSubscriber {
         this.subscriptions        = new CompositeSubscription();
     }
 
-    private <T> Observable.Transformer<T, T> applySchedulers() {
+    public <T> Observable.Transformer<T, T> applySchedulers() {
         return observable -> observable.subscribeOn(subscribeOnScheduler)
                 .observeOn(observeOnScheduler);
     }
@@ -30,20 +30,6 @@ public class RxSubscriber {
                 .compose(applySchedulers())
                 .subscribe(onNext, onError));
     }
-
-
-/*    public <T> void add(Observer<T> observer,
-                        Observable<T> observable) {
-        subscriptions.add(observable
-                .compose(applySchedulers())
-                .subscribe(observer));
-    }
-
-    public <T> void add(Observable<T> observable) {
-        subscriptions.add(observable
-                .compose(applySchedulers())
-                .subscribe());
-    }*/
 
     public void clear() {
         subscriptions.unsubscribe();

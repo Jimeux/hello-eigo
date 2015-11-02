@@ -58,7 +58,6 @@ public class CommentsFragment extends RxFragment implements OnRefreshListener {
 
     private void initialiseRecyclerView() {
         refreshLayout.setOnRefreshListener(this);
-        refreshLayout.setEnabled(false);
         refreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
         commentsAdapter  = new CommentsAdapter();
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -68,8 +67,7 @@ public class CommentsFragment extends RxFragment implements OnRefreshListener {
 
     @Override
     public void onRefresh() {
-        //TODO: Handle refreshing comments!
-        //commentsAdapter.clear();
+        ((RxFragment)getParentFragment()).onRefresh();
     }
 
 }

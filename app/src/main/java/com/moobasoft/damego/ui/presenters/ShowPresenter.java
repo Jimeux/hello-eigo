@@ -8,6 +8,8 @@ import com.moobasoft.damego.ui.presenters.base.RxPresenter;
 
 import retrofit.Response;
 import retrofit.Result;
+import rx.Observable;
+import rx.Subscription;
 
 public class ShowPresenter extends RxPresenter<ShowPresenter.ShowView> {
 
@@ -31,14 +33,26 @@ public class ShowPresenter extends RxPresenter<ShowPresenter.ShowView> {
 
     public void deleteBookmark(int postId) {
         subscriptions.add(postService.deleteBookmark(postId),
-                          this::onUnbookmarked,
-                          this::handleError);
+                this::onUnbookmarked,
+                this::handleError);
+    }
+
+    private Observable<Result<Post>> request;
+    private Subscription sub;
+
+    @Override
+    public void releaseView() {
+        super.releaseView();
+        sub.unsubscribe();
     }
 
     public void getPost(int id) {
-        subscriptions.add(postService.show(id),
-                this::onPostReturned,
-                this::handleError);
+        if (request == null)
+            request = postService.show(id).cache();
+        sub = request
+                .compose(subscriptions.applySchedulers())
+                .subscribe(this::onPostReturned,
+                           this::handleError);
     }
 
     // TODO: Tidy these three methods up
@@ -46,7 +60,7 @@ public class ShowPresenter extends RxPresenter<ShowPresenter.ShowView> {
         Response response = result.response();
         if (response == null)
             view.onError(R.string.error_server);
-        else  if (response.code() == SUCCESS)
+        else if (response.code() == SUCCESS)
             view.onBookmarked(true);
         else
             handleResponse(result, response);
@@ -63,6 +77,9 @@ public class ShowPresenter extends RxPresenter<ShowPresenter.ShowView> {
     }
 
     public void onPostReturned(Result<Post> result) {
+        if (view == null) return;
+
+        request = null; // Clear cache
         Response<Post> response = result.response();
 
         if (response == null)

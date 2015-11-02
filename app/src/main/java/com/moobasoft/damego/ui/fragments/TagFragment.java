@@ -19,7 +19,7 @@ import com.moobasoft.damego.ui.fragments.base.RxFragment;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class TagFragment extends RxFragment implements IndexActivity.ToolbarFragment{
+public class TagFragment extends RxFragment implements  IndexActivity.ToolbarFragment{
 
     /** The tag name of the posts to be loaded (includes 'Bookmarks'). */
     private String tagName;

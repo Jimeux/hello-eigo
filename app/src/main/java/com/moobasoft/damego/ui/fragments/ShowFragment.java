@@ -9,6 +9,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -46,6 +47,7 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
     public static final String OPEN_COMMENTS_KEY = "open_comments";
     public static final int CONTENT_PAGE  = 0;
     public static final int COMMENTS_PAGE = 1;
+    private static final int BOOKMARK_ID = 444;
 
     private int postIdArg;
     private String tagNameArg;
@@ -85,37 +87,11 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        setRetainInstance(true);
         getComponent().inject(this);
-        presenter.bindView(this);
         postIdArg       = getArguments().getInt(POST_ID_KEY, 0);
         tagNameArg      = getArguments().getString(TAG_NAME_KEY);
         openCommentsArg = getArguments().getBoolean(OPEN_COMMENTS_KEY);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.removeGroup(R.id.fragment_specific_options);
-        if (post != null) {
-            inflater.inflate(R.menu.menu_show, menu);
-            menu.findItem(R.id.action_unbookmark).setVisible(post.isBookmarked());
-            menu.findItem(R.id.action_bookmark).setVisible(!post.isBookmarked());
-        } else
-            super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // TODO: Check user is logged in first
-        // TODO: Show some kind of loading indication
-        if (post == null)
-            return super.onOptionsItemSelected(item);
-        else if (item.getItemId() == R.id.action_bookmark) {
-            presenter.createBookmark(post.getId());
-            return false;
-        } else if (item.getItemId() == R.id.action_unbookmark) {
-            presenter.deleteBookmark(post.getId());
-            return false;
-        } else return super.onOptionsItemSelected(item);
     }
 
     @Nullable @Override
@@ -123,6 +99,7 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
         View view = inflater.inflate(R.layout.fragment_show, container, false);
         ButterKnife.bind(this, view);
         tabLayout.setVisibility(GONE);
+        presenter.bindView(this);
         return view;
     }
 
@@ -137,6 +114,38 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
             loadPost(post);
         else
             onRefresh();
+    }
+
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.removeGroup(R.id.fragment_specific_options);
+
+        if (post != null) {
+            // TODO: ID won't work when same post is open twice
+            MenuItem bookmark = menu.add(
+                    R.id.fragment_specific_options, postIdArg + BOOKMARK_ID, 0, R.string.action_bookmark);
+            bookmark.setIcon(post.isBookmarked() ?
+                            R.drawable.ic_bookmark_white_24dp :
+                            R.drawable.ic_bookmark_outline_white_24dp);
+            MenuItemCompat.setShowAsAction(bookmark, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // TODO: Check user is logged in first
+        // TODO: Show some kind of loading indication
+        if (post == null)
+            return super.onOptionsItemSelected(item);
+        else if (item.getItemId() == postIdArg + BOOKMARK_ID) {
+            if (post.isBookmarked())
+                presenter.deleteBookmark(post.getId());
+            else
+                presenter.createBookmark(post.getId());
+            return true;
+        } else
+            return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -154,6 +163,8 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
 
     @Override
     public void onRefresh() {
+        if (post != null)
+            openCommentsArg = (viewPager.getCurrentItem() == COMMENTS_PAGE);
         activateLoadingView();
         presenter.getPost(postIdArg);
     }
@@ -177,17 +188,18 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
         ShowAdapter showAdapter = new ShowAdapter(getChildFragmentManager(), post);
         viewPager.setAdapter(showAdapter);
         viewPager.setPageMargin(16);
-        tabLayout.setupWithViewPager(viewPager);
-        tabLayout.getTabAt(CONTENT_PAGE).setIcon(R.drawable.ic_subject_white_24dp);
-        tabLayout.getTabAt(COMMENTS_PAGE).setIcon(R.drawable.ic_comment_white_24dp);
         viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(final int position) {
-                fab.setVisibility(position == COMMENTS_PAGE ? VISIBLE : GONE);
+                fab.setVisibility(position == CONTENT_PAGE ? GONE : VISIBLE);
             }
         });
-        if (openCommentsArg) viewPager.setCurrentItem(COMMENTS_PAGE);
+
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.getTabAt(CONTENT_PAGE).setIcon(R.drawable.ic_subject_white_24dp);
+        tabLayout.getTabAt(COMMENTS_PAGE).setIcon(R.drawable.ic_comment_white_24dp);
         tabLayout.setVisibility(VISIBLE);
+        if (openCommentsArg) viewPager.setCurrentItem(COMMENTS_PAGE);
         activateContentView();
     }
 

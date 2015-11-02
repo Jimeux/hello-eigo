@@ -34,8 +34,13 @@ public class MainManager {
     }
 
     public void openTagFragment(String tagNameArg) {
-        TagFragment fragment = TagFragment.newInstance(Mode.TAG, tagNameArg);
-        loadFragment(fragment, Tag.TAG, true);
+        if (manager.getBackStackEntryCount() == 0) {
+            IndexFragment indexFragment = (IndexFragment) manager.findFragmentByTag(Tag.INDEX.name());
+            if (indexFragment != null) indexFragment.setCurrentTag(tagNameArg);
+        } else {
+            TagFragment fragment = TagFragment.newInstance(Mode.TAG, tagNameArg);
+            loadFragment(fragment, Tag.TAG, true);
+        }
     }
 
     public void openBookmarksFragment(String tagNameArg) {
