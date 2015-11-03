@@ -16,14 +16,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.moobasoft.damego.R;
-import com.moobasoft.damego.ui.activities.IndexActivity;
+import com.moobasoft.damego.ui.activities.MainActivity;
 import com.moobasoft.damego.ui.fragments.PostsFragment.Mode;
 import com.moobasoft.damego.util.Util;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class SearchFragment extends Fragment implements IndexActivity.ToolbarFragment {
+public class SearchFragment extends Fragment implements MainActivity.ToolbarFragment {
 
     @Bind(R.id.toolbar)      Toolbar toolbar;
     @Bind(R.id.search_input) EditText  searchInput;

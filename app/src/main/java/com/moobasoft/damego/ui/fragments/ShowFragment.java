@@ -23,7 +23,7 @@ import android.widget.TextView;
 import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.activities.CreateCommentActivity;
-import com.moobasoft.damego.ui.activities.IndexActivity;
+import com.moobasoft.damego.ui.activities.MainActivity;
 import com.moobasoft.damego.ui.activities.base.BaseActivity;
 import com.moobasoft.damego.ui.fragments.base.RxFragment;
 import com.moobasoft.damego.ui.presenters.ShowPresenter;
@@ -41,7 +41,7 @@ import butterknife.OnClick;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, IndexActivity.ToolbarFragment {
+public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, MainActivity.ToolbarFragment {
 
     public static final String POST_KEY          = "post_key";
     public static final String POST_ID_KEY       = "post_id";

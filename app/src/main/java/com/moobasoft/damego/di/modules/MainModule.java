@@ -8,7 +8,7 @@ import com.moobasoft.damego.ui.RxSubscriber;
 import com.moobasoft.damego.ui.presenters.CommentPresenter;
 import com.moobasoft.damego.ui.presenters.ConnectPresenter;
 import com.moobasoft.damego.ui.presenters.IndexPresenter;
-import com.moobasoft.damego.ui.presenters.MainPresenter;
+import com.moobasoft.damego.ui.presenters.PostsPresenter;
 import com.moobasoft.damego.ui.presenters.ShowPresenter;
 
 import dagger.Module;
@@ -35,14 +35,14 @@ public class MainModule {
 
     @PerActivity
     @Provides
-    public IndexPresenter indexPresenter(PostService postService, RxSubscriber rxSubscriber) {
-        return new IndexPresenter(postService, rxSubscriber);
+    public PostsPresenter indexPresenter(PostService postService, RxSubscriber rxSubscriber) {
+        return new PostsPresenter(postService, rxSubscriber);
     }
 
     @PerActivity
     @Provides
-    public MainPresenter mainPresenter(PostService postService, RxSubscriber rxSubscriber) {
-        return new MainPresenter(postService, rxSubscriber);
+    public IndexPresenter mainPresenter(PostService postService, RxSubscriber rxSubscriber) {
+        return new IndexPresenter(postService, rxSubscriber);
     }
 
     @PerActivity

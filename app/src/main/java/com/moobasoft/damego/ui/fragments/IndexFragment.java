@@ -19,10 +19,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.moobasoft.damego.R;
-import com.moobasoft.damego.ui.activities.IndexActivity;
+import com.moobasoft.damego.ui.activities.MainActivity;
 import com.moobasoft.damego.ui.fragments.PostsFragment.Mode;
 import com.moobasoft.damego.ui.fragments.base.RxFragment;
-import com.moobasoft.damego.ui.presenters.MainPresenter;
+import com.moobasoft.damego.ui.presenters.IndexPresenter;
 import com.moobasoft.damego.util.DepthPageTransformer;
 
 import java.util.ArrayList;
@@ -33,9 +33,11 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class IndexFragment extends RxFragment implements MainPresenter.View, IndexActivity.ToolbarFragment {
+public class IndexFragment extends RxFragment
+        implements IndexPresenter.View, MainActivity.ToolbarFragment {
 
-    @Inject MainPresenter presenter;
+    @Inject
+    IndexPresenter presenter;
 
     @Bind(R.id.toolbar)    Toolbar toolbar;
     @Bind(R.id.app_bar)    AppBarLayout appBarLayout;
@@ -70,9 +72,10 @@ public class IndexFragment extends RxFragment implements MainPresenter.View, Ind
     @Override
     public void onCreate(@Nullable Bundle state) {
         super.onCreate(state);
+        setHasOptionsMenu(true);
         adapter = new Adapter(getChildFragmentManager());
         tags = new ArrayList<>();
-        setHasOptionsMenu(true);
+        getComponent().inject(this);
         if (state != null)
             tags = state.getStringArrayList(TAGS_KEY);
     }
@@ -86,7 +89,6 @@ public class IndexFragment extends RxFragment implements MainPresenter.View, Ind
     @Nullable @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state) {
         View view = inflater.inflate(R.layout.fragment_index, container, false);
-        getComponent().inject(this);
         presenter.bindView(this);
         ButterKnife.bind(this, view);
         tabLayout.setVisibility(View.GONE);

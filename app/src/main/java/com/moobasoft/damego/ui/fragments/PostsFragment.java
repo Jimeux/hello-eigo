@@ -15,13 +15,14 @@ import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.PostsAdapter;
 import com.moobasoft.damego.ui.StaggeredScrollListener;
-import com.moobasoft.damego.ui.activities.IndexActivity;
+import com.moobasoft.damego.ui.activities.MainActivity;
 import com.moobasoft.damego.ui.fragments.base.RxFragment;
-import com.moobasoft.damego.ui.presenters.IndexPresenter;
+import com.moobasoft.damego.ui.presenters.PostsPresenter;
 
 import org.parceler.Parcels;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.inject.Inject;
 
@@ -30,35 +31,42 @@ import butterknife.ButterKnife;
 
 import static android.view.View.VISIBLE;
 
-public class PostsFragment extends RxFragment implements IndexPresenter.View,
+public class PostsFragment extends RxFragment implements PostsPresenter.View,
         SwipeRefreshLayout.OnRefreshListener, AppBarLayout.OnOffsetChangedListener {
 
-    public static final String POSTS_KEY      = "posts";
-    public static final String SCROLL_KEY     = "scroll_key";
-    public static final String VIEWS_INIT_KEY = "views_uninitialised";
-    public static final String TAG_NAME_ARG   = "tag_name";
-    public static final String MODE_ARG       = "mode";
+    public static final String UUID_KEY  = "uuid_key";
+    public static final String POSTS_KEY  = "posts_key";
+    public static final String SCROLL_KEY = "scroll_key";
+
+    public static final String TAG_NAME_ARG = "tag_name";
+    public static final String MODE_ARG     = "mode";
 
     public enum Mode { ALL, BOOKMARKS, TAG, SEARCH }
 
+    private UUID presenterUuid;
+
+    /** RecyclerView.Adapter implementation for {@code postsRecyclerView} */
     private PostsAdapter postsAdapter;
+
     /** The tag name of the posts to be loaded (includes search terms and 'Bookmarks'). */
     private String tagName;
-    /** Determine if this is for tags, bookmarks, search or everything. */
+
+    /** Determine if this instance is for tags, bookmarks, search or all posts. */
     private Mode mode;
+
     /** OnScrollListener for {@code postsRecyclerView} */
     private StaggeredScrollListener scrollListener;
-    /** A reference to the Activity's AppBarLayout. */
+
+    /** A reference to the current AppBarLayout. */
     private AppBarLayout appBarLayout;
+
     /**
-     *  Manually keep track of {@code appBarLayout}'s expanded/collapsed state.
-     *  Makes use of {@code AppBarLayout.OnOffsetChangedListener}.
+     * Manually keep track of {@code appBarLayout}'s expanded/collapsed state.
+     * Makes use of {@code AppBarLayout.OnOffsetChangedListener}.
      */
     private boolean appBarIsExpanded = true;
-    /** Track whether any views have been set up //TODO: Complete this */
-    private boolean viewsUninitialised = true;
 
-    @Inject IndexPresenter presenter;
+    @Inject PostsPresenter presenter;
 
     @Bind(R.id.post_recycler) RecyclerView postsRecyclerView;
     @Bind(R.id.swipe_refresh) SwipeRefreshLayout refreshLayout;
@@ -80,7 +88,7 @@ public class PostsFragment extends RxFragment implements IndexPresenter.View,
         tagName = getArguments().getString(TAG_NAME_ARG);
         mode = (Mode) getArguments().getSerializable(MODE_ARG);
         int columns = getResources().getInteger(R.integer.main_list_columns);
-        postsAdapter = new PostsAdapter((IndexActivity)getActivity(), columns, tagName);
+        postsAdapter   = new PostsAdapter((MainActivity)getActivity(), columns, tagName);
         scrollListener = new StaggeredScrollListener() {
             @Override public void onLoadMore(int currentPage) {
                 loadPosts(currentPage, false);
@@ -90,9 +98,11 @@ public class PostsFragment extends RxFragment implements IndexPresenter.View,
                 return refreshLayout.isRefreshing();
             }
         };
+        restoreState(state);
+    }
 
+    private void restoreState(@Nullable Bundle state) {
         if (state != null) {
-            viewsUninitialised = state.getBoolean(VIEWS_INIT_KEY);
             List<Post> posts = Parcels.unwrap(state.getParcelable(POSTS_KEY));
             scrollListener.restoreState(Parcels.unwrap(state.getParcelable(SCROLL_KEY)));
             if (scrollListener.isFinished()) postsAdapter.setFinished();
@@ -115,10 +125,9 @@ public class PostsFragment extends RxFragment implements IndexPresenter.View,
     public void onViewStateRestored(@Nullable Bundle state) {
         super.onViewStateRestored(state);
 
-        if (state == null && viewsUninitialised) {
-            viewsUninitialised = false;
+        if (state == null) { // Add first-init check
             loadPosts(1, false);
-        } else if (state != null) {
+        } else {
             if (postsAdapter.getPostList().isEmpty())
                 activateEmptyView(getString(R.string.no_posts_found));
             else
@@ -141,12 +150,9 @@ public class PostsFragment extends RxFragment implements IndexPresenter.View,
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
-        if (scrollListener != null && postsAdapter != null && postsAdapter.getPostList() != null ) {
-            state.putBoolean(VIEWS_INIT_KEY, viewsUninitialised);
-            state.putParcelable(POSTS_KEY, Parcels.wrap(postsAdapter.getPostList()));
-            state.putParcelable(SCROLL_KEY, Parcels.wrap(scrollListener.getOutState()));
-        }
-        super.onSaveInstanceState(state);
+        state.putSerializable(UUID_KEY, presenterUuid);
+        state.putParcelable(POSTS_KEY, Parcels.wrap(postsAdapter.getPostList()));
+        state.putParcelable(SCROLL_KEY, Parcels.wrap(scrollListener.getOutState()));
     }
 
     @Override
@@ -172,7 +178,8 @@ public class PostsFragment extends RxFragment implements IndexPresenter.View,
     }
 
     private void setRefreshLayoutEnabled() {
-        if (refreshLayout == null || postsRecyclerView == null) return;
+        if (refreshLayout == null || postsRecyclerView == null)
+            return;
         boolean canRefresh = appBarIsExpanded &&
                 !ViewCompat.canScrollVertically(postsRecyclerView, -1);
         refreshLayout.setEnabled(canRefresh);

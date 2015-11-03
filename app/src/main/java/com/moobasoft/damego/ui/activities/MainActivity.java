@@ -13,15 +13,16 @@ import android.view.ViewGroup;
 import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.MainManager;
-import com.moobasoft.damego.ui.PostsAdapter;
 import com.moobasoft.damego.ui.activities.base.BaseActivity;
 import com.moobasoft.damego.ui.fragments.IndexFragment;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class IndexActivity extends BaseActivity
-        implements PostsAdapter.PostClickListener, FragmentManager.OnBackStackChangedListener {
+import static android.support.v4.app.FragmentManager.OnBackStackChangedListener;
+import static com.moobasoft.damego.ui.PostsAdapter.OnPostClickListener;
+
+public class MainActivity extends BaseActivity implements OnPostClickListener, OnBackStackChangedListener {
 
     public interface ToolbarFragment {
         Toolbar getToolbar();

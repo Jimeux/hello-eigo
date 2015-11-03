@@ -13,7 +13,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.moobasoft.damego.R;
 import com.moobasoft.damego.rest.models.Post;
-import com.moobasoft.damego.ui.activities.IndexActivity;
+import com.moobasoft.damego.ui.activities.MainActivity;
 import com.moobasoft.damego.util.Util;
 
 import org.parceler.Parcels;
@@ -67,7 +67,7 @@ public class ContentFragment extends Fragment {
         for (int i = 0; i < tags.getChildCount(); i++) {
             TextView tag = (TextView) tags.getChildAt(i);
             tag.setOnClickListener(v ->
-                    ((IndexActivity) getActivity()).onTagClicked(tag.getText().toString()));
+                    ((MainActivity) getActivity()).onTagClicked(tag.getText().toString()));
         }
     }
 

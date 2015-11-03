@@ -17,7 +17,7 @@ import com.moobasoft.damego.util.Util;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-import static com.moobasoft.damego.ui.PostsAdapter.PostClickListener;
+import static com.moobasoft.damego.ui.PostsAdapter.OnPostClickListener;
 import static com.moobasoft.damego.ui.PostsAdapter.TYPE_FEATURED;
 
 public final class PostSummaryView extends LinearLayout {
@@ -38,15 +38,15 @@ public final class PostSummaryView extends LinearLayout {
         ButterKnife.bind(this);
     }
 
-    public void bindTo(Post post, int itemViewType, PostClickListener postClickListener, String tagName) {
+    public void bindTo(Post post, int itemViewType, OnPostClickListener onPostClickListener, String tagName) {
         title.setText(post.getTitle());
         body.setText(Html.fromHtml(post.getBody()));
         commentsCount.setText(String.valueOf(post.getCommentsCount()));
-        commentStrip.setOnClickListener(v -> postClickListener.onSummaryClicked(post, true, tagName));
-        setOnClickListener(v -> postClickListener.onSummaryClicked(post, false, tagName));
+        commentStrip.setOnClickListener(v -> onPostClickListener.onSummaryClicked(post, true, tagName));
+        setOnClickListener(v -> onPostClickListener.onSummaryClicked(post, false, tagName));
 
         loadImage(post, itemViewType);
-        loadTags(post, postClickListener);
+        loadTags(post, onPostClickListener);
     }
 
     private void loadImage(Post post, int itemViewType) {
@@ -57,14 +57,14 @@ public final class PostSummaryView extends LinearLayout {
                 .into(image);
     }
 
-    private void loadTags(Post post, PostClickListener postClickListener) {
+    private void loadTags(Post post, OnPostClickListener onPostClickListener) {
         LayoutInflater inflater = (LayoutInflater) tags.getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         Util.insertTags(post, inflater, tags, false);
 
         for (int i = 0; i < tags.getChildCount(); i++) {
             TextView tag = (TextView) tags.getChildAt(i);
-            tag.setOnClickListener(v -> postClickListener.onTagClicked(tag.getText().toString()));
+            tag.setOnClickListener(v -> onPostClickListener.onTagClicked(tag.getText().toString()));
         }
     }
 

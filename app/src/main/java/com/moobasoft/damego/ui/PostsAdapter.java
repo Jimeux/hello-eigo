@@ -24,11 +24,11 @@ public class PostsAdapter extends RecyclerView.Adapter<ViewHolder> {
     private final String tagName;
     private boolean hideFooter = true;
 
-    private PostClickListener summaryClickListener;
+    private OnPostClickListener summaryClickListener;
     private ArrayList<Post> postList;
     private final int columns;
 
-    public PostsAdapter(PostClickListener summaryClickListener, int columns, String tagName) {
+    public PostsAdapter(OnPostClickListener summaryClickListener, int columns, String tagName) {
         this.summaryClickListener = summaryClickListener;
         this.postList = new ArrayList<>();
         this.columns = columns;
@@ -109,7 +109,7 @@ public class PostsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     public boolean isEmpty() { return postList.isEmpty(); }
 
-    public interface PostClickListener {
+    public interface OnPostClickListener {
         void onSummaryClicked(Post post, boolean openComments, String tagName);
         void onTagClicked(String tag);
     }
@@ -123,7 +123,7 @@ public class PostsAdapter extends RecyclerView.Adapter<ViewHolder> {
             this.itemView = itemView;
         }
 
-        public void bindTo(Post post, int itemViewType, PostClickListener listener, String tagName) {
+        public void bindTo(Post post, int itemViewType, OnPostClickListener listener, String tagName) {
             itemView.setId(ID_PREFIX + post.getId());
             itemView.bindTo(post, itemViewType, listener, tagName);
         }

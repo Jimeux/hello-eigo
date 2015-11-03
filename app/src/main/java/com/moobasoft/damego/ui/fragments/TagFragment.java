@@ -12,17 +12,18 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.moobasoft.damego.R;
-import com.moobasoft.damego.ui.activities.IndexActivity;
+import com.moobasoft.damego.ui.activities.MainActivity;
 import com.moobasoft.damego.ui.fragments.PostsFragment.Mode;
 import com.moobasoft.damego.ui.fragments.base.RxFragment;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class TagFragment extends RxFragment implements IndexActivity.ToolbarFragment{
+public class TagFragment extends RxFragment implements MainActivity.ToolbarFragment{
 
     /** The tag name of the posts to be loaded (includes 'Bookmarks'). */
     private String tagName;
+
     /** Determine if this is for tags or bookmarks. */
     private Mode mode; // TODO: This should be limited to TAG and BOOKMARKS (make a new enum)
 
@@ -57,7 +58,7 @@ public class TagFragment extends RxFragment implements IndexActivity.ToolbarFrag
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.removeGroup(R.id.fragment_specific_options); //TODO: Why doesn't this work?
+        menu.removeGroup(R.id.fragment_specific_options);
         MenuItem unbook = menu.findItem(R.id.action_unbookmark);
         MenuItem book   = menu.findItem(R.id.action_bookmark);
         if (unbook != null && book != null) {

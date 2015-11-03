@@ -3,7 +3,6 @@ package com.moobasoft.damego.rest;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.Log;
 
 import com.moobasoft.damego.CredentialStore;
 import com.squareup.okhttp.Interceptor;
@@ -33,10 +32,6 @@ public final class ApiHeaders implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request originalRequest = chain.request();
-
-        String header = originalRequest.header(CACHE_CONTROL_HEADER);
-        Log.d("TAGGART", header == null ? "ぬる" : header);
-
         Request.Builder builder = originalRequest.newBuilder();
         addAuthHeader(builder);
         addCacheHeader(builder, originalRequest.method());
