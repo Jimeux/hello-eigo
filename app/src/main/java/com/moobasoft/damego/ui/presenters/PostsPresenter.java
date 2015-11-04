@@ -10,7 +10,6 @@ import java.util.List;
 import retrofit.Response;
 import retrofit.Result;
 import rx.Observable;
-import rx.Subscription;
 
 import static com.moobasoft.damego.ui.fragments.PostsFragment.Mode;
 
@@ -21,8 +20,6 @@ public class PostsPresenter extends RxPresenter<PostsPresenter.View> {
     }
 
     private final PostService postService;
-    private Observable<Result<List<Post>>> request;
-    private Subscription subscription;
 
     public PostsPresenter(PostService postService, RxSubscriber subscriptions) {
         super(subscriptions);
@@ -30,44 +27,38 @@ public class PostsPresenter extends RxPresenter<PostsPresenter.View> {
     }
 
     public void loadPosts(Mode mode, String tag, boolean refresh, int page) {
-        if (request == null) request = setRequest(mode, tag, refresh, page);
-        createSubscription();
+        subscriptions.add(getRequest(mode, tag, refresh, page),
+                          this::handleOnNext,
+                          this::handleError);
     }
 
-    private Observable<Result<List<Post>>> setRequest(Mode mode, String tag, boolean refresh, int page) {
+    private Observable<Result<List<Post>>> getRequest(Mode mode, String tag, boolean refresh, int page) {
         String cacheHeader = getCacheHeader(refresh);
         switch (mode) {
             case TAG:
-                return postService.filterByTag(cacheHeader, tag, page).cache();
+                return postService.filterByTag(cacheHeader, tag, page);
             case BOOKMARKS:
-                return postService.getBookmarks(cacheHeader, page).cache();
+                return postService.getBookmarks(cacheHeader, page);
             case SEARCH:
-                return postService.search(tag, page).cache();
+                return postService.search(tag, page);
             default:
-                return postService.index(cacheHeader, page).cache();
+                return postService.index(cacheHeader, page);
         }
-    }
-
-    private void createSubscription() {
-        subscription = request
-                .compose(subscriptions.applySchedulers())
-                .subscribe(this::handleOnNext,
-                        this::handleError);
     }
 
     private void handleOnNext(Result<List<Post>> result) {
         if (view == null) return;
-        subscription = null;
-        request = null;
-
-        Response<List<Post>> response = result.response();
 
         if (result.isError())
             handleError(result.error());
-        else if (response.code() == SUCCESS)
-            view.onPostsRetrieved(response.body());
-        else
-            defaultResponses(response.code());
+        else {
+            Response<List<Post>> response = result.response();
+
+            if (response.isSuccess())
+                view.onPostsRetrieved(response.body());
+            else
+                defaultResponses(response.code());
+        }
     }
 
 }

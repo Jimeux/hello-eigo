@@ -22,7 +22,6 @@ import com.moobasoft.damego.ui.presenters.PostsPresenter;
 import org.parceler.Parcels;
 
 import java.util.List;
-import java.util.UUID;
 
 import javax.inject.Inject;
 
@@ -34,7 +33,6 @@ import static android.view.View.VISIBLE;
 public class PostsFragment extends RxFragment implements PostsPresenter.View,
         SwipeRefreshLayout.OnRefreshListener, AppBarLayout.OnOffsetChangedListener {
 
-    public static final String UUID_KEY  = "uuid_key";
     public static final String POSTS_KEY  = "posts_key";
     public static final String SCROLL_KEY = "scroll_key";
 
@@ -42,8 +40,6 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
     public static final String MODE_ARG     = "mode";
 
     public enum Mode { ALL, BOOKMARKS, TAG, SEARCH }
-
-    private UUID presenterUuid;
 
     /** RecyclerView.Adapter implementation for {@code postsRecyclerView} */
     private PostsAdapter postsAdapter;
@@ -85,6 +81,7 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
     @Override
     public void onCreate(@Nullable Bundle state) {
         super.onCreate(state);
+        getComponent().inject(this);
         tagName = getArguments().getString(TAG_NAME_ARG);
         mode = (Mode) getArguments().getSerializable(MODE_ARG);
         int columns = getResources().getInteger(R.integer.main_list_columns);
@@ -114,16 +111,16 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tag, container, false);
         appBarLayout = (AppBarLayout) getActivity().findViewById(R.id.app_bar);
-        getComponent().inject(this);
-        presenter.bindView(this);
         ButterKnife.bind(this, view);
         initialiseRecyclerView();
         return view;
     }
 
     @Override
-    public void onViewStateRestored(@Nullable Bundle state) {
-        super.onViewStateRestored(state);
+    public void onActivityCreated(@Nullable Bundle state) {
+        super.onActivityCreated(state);
+
+        presenter.bindView(this);
 
         if (state == null) { // Add first-init check
             loadPosts(1, false);
@@ -150,7 +147,6 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
-        state.putSerializable(UUID_KEY, presenterUuid);
         state.putParcelable(POSTS_KEY, Parcels.wrap(postsAdapter.getPostList()));
         state.putParcelable(SCROLL_KEY, Parcels.wrap(scrollListener.getOutState()));
     }

@@ -1,6 +1,6 @@
 package com.moobasoft.damego.ui.presenters.base;
 
-public class BasePresenter<V> {
+public class Presenter<V> {
 
     protected V view;
 

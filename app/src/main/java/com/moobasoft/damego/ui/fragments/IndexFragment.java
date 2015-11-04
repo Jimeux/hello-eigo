@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.moobasoft.damego.R;
 import com.moobasoft.damego.ui.activities.MainActivity;
@@ -36,8 +37,10 @@ import butterknife.ButterKnife;
 public class IndexFragment extends RxFragment
         implements IndexPresenter.View, MainActivity.ToolbarFragment {
 
-    @Inject
-    IndexPresenter presenter;
+    @Inject IndexPresenter presenter;
+
+    /** w1024p view */
+    @Nullable @Bind(R.id.title_view) TextView titleView;
 
     @Bind(R.id.toolbar)    Toolbar toolbar;
     @Bind(R.id.app_bar)    AppBarLayout appBarLayout;
@@ -66,6 +69,7 @@ public class IndexFragment extends RxFragment
 
     @Override
     public Toolbar getToolbar() {
+        if (titleView != null) toolbar.setTitle("");
         return toolbar;
     }
 
