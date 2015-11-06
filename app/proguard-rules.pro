@@ -37,3 +37,49 @@
 -keep class retrofit.** { *; }
 -keepattributes Signature
 -keepattributes Exceptions
+
+# Parceler
+-keep class * implements android.os.Parcelable {
+  public static final android.os.Parcelable$Creator *;
+}
+
+-keep class org.parceler.Parceler$$Parcels
+
+# Glide
+-keep public class * implements com.bumptech.glide.module.GlideModule
+-keep public enum com.bumptech.glide.load.resource.bitmap.ImageHeaderParser$** {
+    **[] $VALUES;
+    public *;
+}
+
+
+-dontwarn okio.**
+
+
+##---------------Begin: proguard configuration for Gson ----------
+# For using GSON @Expose annotation
+-keepattributes *Annotation*
+
+# Gson specific classes
+#-keep class sun.misc.Unsafe { *; }
+-keep class com.google.gson.stream.** { *; }
+
+# Application classes that will be serialized/deserialized over Gson, keepclassmembers
+-keep class com.moobasoft.damego.rest.model.** { *; }
+-keepclassmembers class com.moobasoft.damego.rest.model.** { *; }
+
+##---------------End: proguard configuration for Gson ----------
+
+ -keep class android.support.v4.** { *; }
+ -keep interface android.support.v4.** { *; }
+ -keep class android.support.v7.** { *; }
+
+ # for RxJava:
+#-dontwarn sun.misc.Unsafe
+
+
+-keepattributes Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod
+
+
+## From the warnings ##
+#-keepattributes InnerClasses

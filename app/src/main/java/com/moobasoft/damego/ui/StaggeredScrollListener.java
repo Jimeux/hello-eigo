@@ -10,6 +10,8 @@ import org.parceler.Parcel;
  */
 public abstract class StaggeredScrollListener extends RecyclerView.OnScrollListener {
 
+    private StaggeredGridLayoutManager layoutManager;
+
     /**
      * The minimum amount of items to have below your current scroll position before loading more.
      */
@@ -20,18 +22,11 @@ public abstract class StaggeredScrollListener extends RecyclerView.OnScrollListe
      */
     private int previousTotal = 0;
 
-    // The current page
-    //private int currentPage = 1;
-
     /**
-     * True if setFinished() has been called
+     * Should be true when no more data is left to load
      */
     private boolean isFinished = false;
 
-    private StaggeredGridLayoutManager layoutManager;
-
-    /** Getters */
-    //public int getCurrentPage() { return currentPage; }
     public boolean isFinished() { return isFinished; }
 
     /**
@@ -80,7 +75,6 @@ public abstract class StaggeredScrollListener extends RecyclerView.OnScrollListe
      */
     public void reset() {
         previousTotal = 0;
-        //currentPage = 1;
         isFinished = false;
     }
 
@@ -96,7 +90,6 @@ public abstract class StaggeredScrollListener extends RecyclerView.OnScrollListe
      * Use in onRestoreInstanceState()
      */
     public void restoreState(ScrollOutState state) {
-        //this.currentPage   = state.currentPage;
         this.previousTotal = state.previousTotal;
         this.isFinished    = state.isFinished;
     }
@@ -121,14 +114,12 @@ public abstract class StaggeredScrollListener extends RecyclerView.OnScrollListe
 
     @Parcel
     public static class ScrollOutState {
-        //public int currentPage;
         public int previousTotal;
         public boolean isFinished;
 
         public ScrollOutState() {}
 
         public ScrollOutState(int previousTotal, boolean isFinished) {
-            //this.currentPage = currentPage;
             this.previousTotal = previousTotal;
             this.isFinished = isFinished;
         }

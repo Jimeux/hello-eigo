@@ -1,10 +1,7 @@
 package com.moobasoft.damego.rest.models;
 
-import org.parceler.Parcel;
-
 import java.util.Date;
 
-@Parcel
 public class User {
 
     int id;

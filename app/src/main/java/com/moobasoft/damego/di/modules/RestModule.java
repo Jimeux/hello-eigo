@@ -2,11 +2,9 @@ package com.moobasoft.damego.di.modules;
 
 import android.content.Context;
 
-import com.facebook.stetho.okhttp.StethoInterceptor;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.moobasoft.damego.BuildConfig;
 import com.moobasoft.damego.CredentialStore;
 import com.moobasoft.damego.di.scopes.Endpoint;
 import com.moobasoft.damego.rest.ApiAuthenticator;
@@ -30,7 +28,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 @Module
 public class RestModule {
 
-    private static final int DISK_CACHE_SIZE = 7 * 1024 * 1024; //7MB
+    private static final int DISK_CACHE_SIZE = 8 * 1024 * 1024; //8MB
 
     @Provides
     @Singleton
@@ -56,16 +54,16 @@ public class RestModule {
         client.interceptors().add(new ApiHeaders(context, store));
         client.setAuthenticator(new ApiAuthenticator(store));
 
-        if (BuildConfig.DEBUG)
-            client.networkInterceptors().add(new StethoInterceptor());
+        //if (BuildConfig.DEBUG)
+          //  client.networkInterceptors().add(new StethoInterceptor());
 
-        client.setConnectTimeout(10, SECONDS);
-        client.setReadTimeout(10, SECONDS);
-        client.setWriteTimeout(10, SECONDS);
+        client.setConnectTimeout(11, SECONDS);
+        client.setReadTimeout(11, SECONDS);
+        client.setWriteTimeout(11, SECONDS);
 
         File cacheDir = new File(context.getCacheDir(), "http");
         Cache cache = new Cache(cacheDir, DISK_CACHE_SIZE);
-        //client.setCache(cache);
+        client.setCache(cache);
     }
 
 }

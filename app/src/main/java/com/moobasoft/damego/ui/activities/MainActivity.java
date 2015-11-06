@@ -2,6 +2,8 @@ package com.moobasoft.damego.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,7 +17,6 @@ import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.MainManager;
 import com.moobasoft.damego.ui.activities.base.BaseActivity;
 import com.moobasoft.damego.ui.fragments.IndexFragment;
-import com.moobasoft.damego.ui.fragments.PostsFragment;
 import com.moobasoft.damego.ui.fragments.PresenterRetainer;
 import com.moobasoft.damego.ui.presenters.base.Presenter;
 
@@ -27,7 +28,8 @@ import butterknife.ButterKnife;
 import static android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import static com.moobasoft.damego.ui.PostsAdapter.OnPostClickListener;
 
-public class MainActivity extends BaseActivity implements OnPostClickListener, OnBackStackChangedListener, PostsFragment.PresenterHost {
+public class MainActivity extends BaseActivity implements
+        OnPostClickListener, OnBackStackChangedListener, PresenterRetainer.PresenterHost {
 
     public interface ToolbarFragment {
         Toolbar getToolbar();
@@ -38,34 +40,18 @@ public class MainActivity extends BaseActivity implements OnPostClickListener, O
 
     @Bind(R.id.container) ViewGroup container;
 
-    public static final String TAG_RETAINER = "retainer_tag";
-
-    private PresenterRetainer getRetainer() {
-        PresenterRetainer retainer = (PresenterRetainer)
-                fragmentManager.findFragmentByTag(TAG_RETAINER);
-        if (retainer == null) {
-            retainer = new PresenterRetainer();
-            fragmentManager.beginTransaction()
-                    .add(retainer, TAG_RETAINER).commit();
-        }
-        return retainer;
+    @Override
+    public void putPresenter(@NonNull UUID key, @NonNull Presenter presenter) {
+        PresenterRetainer.put(fragmentManager, key, presenter);
     }
 
     @Override
-    public void putPresenter(UUID key, Presenter presenter) {
-        getRetainer().put(key, presenter);
+    public Presenter getPresenter(@NonNull UUID key) {
+        return PresenterRetainer.get(fragmentManager, key);
     }
 
     @Override
-    public Presenter getPresenter(UUID key) {
-        return getRetainer().get(key);
-    }
-
-
-
-
-    @Override
-    protected void onCreate(Bundle state) {
+    protected void onCreate(@Nullable Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);

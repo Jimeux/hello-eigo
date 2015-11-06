@@ -18,7 +18,6 @@ import com.moobasoft.damego.ui.StaggeredScrollListener;
 import com.moobasoft.damego.ui.activities.MainActivity;
 import com.moobasoft.damego.ui.fragments.base.RxFragment;
 import com.moobasoft.damego.ui.presenters.PostsPresenter;
-import com.moobasoft.damego.ui.presenters.base.Presenter;
 
 import org.parceler.Parcels;
 
@@ -31,10 +30,12 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 import static android.view.View.VISIBLE;
+import static com.moobasoft.damego.ui.fragments.PresenterRetainer.*;
 
 public class PostsFragment extends RxFragment implements PostsPresenter.View,
         SwipeRefreshLayout.OnRefreshListener, AppBarLayout.OnOffsetChangedListener {
 
+    public static final String UUID_KEY   = "uuid_key";
     public static final String PAGE_KEY   = "page_key";
     public static final String POSTS_KEY  = "posts_key";
     public static final String SCROLL_KEY = "scroll_key";
@@ -65,29 +66,16 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
      */
     private boolean appBarIsExpanded = true;
 
+    /** A unique ID to store/retrieve the presenter from a map */
+    private UUID presenterUuid;
+
+    /** The current page of post data. Used as a query param. */
     private int currentPage = 1;
 
     @Inject PostsPresenter presenter;
 
     @Bind(R.id.post_recycler) RecyclerView postsRecyclerView;
     @Bind(R.id.swipe_refresh) SwipeRefreshLayout refreshLayout;
-
-
-
-
-    private UUID presenterUuid;
-
-    public static final String UUID_KEY  = "uuid_key";
-
-    public interface PresenterHost {
-        void putPresenter(UUID key, Presenter presenter);
-        Presenter getPresenter(UUID key);
-    }
-
-
-
-
-
 
     public PostsFragment() {}
 
