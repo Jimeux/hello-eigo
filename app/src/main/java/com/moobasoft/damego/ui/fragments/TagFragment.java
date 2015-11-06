@@ -25,7 +25,7 @@ public class TagFragment extends RxFragment implements MainActivity.ToolbarFragm
     private String tagName;
 
     /** Determine if this is for tags or bookmarks. */
-    private Mode mode; // TODO: This should be limited to TAG and BOOKMARKS (make a new enum)
+    private Mode mode;
 
     @Bind(R.id.toolbar) Toolbar toolbar;
 

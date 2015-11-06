@@ -13,6 +13,7 @@
 
     <dimen name="show_backdrop_height">310dp</dimen>
     <dimen name="show_title_text">36sp</dimen>
+    <dimen name="show_bottom_padding">50dp</dimen>
     <!--<dimen name="show_padding">24dp</dimen>
     <dimen name="show_tag_text">18dp</dimen>
     <dimen name="show_body_text">20sp</dimen>

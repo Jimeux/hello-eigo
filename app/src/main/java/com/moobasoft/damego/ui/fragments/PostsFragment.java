@@ -33,6 +33,7 @@ import static android.view.View.VISIBLE;
 public class PostsFragment extends RxFragment implements PostsPresenter.View,
         SwipeRefreshLayout.OnRefreshListener, AppBarLayout.OnOffsetChangedListener {
 
+    public static final String PAGE_KEY   = "page_key";
     public static final String POSTS_KEY  = "posts_key";
     public static final String SCROLL_KEY = "scroll_key";
 
@@ -62,6 +63,8 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
      */
     private boolean appBarIsExpanded = true;
 
+    private int currentPage = 1;
+
     @Inject PostsPresenter presenter;
 
     @Bind(R.id.post_recycler) RecyclerView postsRecyclerView;
@@ -87,8 +90,8 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
         int columns = getResources().getInteger(R.integer.main_list_columns);
         postsAdapter   = new PostsAdapter((MainActivity)getActivity(), columns, tagName);
         scrollListener = new StaggeredScrollListener() {
-            @Override public void onLoadMore(int currentPage) {
-                loadPosts(currentPage, false);
+            @Override public void onLoadMore() {
+                loadPosts(false);
             }
             @Override public boolean isRefreshing() {
                 setRefreshLayoutEnabled();
@@ -100,6 +103,7 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
 
     private void restoreState(@Nullable Bundle state) {
         if (state != null) {
+            currentPage = state.getInt(PAGE_KEY);
             List<Post> posts = Parcels.unwrap(state.getParcelable(POSTS_KEY));
             scrollListener.restoreState(Parcels.unwrap(state.getParcelable(SCROLL_KEY)));
             if (scrollListener.isFinished()) postsAdapter.setFinished();
@@ -123,7 +127,7 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
         presenter.bindView(this);
 
         if (state == null) { // Add first-init check
-            loadPosts(1, false);
+            loadPosts(false);
         } else {
             if (postsAdapter.getPostList().isEmpty())
                 activateEmptyView(getString(R.string.no_posts_found));
@@ -147,6 +151,7 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
+        state.putInt(PAGE_KEY, currentPage);
         state.putParcelable(POSTS_KEY, Parcels.wrap(postsAdapter.getPostList()));
         state.putParcelable(SCROLL_KEY, Parcels.wrap(scrollListener.getOutState()));
     }
@@ -181,20 +186,21 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
         refreshLayout.setEnabled(canRefresh);
     }
 
-    private void loadPosts(int page, boolean refresh) {
-        if (page == 1 || errorView.getVisibility() == VISIBLE || emptyView.getVisibility() == VISIBLE)
+    private void loadPosts(boolean refresh) {
+        if (currentPage == 1 || errorView.getVisibility() == VISIBLE || emptyView.getVisibility() == VISIBLE)
             activateLoadingView();
         else
             refreshLayout.setRefreshing(true);
 
-        presenter.loadPosts(mode, tagName, refresh, page);
+        presenter.loadPosts(mode, tagName, refresh, currentPage);
     }
 
     @Override
     public void onPostsRetrieved(List<Post> newPosts) {
-        if (scrollListener.getCurrentPage() == 1)
-            postsAdapter.clear();
         refreshLayout.setRefreshing(false);
+
+        if (currentPage == 1) postsAdapter.clear();
+        currentPage++;
 
         if (postsAdapter.isEmpty() && newPosts.isEmpty())
             activateEmptyView(getString(R.string.no_posts_found));
@@ -207,7 +213,6 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
         }
     }
 
-    // FIXME: Current page is incremented even on error, which may result in skipped pages
     @Override
     public void onError(int messageId) {
         super.onError(messageId);
@@ -223,7 +228,8 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
     @Override
     public void onRefresh() {
         scrollListener.reset();
-        loadPosts(1, true);
+        currentPage = 1;
+        loadPosts(true);
     }
 
     @Override

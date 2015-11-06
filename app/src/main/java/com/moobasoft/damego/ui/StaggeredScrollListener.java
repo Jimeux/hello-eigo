@@ -10,19 +10,28 @@ import org.parceler.Parcel;
  */
 public abstract class StaggeredScrollListener extends RecyclerView.OnScrollListener {
 
-    // The minimum amount of items to have below your current scroll position before loading more.
+    /**
+     * The minimum amount of items to have below your current scroll position before loading more.
+     */
     private static final int VISIBLE_THRESHOLD = 1;
-    // The total number of items in the dataset after the last load
+
+    /**
+     * The total number of items in the dataset after the last load
+     */
     private int previousTotal = 0;
+
     // The current page
-    private int currentPage = 1;
-    // True if setFinished() has been called
+    //private int currentPage = 1;
+
+    /**
+     * True if setFinished() has been called
+     */
     private boolean isFinished = false;
 
     private StaggeredGridLayoutManager layoutManager;
 
     /** Getters */
-    public int getCurrentPage() { return currentPage; }
+    //public int getCurrentPage() { return currentPage; }
     public boolean isFinished() { return isFinished; }
 
     /**
@@ -40,8 +49,7 @@ public abstract class StaggeredScrollListener extends RecyclerView.OnScrollListe
 
         int visibleItemCount = recyclerView.getChildCount();
         int totalItemCount   = layoutManager.getItemCount();
-        int firstVisibleItem = layoutManager
-                .findFirstCompletelyVisibleItemPositions(null)[0]; //TODO: Could be dangerous
+        int firstVisibleItem = findFirstVisibleItem();
 
         if (firstVisibleItem < 0) return;
 
@@ -52,9 +60,18 @@ public abstract class StaggeredScrollListener extends RecyclerView.OnScrollListe
                 <= (firstVisibleItem + VISIBLE_THRESHOLD);
 
         if (endReached) {
-            currentPage++;
-            onLoadMore(currentPage);
+            onLoadMore();
         }
+    }
+
+    private int findFirstVisibleItem() {
+        int[] firstCompletelyVisibleItemPositions = layoutManager
+                .findFirstCompletelyVisibleItemPositions(null);
+
+        if (firstCompletelyVisibleItemPositions.length > 0)
+            return firstCompletelyVisibleItemPositions[0];
+        else
+            return -1;
     }
 
     /**
@@ -62,7 +79,7 @@ public abstract class StaggeredScrollListener extends RecyclerView.OnScrollListe
      */
     public void reset() {
         previousTotal = 0;
-        currentPage = 1;
+        //currentPage = 1;
         isFinished = false;
     }
 
@@ -78,7 +95,7 @@ public abstract class StaggeredScrollListener extends RecyclerView.OnScrollListe
      * Use in onRestoreInstanceState()
      */
     public void restoreState(ScrollOutState state) {
-        this.currentPage   = state.currentPage;
+        //this.currentPage   = state.currentPage;
         this.previousTotal = state.previousTotal;
         this.isFinished    = state.isFinished;
     }
@@ -88,13 +105,13 @@ public abstract class StaggeredScrollListener extends RecyclerView.OnScrollListe
      * Use in onSaveInstanceState()
      */
     public ScrollOutState getOutState() {
-        return new ScrollOutState(currentPage, previousTotal, isFinished);
+        return new ScrollOutState(previousTotal, isFinished);
     }
 
     /**
-     * Allow client to define behaviour when next page is loaded.
+     * Allow client to define behaviour when next page should be loaded.
      */
-    public abstract void onLoadMore(int currentPage);
+    public abstract void onLoadMore();
 
     /**
      * Is previous request still loading?
@@ -103,14 +120,14 @@ public abstract class StaggeredScrollListener extends RecyclerView.OnScrollListe
 
     @Parcel
     public static class ScrollOutState {
-        public int currentPage;
+        //public int currentPage;
         public int previousTotal;
         public boolean isFinished;
 
         public ScrollOutState() {}
 
-        public ScrollOutState(int currentPage, int previousTotal, boolean isFinished) {
-            this.currentPage = currentPage;
+        public ScrollOutState(int previousTotal, boolean isFinished) {
+            //this.currentPage = currentPage;
             this.previousTotal = previousTotal;
             this.isFinished = isFinished;
         }

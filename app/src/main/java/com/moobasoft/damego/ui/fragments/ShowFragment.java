@@ -48,6 +48,7 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
     public static final String POST_ID_KEY       = "post_id";
     public static final String TAG_NAME_KEY      = "tag_name";
     public static final String OPEN_COMMENTS_KEY = "open_comments";
+
     public static final int CONTENT_PAGE  = 0;
     public static final int COMMENTS_PAGE = 1;
     public static final int BOOKMARK_ID = 444;
@@ -126,7 +127,7 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.removeGroup(R.id.fragment_specific_options);
         if (post != null) {
-            MenuItem item = menu.add( // TODO: ID won't work when same post is open twice
+            MenuItem item = menu.add( // FIXME: ID won't work when same post is open twice
                 R.id.fragment_specific_options, postIdArg + BOOKMARK_ID, 0, R.string.action_bookmark);
             MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
@@ -222,7 +223,7 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
     public Toolbar getToolbar() {
         toolbar.setTitle(tagNameArg);
         if (titleView != null) {
-            toolbar.setTitle(""); //TODO: Clean this up
+            toolbar.setTitle("");
             titleView.setText(tagNameArg);
         }
         return toolbar;

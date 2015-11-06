@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/content"
     android:clipToPadding="false"
-    android:paddingBottom="40dp"
+    android:paddingBottom="@dimen/show_bottom_padding"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 

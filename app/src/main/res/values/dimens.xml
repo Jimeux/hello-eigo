@@ -24,6 +24,7 @@
 
     <dimen name="show_backdrop_negative_margin">250dp</dimen>
     <dimen name="show_backdrop_height">250dp</dimen>
+    <dimen name="show_bottom_padding">@dimen/show_land_margin</dimen>
     <dimen name="show_padding">22dp</dimen>
     <dimen name="show_tag_text">17dp</dimen>
     <dimen name="show_title_text">26sp</dimen>

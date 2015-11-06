@@ -26,7 +26,8 @@ public class MainModule {
         return new RxSubscriber(Schedulers.io(), AndroidSchedulers.mainThread());
     }
 
-    @PerActivity @Provides
+    @PerActivity
+    @Provides
     public ConnectPresenter loginPresenter(RxSubscriber subscriptionManager,
                                            UserService userService,
                                            CredentialStore credentialStore) {
