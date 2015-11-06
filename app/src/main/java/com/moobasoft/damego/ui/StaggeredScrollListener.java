@@ -43,7 +43,8 @@ public abstract class StaggeredScrollListener extends RecyclerView.OnScrollListe
 
     @Override
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-        if (layoutManager == null || isRefreshing() || isFinished) return;
+        if (layoutManager == null || isRefreshing() || isFinished || dy == 0)
+            return;
 
         super.onScrolled(recyclerView, dx, dy);
 

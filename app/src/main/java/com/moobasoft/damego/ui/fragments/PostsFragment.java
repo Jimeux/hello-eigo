@@ -18,10 +18,12 @@ import com.moobasoft.damego.ui.StaggeredScrollListener;
 import com.moobasoft.damego.ui.activities.MainActivity;
 import com.moobasoft.damego.ui.fragments.base.RxFragment;
 import com.moobasoft.damego.ui.presenters.PostsPresenter;
+import com.moobasoft.damego.ui.presenters.base.Presenter;
 
 import org.parceler.Parcels;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.inject.Inject;
 
@@ -70,6 +72,23 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
     @Bind(R.id.post_recycler) RecyclerView postsRecyclerView;
     @Bind(R.id.swipe_refresh) SwipeRefreshLayout refreshLayout;
 
+
+
+
+    private UUID presenterUuid;
+
+    public static final String UUID_KEY  = "uuid_key";
+
+    public interface PresenterHost {
+        void putPresenter(UUID key, Presenter presenter);
+        Presenter getPresenter(UUID key);
+    }
+
+
+
+
+
+
     public PostsFragment() {}
 
     public static PostsFragment newInstance(Mode mode, String tagName) {
@@ -84,7 +103,6 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
     @Override
     public void onCreate(@Nullable Bundle state) {
         super.onCreate(state);
-        getComponent().inject(this);
         tagName = getArguments().getString(TAG_NAME_ARG);
         mode = (Mode) getArguments().getSerializable(MODE_ARG);
         int columns = getResources().getInteger(R.integer.main_list_columns);
@@ -103,6 +121,7 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
 
     private void restoreState(@Nullable Bundle state) {
         if (state != null) {
+            presenterUuid = (UUID) state.getSerializable(UUID_KEY);
             currentPage = state.getInt(PAGE_KEY);
             List<Post> posts = Parcels.unwrap(state.getParcelable(POSTS_KEY));
             scrollListener.restoreState(Parcels.unwrap(state.getParcelable(SCROLL_KEY)));
@@ -124,10 +143,21 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
     public void onActivityCreated(@Nullable Bundle state) {
         super.onActivityCreated(state);
 
+        presenter = (PostsPresenter)
+                ((PresenterHost) getActivity()).getPresenter(presenterUuid);
+
+        if (presenter == null) {
+            getComponent().inject(this);
+            presenterUuid = UUID.randomUUID();
+            ((PresenterHost) getActivity()).putPresenter(presenterUuid, presenter);
+        }
+
         presenter.bindView(this);
 
         if (state == null) { // Add first-init check
             loadPosts(false);
+        } else if (presenter.requestInProgress()) {
+            showLoadingIndicator();
         } else {
             if (postsAdapter.getPostList().isEmpty())
                 activateEmptyView(getString(R.string.no_posts_found));
@@ -151,6 +181,7 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
+        state.putSerializable(UUID_KEY, presenterUuid);
         state.putInt(PAGE_KEY, currentPage);
         state.putParcelable(POSTS_KEY, Parcels.wrap(postsAdapter.getPostList()));
         state.putParcelable(SCROLL_KEY, Parcels.wrap(scrollListener.getOutState()));
@@ -181,17 +212,13 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
     private void setRefreshLayoutEnabled() {
         if (refreshLayout == null || postsRecyclerView == null)
             return;
-        boolean canRefresh = appBarIsExpanded &&
+        boolean canRefresh = !mode.equals(Mode.SEARCH) && appBarIsExpanded &&
                 !ViewCompat.canScrollVertically(postsRecyclerView, -1);
         refreshLayout.setEnabled(canRefresh);
     }
 
     private void loadPosts(boolean refresh) {
-        if (currentPage == 1 || errorView.getVisibility() == VISIBLE || emptyView.getVisibility() == VISIBLE)
-            activateLoadingView();
-        else
-            refreshLayout.setRefreshing(true);
-
+        showLoadingIndicator();
         presenter.loadPosts(mode, tagName, refresh, currentPage);
     }
 
@@ -211,6 +238,13 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
             activateContentView();
             postsAdapter.loadPosts(newPosts);
         }
+    }
+
+    private void showLoadingIndicator() {
+        if (currentPage == 1 || errorView.getVisibility() == VISIBLE || emptyView.getVisibility() == VISIBLE)
+            activateLoadingView();
+        else
+            refreshLayout.setRefreshing(true);
     }
 
     @Override

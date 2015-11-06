@@ -50,8 +50,10 @@ public class SearchFragment extends Fragment implements MainActivity.ToolbarFrag
         @Override
         public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
             boolean containsText = cs.length() > 0;
-            searchInput.setError(null);
-            clearBtn.setVisibility(containsText ? View.VISIBLE : View.INVISIBLE);
+            if (searchInput != null) {
+                searchInput.setError(null);
+                clearBtn.setVisibility(containsText ? View.VISIBLE : View.INVISIBLE);
+            }
         }
         @Override public void beforeTextChanged(CharSequence a0, int a1, int a2, int a3) {}
         @Override public void afterTextChanged(Editable arg0) {}

@@ -15,6 +15,11 @@ import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.MainManager;
 import com.moobasoft.damego.ui.activities.base.BaseActivity;
 import com.moobasoft.damego.ui.fragments.IndexFragment;
+import com.moobasoft.damego.ui.fragments.PostsFragment;
+import com.moobasoft.damego.ui.fragments.PresenterRetainer;
+import com.moobasoft.damego.ui.presenters.base.Presenter;
+
+import java.util.UUID;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -22,7 +27,7 @@ import butterknife.ButterKnife;
 import static android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import static com.moobasoft.damego.ui.PostsAdapter.OnPostClickListener;
 
-public class MainActivity extends BaseActivity implements OnPostClickListener, OnBackStackChangedListener {
+public class MainActivity extends BaseActivity implements OnPostClickListener, OnBackStackChangedListener, PostsFragment.PresenterHost {
 
     public interface ToolbarFragment {
         Toolbar getToolbar();
@@ -32,6 +37,32 @@ public class MainActivity extends BaseActivity implements OnPostClickListener, O
     private MainManager manager;
 
     @Bind(R.id.container) ViewGroup container;
+
+    public static final String TAG_RETAINER = "retainer_tag";
+
+    private PresenterRetainer getRetainer() {
+        PresenterRetainer retainer = (PresenterRetainer)
+                fragmentManager.findFragmentByTag(TAG_RETAINER);
+        if (retainer == null) {
+            retainer = new PresenterRetainer();
+            fragmentManager.beginTransaction()
+                    .add(retainer, TAG_RETAINER).commit();
+        }
+        return retainer;
+    }
+
+    @Override
+    public void putPresenter(UUID key, Presenter presenter) {
+        getRetainer().put(key, presenter);
+    }
+
+    @Override
+    public Presenter getPresenter(UUID key) {
+        return getRetainer().get(key);
+    }
+
+
+
 
     @Override
     protected void onCreate(Bundle state) {

@@ -1,7 +1,5 @@
 package com.moobasoft.damego;
 
-import com.moobasoft.damego.ui.presenters.base.Presenter;
-
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
@@ -9,37 +7,35 @@ import java.util.concurrent.TimeUnit;
 import rx.Observable;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
+import rx.subjects.BehaviorSubject;
 
 public class ExampleUnitTest {
 
     @Test
     public void addition_isCorrect() throws Exception {
+        BehaviorSubject<String> subject = BehaviorSubject.create();
 
-        Observable<Integer> cache = Observable.just(111).cache();
+        /** User loads view and network request begins */
+        Observable.just("value")
+                .delay(200, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(subject::onNext);
 
-        Subscription subscription = cache
-                .delay(1, TimeUnit.SECONDS)
-                .observeOn(Schedulers.immediate())
-                .subscribeOn(Schedulers.immediate())
-                .subscribe(System.out::println);
+        Subscription portraitSub = subject.subscribe(
+                s -> System.out.println("Portrait: " + s));
 
-        subscription.unsubscribe();
+        /** onDestroy() */
+        portraitSub.unsubscribe();
 
-        cache.subscribe(System.out::println);
+        /** Rotating... */
+        Thread.sleep(300);
 
+        /** onRestoreInstanceState **/
+        Subscription landscapeSub = subject.subscribe(
+                s -> System.out.println("Landscape: " + s));
+
+        /** Output */
+        // > Landscape: value
     }
 
-    class Testenter extends Presenter {
-
-        private final String name;
-
-        public Testenter(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
 }

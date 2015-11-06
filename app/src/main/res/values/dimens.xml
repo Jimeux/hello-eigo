@@ -8,6 +8,11 @@
 
     <dimen name="shadow_height">2dp</dimen>
 
+    <dimen name="portrait_title_size">20sp</dimen>
+    <dimen name="land_title_size">18sp</dimen>
+    <dimen name="show_land_overlap_top">75dp</dimen>
+    <dimen name="show_land_margin">16dp</dimen>
+
     <dimen name="comment_elevation">1dp</dimen>
     <dimen name="comment_card_margin_vert">2dp</dimen>
     <dimen name="comment_card_margin_horiz">2dp</dimen>
@@ -17,10 +22,6 @@
     <dimen name="comment_body_text">16sp</dimen>
     <dimen name="comment_list_margin_vert">6dp</dimen>
     <dimen name="comment_list_margin_horiz">6dp</dimen>
-
-    <dimen name="land_title_size">18sp</dimen>
-    <dimen name="show_land_overlap_top">75dp</dimen>
-    <dimen name="show_land_margin">16dp</dimen>
 
     <dimen name="show_backdrop_negative_margin">250dp</dimen>
     <dimen name="show_backdrop_height">250dp</dimen>

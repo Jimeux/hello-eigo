@@ -3,7 +3,6 @@ package com.moobasoft.damego.ui.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -65,7 +64,7 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
     @Nullable @Bind(R.id.title_view) TextView titleView;
 
     @Bind(R.id.toolbar)    Toolbar toolbar;
-    @Bind(R.id.app_bar)    AppBarLayout appBarLayout;
+    //@Bind(R.id.app_bar)    AppBarLayout appBarLayout;
     @Bind(R.id.tab_layout) TabLayout tabLayout;
     @Bind(R.id.view_pager) ViewPager viewPager;
     @Bind(R.id.fab)        FloatingActionButton fab;
@@ -105,7 +104,7 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
         ButterKnife.bind(this, view);
         tabLayout.setVisibility(GONE);
         presenter.bindView(this);
-        appBarLayout.setExpanded(false, false);
+        //appBarLayout.setExpanded(false, false);
         return view;
     }
 
@@ -199,7 +198,7 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
 
     private void loadPost(Post post) {
         getActivity().supportInvalidateOptionsMenu();
-        appBarLayout.setExpanded(true, false);
+        //appBarLayout.setExpanded(true, false);
 
         ShowAdapter showAdapter = new ShowAdapter(getChildFragmentManager(), post);
         viewPager.setAdapter(showAdapter);
@@ -232,7 +231,7 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
     @Override
     public void onError(int messageId) {
         super.onError(messageId);
-        appBarLayout.setExpanded(false, false);
+        //appBarLayout.setExpanded(false, false);
         bookmarkRequestOngoing = false;
         getActivity().supportInvalidateOptionsMenu();
     }
