@@ -7,7 +7,7 @@
     android:fitsSystemWindows="true"
     android:background="@color/white"
     android:orientation="vertical"
-    tools:context="com.moobasoft.damego.ui.activities.CreateCommentActivity">
+    tools:context="com.moobasoft.helloeigo.ui.activities.CreateCommentActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"

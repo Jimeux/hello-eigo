@@ -31,10 +31,12 @@
 -keepattributes *Annotation*
 -keep class com.google.gson.stream.** { *; }
 
--keep class com.moobasoft.damego.rest.models.** { *; }
--keepclassmembers class com.moobasoft.damego.rest.models.** { *; }
--keep class com.moobasoft.damego.rest.requests.** { *; }
--keepclassmembers class com.moobasoft.damego.rest.requests.** { *; }
+-keep class com.moobasoft.helloeigo.rest.models.** { *; }
+-keepclassmembers class com.moobasoft.helloeigo.rest.models.** { *; }
+-keep class com.moobasoft.helloeigo.rest.requests.** { *; }
+-keepclassmembers class com.moobasoft.helloeigo.rest.requests.** { *; }
+-keep class com.moobasoft.helloeigo.rest.errors.** { *; }
+-keepclassmembers class com.moobasoft.helloeigo.rest.errors.** { *; }
 
 # Hax
 -keepattributes InnerClasses,Deprecated,SourceFile,LineNumberTable,EnclosingMethod

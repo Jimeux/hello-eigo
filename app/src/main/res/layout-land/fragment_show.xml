@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/greyBackground"
-    tools:context="com.moobasoft.damego.ui.fragments.ShowFragment">
+    tools:context="com.moobasoft.helloeigo.ui.fragments.ShowFragment">
 
     <include layout="@layout/toolbar_show" />
 

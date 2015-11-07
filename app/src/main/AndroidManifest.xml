@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.moobasoft.damego" >
+    package="com.moobasoft.helloeigo" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
-        android:name=".App"
+        android:name="com.moobasoft.helloeigo.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
 
         <activity
-            android:name=".ui.activities.MainActivity"
+            android:name="com.moobasoft.helloeigo.ui.activities.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.TransStatusBar" >
 
@@ -26,13 +26,13 @@
         </activity>
 
         <activity
-            android:name=".ui.activities.CreateCommentActivity"
+            android:name="com.moobasoft.helloeigo.ui.activities.CreateCommentActivity"
             android:label="@string/title_activity_create_comment"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
 
         <activity
-            android:name=".ui.activities.ConnectActivity"
+            android:name="com.moobasoft.helloeigo.ui.activities.ConnectActivity"
             android:theme="@style/AppTheme.Titleless" >
         </activity>
 

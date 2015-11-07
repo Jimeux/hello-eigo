@@ -7,7 +7,7 @@
     android:minWidth="350dp"
     android:maxWidth="380dp"
     android:orientation="vertical"
-    tools:context="com.moobasoft.damego.ui.activities.ConnectActivity">
+    tools:context="com.moobasoft.helloeigo.ui.activities.ConnectActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"

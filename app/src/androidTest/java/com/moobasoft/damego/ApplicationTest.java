@@ -1,4 +1,4 @@
-package com.moobasoft.damego;
+package com.moobasoft.helloeigo;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

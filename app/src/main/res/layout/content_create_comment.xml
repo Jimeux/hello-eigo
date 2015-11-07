@@ -18,5 +18,5 @@
     android:hint="@string/comment_hint"
     android:textColorHint="@color/grey400"
 
-    tools:context="com.moobasoft.damego.ui.activities.CreateCommentActivity"
+    tools:context="com.moobasoft.helloeigo.ui.activities.CreateCommentActivity"
     tools:showIn="@layout/activity_create_comment" />

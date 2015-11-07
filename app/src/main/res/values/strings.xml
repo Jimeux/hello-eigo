@@ -16,7 +16,7 @@
     <string name="title_activity_create_comment"></string>
     <string name="comment_length_error">2～500文字以内のコメントを書いてください</string>
     <string name="comment_submitting">コメントを送信中</string>
-    <string name="comment_success">コメントを送信しました。</string>
+    <string name="comment_success">コメントを送信しました</string>
     <string name="comment_hint">コメントを書き込む</string>
     <string name="discard_comment_dialog">データを破棄して戻りますか？</string>
 
@@ -36,7 +36,7 @@
     <string name="logout">ログアウト</string>
 
     <!-- Comments -->
-    <string name="comments_empty">コメントはまだありません。</string>
+    <string name="comments_empty">コメントはまだありません</string>
 
    <!-- Posts -->
     <string name="post_list_footer">これ以上記事はありません。</string>
@@ -54,7 +54,7 @@
 
     <!-- Status messages -->
     <string name="loading_list">Loading…</string>
-    <string name="empty_list">コメントはまだありません。</string>
+    <string name="empty_list">コメントはまだありません</string>
     <string name="bookmarks_title">ブックマーク</string>
     <string name="search_hint">検索キーワードを入力してください…</string>
     <string name="search_error_length">2文字以上のキーワードを入力してください</string>
