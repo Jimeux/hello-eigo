@@ -1,24 +1,24 @@
 <resources>
-    <string name="app_name">Damego</string>
+    <string name="app_name">Hello Eigo</string>
 
     <!-- Menu items -->
     <string name="action_settings">設定</string>
 
     <string name="action_save_comment">送信</string>
-    <string name="action_discard_comment">破棄</string>
+    <string name="action_discard_comment">キャンセル</string>
     <string name="action_search">検索</string>
     <string name="action_share">シェア</string>
-    <string name="action_bookmark">保存する</string>
+    <string name="action_bookmark">ブックマーク</string>
     <string name="action_unbookmark">削除</string>
     <string name="action_bookmarks">ブックマーク</string>
 
     <!--　Create comment　-->
     <string name="title_activity_create_comment"></string>
-    <string name="comment_length_error">文字列が2～500文字以内のコメントを書いてください</string>
+    <string name="comment_length_error">2～500文字以内のコメントを書いてください</string>
     <string name="comment_submitting">コメントを送信中</string>
-    <string name="comment_success">コメントを作成しました。</string>
+    <string name="comment_success">コメントを送信しました。</string>
     <string name="comment_hint">コメントを書き込む</string>
-    <string name="discard_comment_dialog">データをなくして戻りますか？</string>
+    <string name="discard_comment_dialog">データを破棄して戻りますか？</string>
 
     <!-- Comments preview -->
     <string name="comments_title">%1$sコメント</string>
@@ -26,7 +26,7 @@
 
     <string name="login_success">ログインしました</string>
     <string name="login_error">ログインできませんでした</string>
-    <string name="register_success">Damegoへようこそ、%1$s</string>
+    <string name="register_success">Hello Eigoへようこそ、%1$s</string>
     <string name="register">登録する</string>
     <string name="login">ログイン</string>
     <string name="username">ユーザー名</string>
@@ -39,25 +39,24 @@
     <string name="comments_empty">コメントはまだありません。</string>
 
    <!-- Posts -->
-    <string name="post_list_footer">ポストはノーモア残っている。</string>
-    <string name="no_more_posts">ポストはもうありません</string>
-    <string name="no_posts_found">ポストはありません</string>
+    <string name="post_list_footer">これ以上記事はありません。</string>
+    <string name="no_posts_found">記事はありません</string>
 
-    <string name="bookmark_deleted">Bookmarksから外しました</string>
-    <string name="bookmark_created">Bookmarksに追加しました</string>
+    <string name="bookmark_deleted">ブックマークから削除しました</string>
+    <string name="bookmark_created">ブックマークに追加しました</string>
 
     <!-- General errors -->
     <string name="error_default">エラーが発生しました</string>
     <string name="error_unauthorized">ログインしてください</string>
     <string name="error_offline">現在オフラインです</string>
-    <string name="error_timeout">サーバへのリクエストがタイムアウトしました</string>
-    <string name="error_server">サーバに接続できません</string>
+    <string name="error_timeout">リクエストがタイムアウトしました</string>
+    <string name="error_server">サーバーに接続できません</string>
 
     <!-- Status messages -->
     <string name="loading_list">Loading…</string>
     <string name="empty_list">コメントはまだありません。</string>
-    <string name="bookmarks_title">Bookmarks</string>
-    <string name="search_hint">Enter a search term...</string>
-    <string name="search_error_length">\"Search term is too short!\"</string>
+    <string name="bookmarks_title">ブックマーク</string>
+    <string name="search_hint">検索キーワードを入力してください…</string>
+    <string name="search_error_length">2文字以上のキーワードを入力してください</string>
 
 </resources>
