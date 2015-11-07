@@ -1,23 +1,26 @@
 package com.moobasoft.damego.rest.models;
 
-import org.parceler.Parcel;
+import android.os.Parcelable;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-@Parcel
-public class Post {
+public class Post implements Parcelable {
 
-    int id;
-    String title;
-    String body;
-    List<Comment> comments;
-    List<String> tags;
-    Date createdAt;
-    String imageUrl;
-    String thumbnailUrl;
-    int commentsCount;
-    boolean bookmarked;
+    private int id;
+    private String title;
+    private String body;
+    private List<Comment> comments;
+    private List<String> tags;
+    private Date createdAt;
+    private String imageUrl;
+    private String thumbnailUrl;
+    private int commentsCount;
+    private boolean bookmarked;
+
+    public Post() {}
 
     public int getId() {
         return id;
@@ -28,7 +31,7 @@ public class Post {
     }
 
     public String getTitle() {
-        return title;
+        return title != null ? title : "";
     }
 
     public void setTitle(String title) {
@@ -36,7 +39,7 @@ public class Post {
     }
 
     public String getBody() {
-        return body;
+        return body != null ? body : "";
     }
 
     public void setBody(String body) {
@@ -44,7 +47,7 @@ public class Post {
     }
 
     public List<Comment> getComments() {
-        return comments;
+        return comments != null ? comments : Collections.emptyList();
     }
 
     public void setComments(List<Comment> comments) {
@@ -52,7 +55,7 @@ public class Post {
     }
 
     public List<String> getTags() {
-        return tags;
+        return tags != null ? tags : Collections.emptyList();
     }
 
     public void setTags(List<String> tags) {
@@ -103,4 +106,53 @@ public class Post {
     public String toString() {
         return String.format("%s%n%s", title, body);
     }
+
+    /**
+     *  Code to implement Parcelable
+     */
+
+    public Post(android.os.Parcel source) {
+        id    = source.readInt();
+        title = source.readString();
+        body  = source.readString();
+
+        comments = new ArrayList<>();
+        source.readTypedList(comments, Comment.CREATOR);
+        tags = new ArrayList<>();
+        source.readStringList(tags);
+
+        createdAt     = new Date(source.readLong());
+        imageUrl      = source.readString();
+        thumbnailUrl  = source.readString();
+        commentsCount = source.readInt();
+        bookmarked    = (source.readByte() == 1);
+    }
+
+    @Override
+    public int describeContents() { return id; }
+
+    @Override
+    public void writeToParcel(android.os.Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(title);
+        dest.writeString(body);
+        dest.writeTypedList(comments);
+        dest.readStringList(tags);
+        dest.writeLong(createdAt.getTime());
+        dest.writeString(imageUrl);
+        dest.writeString(thumbnailUrl);
+        dest.writeInt(commentsCount);
+        dest.writeByte((byte) (bookmarked ? 1 : 0));
+    }
+
+    public static final Parcelable.Creator<Post> CREATOR = new Parcelable.Creator<Post>() {
+
+        public Post createFromParcel(android.os.Parcel in) {
+            return new Post(in);
+        }
+
+        public Post[] newArray(int size) {
+            return new Post[size];
+        }
+    };
 }

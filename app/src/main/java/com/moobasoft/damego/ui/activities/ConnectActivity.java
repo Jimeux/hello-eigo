@@ -143,7 +143,7 @@ public class ConnectActivity extends BaseActivity implements ConnectPresenter.Vi
     @Override
     public void onLoginError() {
         setProcessing(false);
-        usernameEt.setError(getString(R.string.login_error));
+        usernameEt.setError(getString(R.string.login_error)); //FIXME: Shows as a blank white box on API 10
     }
 
     @Override
@@ -157,7 +157,7 @@ public class ConnectActivity extends BaseActivity implements ConnectPresenter.Vi
                                     @Nullable String email,
                                     @Nullable String password) {
         setProcessing(false);
-        usernameEt.setError(username);
+        usernameEt.setError(username); // FIXME: Not displaying
         emailEt.setError(email);
         passwordEt.setError(password);
     }

@@ -13,8 +13,6 @@ import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.CommentsAdapter;
 import com.moobasoft.damego.ui.fragments.base.RxFragment;
 
-import org.parceler.Parcels;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -33,7 +31,7 @@ public class CommentsFragment extends RxFragment implements OnRefreshListener {
     public static CommentsFragment newInstance(Post post) {
         CommentsFragment fragment = new CommentsFragment();
         Bundle args = new Bundle();
-        args.putParcelable(POST_KEY, Parcels.wrap(post));
+        args.putParcelable(POST_KEY, post);
         fragment.setArguments(args);
         return fragment;
     }
@@ -43,7 +41,7 @@ public class CommentsFragment extends RxFragment implements OnRefreshListener {
         View view = inflater.inflate(R.layout.fragment_comments, container, false);
         ButterKnife.bind(this, view);
         initialiseRecyclerView();
-        Post post = Parcels.unwrap(getArguments().getParcelable(POST_KEY));
+        Post post = getArguments().getParcelable(POST_KEY);
 
         if (post != null && post.getComments() != null) {
             if (post.getComments().isEmpty())

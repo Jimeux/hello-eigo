@@ -7,6 +7,8 @@
     android:layout_height="wrap_content"
     android:background="@color/colorPrimary"
     android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     app:elevation="2dp">
 
     <android.support.v7.widget.Toolbar

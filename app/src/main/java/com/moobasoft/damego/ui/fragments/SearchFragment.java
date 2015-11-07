@@ -73,6 +73,7 @@ public class SearchFragment extends Fragment implements MainActivity.ToolbarFrag
     @Override
     public Toolbar getToolbar() {
         toolbar.setTitle("");
+        initialiseSearchInput();
         return toolbar;
     }
 
@@ -80,7 +81,7 @@ public class SearchFragment extends Fragment implements MainActivity.ToolbarFrag
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
         ButterKnife.bind(this, view);
-        initialiseSearchInput();
+        //initialiseSearchInput();
         return view;
     }
 
@@ -90,6 +91,7 @@ public class SearchFragment extends Fragment implements MainActivity.ToolbarFrag
         searchInput.setOnFocusChangeListener((v, hasFocus) -> {
             if (searchInput != null) Util.setImeVisibility(hasFocus, searchInput);
         });
+        // FIXME: Not getting focus on API 10/Infobar
         searchInput.requestFocus();
 
         clearBtn.setOnClickListener(v -> {

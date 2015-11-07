@@ -16,8 +16,6 @@ import com.moobasoft.damego.rest.models.Post;
 import com.moobasoft.damego.ui.activities.MainActivity;
 import com.moobasoft.damego.util.Util;
 
-import org.parceler.Parcels;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -36,7 +34,7 @@ public class ContentFragment extends Fragment {
     public static ContentFragment newInstance(Post post) {
         ContentFragment fragment = new ContentFragment();
         Bundle args = new Bundle();
-        args.putParcelable(POST_KEY, Parcels.wrap(post));
+        args.putParcelable(POST_KEY, post);
         fragment.setArguments(args);
         return fragment;
     }
@@ -51,7 +49,7 @@ public class ContentFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_content, container, false);
         ButterKnife.bind(this, view);
 
-        post = Parcels.unwrap(getArguments().getParcelable(POST_KEY)); // TODO: Check and throw error
+        post = getArguments().getParcelable(POST_KEY); // TODO: Check and throw error
         title.setText(post.getTitle());
         body.setText(Html.fromHtml(post.getBody().trim().replaceAll("[\n\r]", "")));
         Glide.with(this)

@@ -56,6 +56,9 @@ public abstract class RxPresenter<V extends RxPresenter.RxView> extends Presente
     public void handleError(Throwable throwable) {
         String message = throwable.getMessage();
 
+        // 401 is giving java.io.EOFException on API 10
+        // java.net.SocketException: No route to host
+
         if (throwable instanceof SocketTimeoutException)
             view.onError(R.string.error_timeout);
         else if (message != null && message.contains(OFFLINE_CODE))

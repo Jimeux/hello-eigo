@@ -1,16 +1,20 @@
 package com.moobasoft.damego.rest.models;
 
+import android.os.Parcelable;
+
 import java.util.Date;
 
-public class User {
+public class User implements Parcelable {
 
-    int id;
-    String username;
-    String email;
-    String password;
-    String avatar;
-    Date createdAt;
-    String avatarUrl;
+    private int id;
+    private String username;
+    private String email;
+    private String password;
+    private String avatar;
+    private Date createdAt;
+    private String avatarUrl;
+
+    public User() {}
 
     public int getId() {
         return id;
@@ -67,4 +71,43 @@ public class User {
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
     }
+
+    /**
+     *  Code to implement Parcelable
+     */
+
+    public User(android.os.Parcel source) {
+        id        = source.readInt();
+        username  = source.readString();
+        email     = source.readString();
+        password  = source.readString();
+        avatar    = source.readString();
+//        createdAt = new Date(source.readLong());
+        avatarUrl = source.readString();
+    }
+
+    @Override
+    public int describeContents() { return id; }
+
+    @Override
+    public void writeToParcel(android.os.Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(username);
+        dest.writeString(email);
+        dest.writeString(password);
+        dest.writeString(avatar);
+//        dest.writeLong(createdAt.getTime());
+        dest.writeString(avatarUrl);
+    }
+
+    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
+
+        public User createFromParcel(android.os.Parcel in) {
+            return new User(in);
+        }
+
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
 }

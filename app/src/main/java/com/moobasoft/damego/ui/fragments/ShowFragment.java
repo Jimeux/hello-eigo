@@ -28,8 +28,6 @@ import com.moobasoft.damego.ui.activities.base.BaseActivity;
 import com.moobasoft.damego.ui.fragments.base.RxFragment;
 import com.moobasoft.damego.ui.presenters.ShowPresenter;
 
-import org.parceler.Parcels;
-
 import java.util.List;
 
 import javax.inject.Inject;
@@ -113,7 +111,7 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
         super.onViewCreated(view, savedInstanceState);
 
         if (savedInstanceState != null)
-            post = Parcels.unwrap(savedInstanceState.getParcelable(POST_KEY));
+            post = savedInstanceState.getParcelable(POST_KEY);
 
         if (post != null)
             loadPost(post);
@@ -159,7 +157,7 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
-        state.putParcelable(POST_KEY, Parcels.wrap(post));
+        state.putParcelable(POST_KEY, post);
     }
 
     @Override

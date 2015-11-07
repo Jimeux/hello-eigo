@@ -1,9 +1,8 @@
 package com.moobasoft.damego.ui;
 
+import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-
-import org.parceler.Parcel;
 
 /**
  * Adapted from this gist: https://gist.github.com/ssinss/e06f12ef66c51252563e
@@ -112,8 +111,7 @@ public abstract class StaggeredScrollListener extends RecyclerView.OnScrollListe
      */
     public abstract boolean isRefreshing();
 
-    @Parcel
-    public static class ScrollOutState {
+    public static class ScrollOutState implements Parcelable {
         public int previousTotal;
         public boolean isFinished;
 
@@ -123,5 +121,34 @@ public abstract class StaggeredScrollListener extends RecyclerView.OnScrollListe
             this.previousTotal = previousTotal;
             this.isFinished = isFinished;
         }
+
+        /**
+         *  Code to implement Parcelable
+         */
+
+        public ScrollOutState(android.os.Parcel source) {
+            previousTotal = source.readInt();
+            isFinished    = (source.readByte() == 1);
+        }
+
+        @Override
+        public int describeContents() { return previousTotal; }
+
+        @Override
+        public void writeToParcel(android.os.Parcel dest, int flags) {
+            dest.writeInt(previousTotal);
+            dest.writeByte((byte) (this.isFinished ? 1 : 0));
+        }
+
+        public static final Parcelable.Creator<ScrollOutState> CREATOR = new Parcelable.Creator<ScrollOutState>() {
+
+            public ScrollOutState createFromParcel(android.os.Parcel in) {
+                return new ScrollOutState(in);
+            }
+
+            public ScrollOutState[] newArray(int size) {
+                return new ScrollOutState[size];
+            }
+        };
     }
 }

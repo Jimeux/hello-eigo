@@ -19,8 +19,6 @@ import com.moobasoft.damego.ui.activities.MainActivity;
 import com.moobasoft.damego.ui.fragments.base.RxFragment;
 import com.moobasoft.damego.ui.presenters.PostsPresenter;
 
-import org.parceler.Parcels;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -30,7 +28,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 import static android.view.View.VISIBLE;
-import static com.moobasoft.damego.ui.fragments.PresenterRetainer.*;
+import static com.moobasoft.damego.ui.fragments.PresenterRetainer.PresenterHost;
 
 public class PostsFragment extends RxFragment implements PostsPresenter.View,
         SwipeRefreshLayout.OnRefreshListener, AppBarLayout.OnOffsetChangedListener {
@@ -111,8 +109,8 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
         if (state != null) {
             presenterUuid = (UUID) state.getSerializable(UUID_KEY);
             currentPage = state.getInt(PAGE_KEY);
-            List<Post> posts = Parcels.unwrap(state.getParcelable(POSTS_KEY));
-            scrollListener.restoreState(Parcels.unwrap(state.getParcelable(SCROLL_KEY)));
+            List<Post> posts = state.getParcelableArrayList(POSTS_KEY);
+            scrollListener.restoreState(state.getParcelable(SCROLL_KEY));
             if (scrollListener.isFinished()) postsAdapter.setFinished();
             postsAdapter.loadPosts(posts);
         }
@@ -171,8 +169,8 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
         super.onSaveInstanceState(state);
         state.putSerializable(UUID_KEY, presenterUuid);
         state.putInt(PAGE_KEY, currentPage);
-        state.putParcelable(POSTS_KEY, Parcels.wrap(postsAdapter.getPostList()));
-        state.putParcelable(SCROLL_KEY, Parcels.wrap(scrollListener.getOutState()));
+        state.putParcelableArrayList(POSTS_KEY, postsAdapter.getPostList());
+        state.putParcelable(SCROLL_KEY, scrollListener.getOutState());
     }
 
     @Override

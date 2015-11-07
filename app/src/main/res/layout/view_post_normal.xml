@@ -19,7 +19,9 @@
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -27,7 +29,7 @@
                 android:orientation="horizontal">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="start|center"
@@ -40,7 +42,6 @@
                         android:layout_height="wrap_content"
                         android:maxLines="1"
                         android:ellipsize="end"
-                        android:text="Why Your English Sucks"
                         android:textColor="@color/grey900"
                         android:textSize="@dimen/main_title_text"
                         android:textStyle="bold" />
@@ -50,11 +51,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/main_title_spacing"
-                        android:ellipsize="end"
                         android:lineSpacingMultiplier="1.2"
-                        android:minLines="3"
+                        android:minLines="2"
                         android:maxLines="3"
-                        android:text="Should I blow this shit up?"
                         android:textColor="@color/grey700"
                         android:textSize="@dimen/main_body_text" />
 

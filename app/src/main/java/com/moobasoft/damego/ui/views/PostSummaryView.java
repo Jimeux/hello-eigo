@@ -1,7 +1,9 @@
 package com.moobasoft.damego.ui.views;
 
 import android.content.Context;
+import android.os.Build;
 import android.text.Html;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -41,6 +43,9 @@ public final class PostSummaryView extends LinearLayout {
     public void bindTo(Post post, int itemViewType, OnPostClickListener onPostClickListener, String tagName) {
         title.setText(post.getTitle());
         body.setText(Html.fromHtml(post.getBody()));
+        if (Build.VERSION.SDK_INT >= 16) //TODO: Find out from what version truncation issue is solved
+            body.setEllipsize(TextUtils.TruncateAt.END);
+
         commentsCount.setText(String.valueOf(post.getCommentsCount()));
         commentStrip.setOnClickListener(v -> onPostClickListener.onSummaryClicked(post, true, tagName));
         setOnClickListener(v -> onPostClickListener.onSummaryClicked(post, false, tagName));

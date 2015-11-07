@@ -91,8 +91,8 @@ dependencies {
     compile 'com.artemzin.rxjava:proguard-rules:1.0.14.2'
 
     /* Useful */
-    apt     "org.parceler:parceler:${PARCELER_VERSION}"
-    compile "org.parceler:parceler-api:${PARCELER_VERSION}"
+    //apt     "org.parceler:parceler:${PARCELER_VERSION}"
+    //compile "org.parceler:parceler-api:${PARCELER_VERSION}"
     compile 'com.github.bumptech.glide:glide:3.6.1'
     compile 'uk.co.chrisjenx:calligraphy:2.1.0'
     compile 'com.jakewharton:butterknife:7.0.1'
