@@ -69,7 +69,7 @@ public class IndexFragment extends RxFragment
 
     @Override
     public Toolbar getToolbar() {
-        if (titleView != null) toolbar.setTitle("");
+        toolbar.setTitle("");
         return toolbar;
     }
 

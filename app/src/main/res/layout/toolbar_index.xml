@@ -16,15 +16,10 @@
         app:layout_scrollFlags="scroll|enterAlways"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-        <TextView
-            android:id="@+id/title_view"
-            android:textColor="@color/white"
+        <ImageView
+            android:src="@drawable/hello_eigo_logo_title_centre"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginRight="25dp"
-            android:gravity="center"
-            android:text="@string/app_name"
-            android:textSize="@dimen/portrait_title_size" />
+            android:layout_height="wrap_content" />
 
     </android.support.v7.widget.Toolbar>
 

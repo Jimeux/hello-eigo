@@ -83,7 +83,7 @@ public class PostsAdapter extends RecyclerView.Adapter<ViewHolder> {
                 (position >= 9  && (position - 9)  % 6 == 0) ||
                 (position >= 10 && (position - 10) % 6 == 0)))
             return TYPE_FEATURED;
-        else if (columns == 2 && (position % 6 == 0 || (position >= 4 && (position + 2) % 6 == 0)))
+        else if (columns == 2 && (position % 10 == 0 || (position >= 6 && (position + 4) % 10 == 0)))
             return TYPE_FEATURED;
         else if (columns == 1 && (position % 10 == 0))
             return TYPE_FEATURED;

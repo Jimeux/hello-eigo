@@ -227,6 +227,14 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
     }
 
     @Override
+    public void promptForLogin() {
+        super.promptForLogin();
+        bookmarkRequestOngoing = false;
+        getActivity().supportInvalidateOptionsMenu();
+
+    }
+
+    @Override
     public void onError(int messageId) {
         super.onError(messageId);
         //appBarLayout.setExpanded(false, false);

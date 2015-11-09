@@ -56,7 +56,7 @@
     <string name="loading_list">Loading…</string>
     <string name="empty_list">コメントはまだありません</string>
     <string name="bookmarks_title">ブックマーク</string>
-    <string name="search_hint">検索キーワードを入力してください…</string>
+    <string name="search_hint">検索キーワードを入力…</string>
     <string name="search_error_length">2文字以上のキーワードを入力してください</string>
 
 </resources>

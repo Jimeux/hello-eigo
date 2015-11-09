@@ -6,6 +6,7 @@ import com.moobasoft.helloeigo.R;
 import com.moobasoft.helloeigo.rest.Rest;
 import com.moobasoft.helloeigo.ui.RxSubscriber;
 
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 public abstract class RxPresenter<V extends RxPresenter.RxView> extends Presenter<V> {
@@ -57,13 +58,13 @@ public abstract class RxPresenter<V extends RxPresenter.RxView> extends Presente
         String message = throwable.getMessage();
 
         // 401 is giving java.io.EOFException on API 10
-        // java.net.SocketException: No route to host
 
         if (throwable instanceof SocketTimeoutException)
             view.onError(R.string.error_timeout);
         else if (message != null && message.contains(OFFLINE_CODE))
             view.onError(R.string.error_offline);
-        else if (message != null && message.contains(SERVER_DOWN_CODE))
+        else if (message != null && message.contains(SERVER_DOWN_CODE) ||
+                throwable instanceof SocketException)
             view.onError(R.string.error_server);
         else {
             Log.e("Taggart", throwable.getMessage(), throwable);

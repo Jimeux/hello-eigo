@@ -28,7 +28,7 @@
     <dimen name="show_bottom_padding">@dimen/show_land_margin</dimen>
     <dimen name="show_padding">22dp</dimen>
     <dimen name="show_tag_text">17dp</dimen>
-    <dimen name="show_title_text">26sp</dimen>
+    <dimen name="show_title_text">30sp</dimen>
     <dimen name="show_body_text">18sp</dimen>
     <dimen name="show_comment_link_text">18dp</dimen>
     <dimen name="show_comment_link_padding">8dp</dimen>
