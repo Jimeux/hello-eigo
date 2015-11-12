@@ -137,7 +137,7 @@ public class Post implements Parcelable {
         dest.writeString(title);
         dest.writeString(body);
         dest.writeTypedList(comments);
-        dest.readStringList(tags);
+        dest.writeStringList(tags);
         dest.writeLong(createdAt.getTime());
         dest.writeString(imageUrl);
         dest.writeString(thumbnailUrl);
