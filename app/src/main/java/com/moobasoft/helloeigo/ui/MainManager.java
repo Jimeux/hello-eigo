@@ -5,11 +5,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
 import com.moobasoft.helloeigo.rest.models.Post;
-import com.moobasoft.helloeigo.ui.fragments.TagFragment;
 import com.moobasoft.helloeigo.ui.fragments.IndexFragment;
 import com.moobasoft.helloeigo.ui.fragments.PostsFragment.Mode;
 import com.moobasoft.helloeigo.ui.fragments.SearchFragment;
 import com.moobasoft.helloeigo.ui.fragments.ShowFragment;
+import com.moobasoft.helloeigo.ui.fragments.TagFragment;
 
 public class MainManager {
 

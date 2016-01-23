@@ -13,10 +13,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 
-import com.moobasoft.helloeigo.App;
 import com.moobasoft.helloeigo.R;
-import com.moobasoft.helloeigo.di.components.DaggerMainComponent;
-import com.moobasoft.helloeigo.di.modules.MainModule;
+import com.moobasoft.helloeigo.events.comment.CommentCreatedEvent;
 import com.moobasoft.helloeigo.rest.models.Comment;
 import com.moobasoft.helloeigo.ui.activities.base.BaseActivity;
 import com.moobasoft.helloeigo.ui.fragments.ShowFragment;
@@ -44,18 +42,10 @@ public class CreateCommentActivity extends BaseActivity implements CommentPresen
         setContentView(R.layout.activity_create_comment);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-
-        initialiseInjector();
+        getComponent().inject(this);
         initialiseSearchInput();
         postId = getIntent().getIntExtra(ShowFragment.POST_ID_KEY, -1);
         presenter.bindView(this);
-    }
-
-    private void initialiseInjector() {
-        DaggerMainComponent.builder()
-                .mainModule(new MainModule())
-                .appComponent(((App) getApplication()).getAppComponent())
-                .build().inject(this);
     }
 
     private void initialiseSearchInput() {
@@ -116,8 +106,13 @@ public class CreateCommentActivity extends BaseActivity implements CommentPresen
     @Override
     public void onCommentSubmitted(Comment comment) {
         progress.dismiss();
-        new ConfirmSubmitDialog()
-                .show(getSupportFragmentManager(), "confirmCreated");
+        finish();
+        eventBus.sendDelayed(new CommentCreatedEvent(comment), 500);
+        //Bundle bundle = new Bundle();
+        //bundle.putParcelable("COMMENT", comment);
+        //ConfirmSubmitDialog dialog = new ConfirmSubmitDialog();
+        //dialog.setArguments(bundle);
+        //dialog.show(getSupportFragmentManager(), "confirmCreated");
     }
 
     @Override
@@ -170,7 +165,7 @@ public class CreateCommentActivity extends BaseActivity implements CommentPresen
             AlertDialog ok = new AlertDialog.Builder(getActivity())
                     .setTitle(getString(R.string.comment_success))
                     .setPositiveButton("OK", (dialog, id) -> {
-                        getActivity().finish();
+                        //getActivity().finish();
                         ConfirmSubmitDialog.this.getDialog().dismiss();
                     })
                     .create();

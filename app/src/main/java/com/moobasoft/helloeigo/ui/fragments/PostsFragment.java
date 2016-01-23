@@ -12,6 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.moobasoft.helloeigo.R;
+import com.moobasoft.helloeigo.events.EventBus;
+import com.moobasoft.helloeigo.events.auth.LogOutEvent;
+import com.moobasoft.helloeigo.events.auth.LoginEvent;
 import com.moobasoft.helloeigo.rest.models.Post;
 import com.moobasoft.helloeigo.ui.PostsAdapter;
 import com.moobasoft.helloeigo.ui.StaggeredScrollListener;
@@ -26,6 +29,8 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import rx.Subscription;
+import rx.subscriptions.CompositeSubscription;
 
 import static android.view.View.VISIBLE;
 import static com.moobasoft.helloeigo.ui.fragments.PresenterRetainer.PresenterHost;
@@ -70,7 +75,10 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
     /** The current page of post data. Used as a query param. */
     private int currentPage = 1;
 
+    private CompositeSubscription eventSubscriptions;
+
     @Inject PostsPresenter presenter;
+    @Inject EventBus eventBus;
 
     @Bind(R.id.post_recycler) RecyclerView postsRecyclerView;
     @Bind(R.id.swipe_refresh) SwipeRefreshLayout refreshLayout;
@@ -84,6 +92,28 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
         args.putString(TAG_NAME_ARG, tagName);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override public void onStart() {
+        super.onStart();
+        subscribeToEvents();
+        appBarLayout.addOnOffsetChangedListener(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        appBarLayout.removeOnOffsetChangedListener(this);
+        if (eventSubscriptions != null)
+            eventSubscriptions.clear();
+    }
+
+    private void subscribeToEvents() {
+        Subscription loginEvent = eventBus.listenFor(LoginEvent.class)
+                        .subscribe(event -> onRefresh());
+        Subscription logOutEvent = eventBus.listenFor(LogOutEvent.class)
+                        .subscribe(event -> onRefresh());
+        eventSubscriptions = new CompositeSubscription(loginEvent, logOutEvent);
     }
 
     @Override
@@ -128,14 +158,16 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
     @Override
     public void onActivityCreated(@Nullable Bundle state) {
         super.onActivityCreated(state);
+        getComponent().inject(this);
 
-        presenter = (PostsPresenter)
+        PostsPresenter savedPresenter = (PostsPresenter)
                 ((PresenterHost) getActivity()).getPresenter(presenterUuid);
 
-        if (presenter == null) {
-            getComponent().inject(this);
+        if (savedPresenter == null) {
             presenterUuid = UUID.randomUUID();
             ((PresenterHost) getActivity()).putPresenter(presenterUuid, presenter);
+        } else {
+            presenter = savedPresenter;
         }
 
         presenter.bindView(this);
@@ -150,18 +182,6 @@ public class PostsFragment extends RxFragment implements PostsPresenter.View,
             else
                 activateContentView();
         }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        appBarLayout.addOnOffsetChangedListener(this);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        appBarLayout.removeOnOffsetChangedListener(this);
     }
 
     @Override

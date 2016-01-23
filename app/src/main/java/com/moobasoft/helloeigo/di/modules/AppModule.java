@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 import com.moobasoft.helloeigo.App;
 import com.moobasoft.helloeigo.CredentialStore;
+import com.moobasoft.helloeigo.events.EventBus;
 
 import javax.inject.Singleton;
 
@@ -21,6 +22,12 @@ public class AppModule {
 
     public AppModule(App application) {
         this.application = application;
+    }
+
+    @Provides
+    @Singleton
+    EventBus provideEventBus() {
+        return new EventBus();
     }
 
     @Provides

@@ -106,6 +106,10 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
         return view;
     }
 
+    @Override public void onStop() {
+        super.onStop();
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -242,7 +246,7 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
         getActivity().supportInvalidateOptionsMenu();
     }
 
-    public static class ShowAdapter extends FragmentPagerAdapter {
+    private static class ShowAdapter extends FragmentPagerAdapter {
 
         private final Post post;
 

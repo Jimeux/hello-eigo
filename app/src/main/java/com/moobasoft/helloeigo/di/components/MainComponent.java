@@ -5,6 +5,7 @@ import com.moobasoft.helloeigo.di.scopes.PerActivity;
 import com.moobasoft.helloeigo.ui.activities.ConnectActivity;
 import com.moobasoft.helloeigo.ui.activities.CreateCommentActivity;
 import com.moobasoft.helloeigo.ui.activities.MainActivity;
+import com.moobasoft.helloeigo.ui.fragments.CommentsFragment;
 import com.moobasoft.helloeigo.ui.fragments.IndexFragment;
 import com.moobasoft.helloeigo.ui.fragments.SearchFragment;
 import com.moobasoft.helloeigo.ui.fragments.ShowFragment;
@@ -30,5 +31,6 @@ public interface MainComponent {
     void inject(ConnectActivity connectActivity);
     void inject(PostsFragment postsFragment);
     void inject(IndexFragment indexFragment);
+    void inject(CommentsFragment commentsFragment);
 
 }

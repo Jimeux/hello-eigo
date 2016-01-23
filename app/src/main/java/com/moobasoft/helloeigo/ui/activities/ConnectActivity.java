@@ -15,6 +15,7 @@ import com.moobasoft.helloeigo.App;
 import com.moobasoft.helloeigo.R;
 import com.moobasoft.helloeigo.di.components.DaggerMainComponent;
 import com.moobasoft.helloeigo.di.modules.MainModule;
+import com.moobasoft.helloeigo.events.auth.LoginEvent;
 import com.moobasoft.helloeigo.ui.activities.base.BaseActivity;
 import com.moobasoft.helloeigo.ui.presenters.ConnectPresenter;
 
@@ -129,6 +130,7 @@ public class ConnectActivity extends BaseActivity implements ConnectPresenter.Vi
         setProcessing(false);
         Toast.makeText(this, getString(R.string.login_success), Toast.LENGTH_SHORT)
                 .show();
+        eventBus.send(new LoginEvent());
         finish();
     }
 
@@ -136,6 +138,7 @@ public class ConnectActivity extends BaseActivity implements ConnectPresenter.Vi
     public void onRegisterSuccess(String username) {
         setProcessing(false);
         Toast.makeText(this, getString(R.string.register_success, username), Toast.LENGTH_LONG).show();
+        eventBus.send(new LoginEvent());
         finish();
     }
 

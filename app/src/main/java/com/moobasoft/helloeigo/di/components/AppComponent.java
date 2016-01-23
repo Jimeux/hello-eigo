@@ -7,6 +7,7 @@ import com.moobasoft.helloeigo.di.modules.AppModule;
 import com.moobasoft.helloeigo.di.modules.EndpointModule;
 import com.moobasoft.helloeigo.di.modules.RestModule;
 import com.moobasoft.helloeigo.di.scopes.Endpoint;
+import com.moobasoft.helloeigo.events.EventBus;
 
 import javax.inject.Singleton;
 
@@ -22,6 +23,8 @@ import retrofit.Retrofit;
         }
 )
 public interface AppComponent {
+
+    EventBus eventBus();
 
     Context applicationContext();
 

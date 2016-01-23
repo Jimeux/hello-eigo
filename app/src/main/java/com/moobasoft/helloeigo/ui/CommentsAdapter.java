@@ -20,6 +20,11 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         this.commentList = new ArrayList<>();
     }
 
+    public void loadComment(Comment comment) {
+        commentList.add(0, comment);
+        notifyItemInserted(0);
+    }
+
     public void loadComments(List<Comment> comments) {
         commentList.addAll(comments);
         notifyDataSetChanged();

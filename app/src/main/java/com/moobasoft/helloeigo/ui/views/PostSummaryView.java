@@ -2,6 +2,7 @@ package com.moobasoft.helloeigo.ui.views;
 
 import android.content.Context;
 import android.os.Build;
+import android.support.v7.widget.CardView;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -23,6 +24,7 @@ import static com.moobasoft.helloeigo.ui.PostsAdapter.OnPostClickListener;
 import static com.moobasoft.helloeigo.ui.PostsAdapter.TYPE_FEATURED;
 
 public final class PostSummaryView extends LinearLayout {
+    @Bind(R.id.card_view)      CardView cardView;
     @Bind(R.id.image)          ImageView image;
     @Bind(R.id.title)          TextView title;
     @Bind(R.id.body)           TextView body;
@@ -48,7 +50,7 @@ public final class PostSummaryView extends LinearLayout {
 
         commentsCount.setText(String.valueOf(post.getCommentsCount()));
         commentStrip.setOnClickListener(v -> onPostClickListener.onSummaryClicked(post, true, tagName));
-        setOnClickListener(v -> onPostClickListener.onSummaryClicked(post, false, tagName));
+        cardView.setOnClickListener(v -> onPostClickListener.onSummaryClicked(post, false, tagName));
 
         loadImage(post, itemViewType);
         loadTags(post, onPostClickListener);

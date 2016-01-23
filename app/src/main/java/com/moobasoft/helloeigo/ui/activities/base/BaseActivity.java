@@ -11,6 +11,7 @@ import com.moobasoft.helloeigo.R;
 import com.moobasoft.helloeigo.di.components.DaggerMainComponent;
 import com.moobasoft.helloeigo.di.components.MainComponent;
 import com.moobasoft.helloeigo.di.modules.MainModule;
+import com.moobasoft.helloeigo.events.EventBus;
 import com.moobasoft.helloeigo.ui.activities.ConnectActivity;
 
 import javax.inject.Inject;
@@ -19,8 +20,8 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class BaseActivity extends AppCompatActivity {
 
-    @Inject
-    protected CredentialStore credentialStore;
+    @Inject protected EventBus eventBus;
+    @Inject protected CredentialStore credentialStore;
 
     @Override
     protected void attachBaseContext(Context newBase) {
