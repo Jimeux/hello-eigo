@@ -32,6 +32,9 @@ public class CommentsFragment extends RxFragment implements OnRefreshListener {
 
     private static final String POST_KEY = "post_key";
     private CommentsAdapter commentsAdapter;
+    private CompositeSubscription eventSubscriptions;
+
+    @Inject EventBus eventBus;
 
     public CommentsFragment() {}
 
@@ -62,9 +65,6 @@ public class CommentsFragment extends RxFragment implements OnRefreshListener {
         return view;
     }
 
-    private CompositeSubscription eventSubscriptions;
-    @Inject EventBus eventBus;
-
     @Override public void onStart() {
         super.onStart();
         subscribeToEvents();
@@ -78,14 +78,11 @@ public class CommentsFragment extends RxFragment implements OnRefreshListener {
     }
 
     private void subscribeToEvents() {
-/*        Subscription loginEvent = eventBus.listenFor(LoginEvent.class)
-                .subscribe(event -> getActivity().supportInvalidateOptionsMenu());
-        Subscription logOutEvent = eventBus.listenFor(LogOutEvent.class)
-                .subscribe(event -> getActivity().supportInvalidateOptionsMenu());*/
         Subscription createdEvent = eventBus
                 .listenFor(CommentCreatedEvent.class)
-                .map(CommentCreatedEvent::getComment)
-                .subscribe(commentsAdapter::loadComment);
+                //.map(CommentCreatedEvent::getComment)
+                //.subscribe(commentsAdapter::loadComment);
+                .subscribe(event -> onRefresh());
         eventSubscriptions = new CompositeSubscription(createdEvent);
     }
 

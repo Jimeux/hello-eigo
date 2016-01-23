@@ -21,6 +21,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.moobasoft.helloeigo.R;
+import com.moobasoft.helloeigo.events.EventBus;
+import com.moobasoft.helloeigo.events.auth.LogOutEvent;
+import com.moobasoft.helloeigo.events.auth.LoginEvent;
 import com.moobasoft.helloeigo.rest.models.Post;
 import com.moobasoft.helloeigo.ui.activities.CreateCommentActivity;
 import com.moobasoft.helloeigo.ui.activities.MainActivity;
@@ -35,6 +38,8 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Subscription;
+import rx.subscriptions.CompositeSubscription;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -55,7 +60,9 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
     private boolean openCommentsArg;
     private boolean bookmarkRequestOngoing = false;
     private Post post;
+    private CompositeSubscription eventSubscriptions;
 
+    @Inject EventBus eventBus;
     @Inject ShowPresenter presenter;
 
     /** w1024p view */
@@ -86,6 +93,26 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
         return fragment;
     }
 
+    @Override public void onStart() {
+        super.onStart();
+        subscribeToEvents();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (eventSubscriptions != null)
+            eventSubscriptions.clear();
+    }
+
+    private void subscribeToEvents() {
+        Subscription loginEvent = eventBus.listenFor(LoginEvent.class)
+                .subscribe(event -> onRefresh());
+        Subscription logOutEvent = eventBus.listenFor(LogOutEvent.class)
+                .subscribe(event -> onRefresh());
+        eventSubscriptions = new CompositeSubscription(loginEvent, logOutEvent);
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,10 +131,6 @@ public class ShowFragment extends RxFragment implements ShowPresenter.ShowView, 
         presenter.bindView(this);
         //appBarLayout.setExpanded(false, false);
         return view;
-    }
-
-    @Override public void onStop() {
-        super.onStop();
     }
 
     @Override

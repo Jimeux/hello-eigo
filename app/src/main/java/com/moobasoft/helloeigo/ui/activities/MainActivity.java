@@ -25,7 +25,6 @@ import java.util.UUID;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.subscriptions.CompositeSubscription;
 
 import static android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import static com.moobasoft.helloeigo.ui.PostsAdapter.OnPostClickListener;
@@ -39,7 +38,6 @@ public class MainActivity extends BaseActivity implements
 
     private FragmentManager fragmentManager;
     private MainManager manager;
-    private CompositeSubscription eventSubscriptions;
 
     @Bind(R.id.container) ViewGroup container;
 
@@ -66,33 +64,6 @@ public class MainActivity extends BaseActivity implements
 
         if (state == null) manager.initialiseFragments();
     }
-
-/*    @Override protected void onStart() {
-        super.onStart();
-        subscribeToEvents();
-    }
-
-    @Override protected void onStop() {
-        super.onStop();
-        eventSubscriptions.clear();
-    }
-
-    private void subscribeToEvents() {
-        Subscription loginEvent = eventBus
-                .listenFor(LoginEvent.class)
-                .subscribe(event -> {});
-
-        Subscription loginPromptEvent = eventBus
-                .listenFor(LoginPromptEvent.class)
-                .subscribe(event -> {});
-
-        Subscription logoutEvent = eventBus
-                .listenFor(LogOutEvent.class)
-                .subscribe(event -> {});
-
-        eventSubscriptions = new CompositeSubscription(
-                loginEvent, loginPromptEvent, logoutEvent);
-    }*/
 
     @Override
     protected void onResume() {
@@ -141,7 +112,10 @@ public class MainActivity extends BaseActivity implements
 
             /** IndexFragment items */
             case R.id.action_bookmarks:
-                manager.openBookmarksFragment(getString(R.string.bookmarks_title));
+                if (credentialStore.isLoggedIn())
+                    manager.openBookmarksFragment(getString(R.string.bookmarks_title));
+                else
+                    promptForLogin();
                 break;
             case R.id.action_search:
                 manager.openSearchFragment();
@@ -163,9 +137,9 @@ public class MainActivity extends BaseActivity implements
                 break;
 
             case R.id.action_logout:
-                eventBus.send(new LogOutEvent());
                 credentialStore.delete();
                 Snackbar.make(container, getString(R.string.logout_success), Snackbar.LENGTH_SHORT).show();
+                eventBus.send(new LogOutEvent());
                 break;
         }
         supportInvalidateOptionsMenu();

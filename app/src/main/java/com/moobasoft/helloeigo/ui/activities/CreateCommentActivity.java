@@ -106,13 +106,8 @@ public class CreateCommentActivity extends BaseActivity implements CommentPresen
     @Override
     public void onCommentSubmitted(Comment comment) {
         progress.dismiss();
-        finish();
         eventBus.sendDelayed(new CommentCreatedEvent(comment), 500);
-        //Bundle bundle = new Bundle();
-        //bundle.putParcelable("COMMENT", comment);
-        //ConfirmSubmitDialog dialog = new ConfirmSubmitDialog();
-        //dialog.setArguments(bundle);
-        //dialog.show(getSupportFragmentManager(), "confirmCreated");
+        finish();
     }
 
     @Override
@@ -155,22 +150,6 @@ public class CreateCommentActivity extends BaseActivity implements CommentPresen
                     .create();
             loading.setCanceledOnTouchOutside(false);
             return loading;
-        }
-    }
-
-    public static class ConfirmSubmitDialog extends DialogFragment {
-        @Override
-        @NonNull
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            AlertDialog ok = new AlertDialog.Builder(getActivity())
-                    .setTitle(getString(R.string.comment_success))
-                    .setPositiveButton("OK", (dialog, id) -> {
-                        //getActivity().finish();
-                        ConfirmSubmitDialog.this.getDialog().dismiss();
-                    })
-                    .create();
-            ok.setCanceledOnTouchOutside(false);
-            return ok;
         }
     }
 
