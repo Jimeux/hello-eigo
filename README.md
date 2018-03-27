@@ -17,8 +17,8 @@ A client app for a blog that was served by a Rails backend. Currently unpublishe
     <img src="images/screen1.png" alt="Main screen landscape"/>
 </p>
 <p align="center">
-    <img src="images/screen1.png" alt="Main screen tablet"/>
+    <img src="images/screen2.png" alt="Main screen tablet"/>
 </p>
 <p align="center">
-    <img src="images/screen1.png" alt="Detail screen tablet"/>
+    <img src="images/screen3.png" alt="Detail screen tablet"/>
 </p>
