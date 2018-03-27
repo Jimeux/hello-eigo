@@ -15,10 +15,12 @@
 -dontwarn java.lang.invoke.*
 
 # Retrofit
--dontwarn retrofit.**
--keep class retrofit.** { *; }
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *; }
 -keepattributes Signature
 -keepattributes Exceptions
+-dontwarn java.lang.reflect.Method
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 
 # Glide
 -keep public class * implements com.bumptech.glide.module.GlideModule

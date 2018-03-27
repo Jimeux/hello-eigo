@@ -114,7 +114,7 @@ public class PostsAdapter extends RecyclerView.Adapter<ViewHolder> {
         void onTagClicked(String tag);
     }
 
-    class SummaryViewHolder extends ViewHolder {
+    static class SummaryViewHolder extends ViewHolder {
 
         private final PostSummaryView itemView;
 
@@ -130,11 +130,8 @@ public class PostsAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
 
     static class FooterHolder extends ViewHolder {
-        //private final View view;
-
         public FooterHolder(View itemView) {
             super(itemView);
-            //this.view = itemView;
         }
     }
 }
